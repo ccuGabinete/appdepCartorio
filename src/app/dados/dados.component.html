@@ -1,3 +1,7 @@
+<!--#region header  -->
+
+
+
 <div class="unicorn-dark-theme">
   <mat-toolbar color="primary">
     <mat-toolbar-row>
@@ -20,197 +24,157 @@
   <img src="https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=https://codigofonte.uol.com.br" id='qrcode'>
 </div>
 
-<div class="alinhamentoItens">
-  <div class="unicorn-dark-theme">
-    <mat-form-field>
-      <input matInput type="text" placeholder="Inscriçao Municipal" name="inscricaomunicipal" id="inscricaomunicipal"
-        (change)="buscaNotificado(notificado.matricula)" (focus)='limpaCampo()' [(ngModel)]='notificado.matricula'
-        maxlength="8">
+
+
+<!--#endregion -->
+<div class="selectAutorizado" style="width: 15%">
+  <div>
+    <mat-form-field class="unicorn-dark-theme">
+      <mat-label>Autorizado</mat-label>
+      <mat-select color="primary" [(ngModel)]='testeAutorizado' (selectionChange)='onAutorizado(testeAutorizado)'>
+        <mat-option *ngFor="let resp of ['sim','não']" [value]="resp">
+          {{resp}}
+        </mat-option>
+      </mat-select>
     </mat-form-field>
   </div>
+</div>
 
-  <div class="unicorn-dark-theme">
-    <mat-form-field>
-      <input matInput type="text" placeholder="Nome do titular" name="nomedotitular" id="nomedotitular"
-        [(ngModel)]='notificado.nome' [disabled]="true">
-    </mat-form-field>
+
+<div *ngIf='autorizado === 1'>
+  <div class="alinhamentoItens">
+    <div class="unicorn-dark-theme">
+      <mat-form-field>
+        <input matInput type="text" placeholder="Inscriçao Municipal" name="inscricaomunicipal" id="inscricaomunicipal"
+          (change)="buscaNotificado(cadastro.matricula)" (focus)='limpaCampo()' [(ngModel)]='cadastro.matricula'
+          maxlength="8">
+      </mat-form-field>
+    </div>
+
+    <div class="unicorn-dark-theme">
+      <mat-form-field>
+        <input matInput type="text" placeholder="Nome do titular" name="nomedotitular" id="nomedotitular"
+          [(ngModel)]='cadastro.nome' [disabled]="true">
+      </mat-form-field>
+    </div>
+
+
+    <mat-accordion class="unicorn-dark-theme">
+      <mat-expansion-panel class="fastamentoAcordion">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Dados complementares
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+
+        <div class="unicorn-dark-theme">
+          <mat-form-field>
+            <input matInput type="text" placeholder="CPF" name="cpf" id="cpf" [(ngModel)]='cadastro.cpf'
+              [disabled]="true">
+          </mat-form-field>
+        </div>
+
+        <div class="unicorn-dark-theme">
+          <mat-form-field>
+            <input matInput type="text" placeholder="Concessão" name="concessao" id="concessao"
+              [(ngModel)]='cadastro.concessao' [disabled]="true">
+          </mat-form-field>
+        </div>
+
+        <div class="unicorn-dark-theme">
+          <mat-form-field>
+            <input matInput type="text" placeholder="Equipamento" name="equipamento" id="equipamento"
+              [(ngModel)]='cadastro.equipamento' [disabled]="true">
+          </mat-form-field>
+        </div>
+
+        <div class="unicorn-dark-theme">
+          <mat-form-field>
+            <input matInput type="text" placeholder="Local" name="local" id="local" [(ngModel)]='cadastro.local'
+              [disabled]="true">
+          </mat-form-field>
+        </div>
+
+        <div class="unicorn-dark-theme">
+          <mat-form-field>
+            <input matInput type="text" placeholder="Nome do auxiliar" name="nomeaux" id="nomeaux"
+              [(ngModel)]='cadastro.nomeaux' [disabled]="true">
+          </mat-form-field>
+        </div>
+
+        <div class="unicorn-dark-theme">
+          <mat-form-field>
+            <input matInput type="text" placeholder="CPF do auxiliar" name="cpfaux" id="cpfaux"
+              [(ngModel)]='cadastro.cpfaux' [disabled]="true">
+          </mat-form-field>
+        </div>
+
+        <div class="unicorn-dark-theme">
+          <mat-form-field>
+            <input matInput type="text" placeholder="Situação" name="situacao" id="situacao"
+              [(ngModel)]='cadastro.situacao' [disabled]="true">
+          </mat-form-field>
+        </div>
+
+        <div class="unicorn-dark-theme">
+          <mat-form-field>
+            <input matInput type="text" placeholder="Isento" name="situacao" id="isento" [(ngModel)]='cadastro.isento'
+              [disabled]="true">
+          </mat-form-field>
+        </div>
+
+
+      </mat-expansion-panel>
+    </mat-accordion>
   </div>
 
 
-  <mat-accordion class="unicorn-dark-theme">
-    <mat-expansion-panel class="fastamentoAcordion">
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          Dados complementares
-        </mat-panel-title>
-      </mat-expansion-panel-header>
-
-
-      <div class="unicorn-dark-theme">
-        <mat-form-field>
-          <input matInput type="text" placeholder="CPF" name="cpf" id="cpf" [(ngModel)]='notificado.cpf'
-            [disabled]="true">
-        </mat-form-field>
-      </div>
-
-      <div class="unicorn-dark-theme">
-        <mat-form-field>
-          <input matInput type="text" placeholder="Concessão" name="concessao" id="concessao"
-            [(ngModel)]='notificado.concessao' [disabled]="true">
-        </mat-form-field>
-      </div>
-
-      <div class="unicorn-dark-theme">
-        <mat-form-field>
-          <input matInput type="text" placeholder="Equipamento" name="equipamento" id="equipamento"
-            [(ngModel)]='notificado.equipamento' [disabled]="true">
-        </mat-form-field>
-      </div>
-
-      <div class="unicorn-dark-theme">
-        <mat-form-field>
-          <input matInput type="text" placeholder="Local" name="local" id="local" [(ngModel)]='notificado.local'
-            [disabled]="true">
-        </mat-form-field>
-      </div>
-
-      <div class="unicorn-dark-theme">
-        <mat-form-field>
-          <input matInput type="text" placeholder="Nome do auxiliar" name="nomeaux" id="nomeaux"
-            [(ngModel)]='notificado.nomeaux' [disabled]="true">
-        </mat-form-field>
-      </div>
-
-      <div class="unicorn-dark-theme">
-        <mat-form-field>
-          <input matInput type="text" placeholder="CPF do auxiliar" name="cpfaux" id="cpfaux"
-            [(ngModel)]='notificado.cpfaux' [disabled]="true">
-        </mat-form-field>
-      </div>
-
-      <div class="unicorn-dark-theme">
-        <mat-form-field>
-          <input matInput type="text" placeholder="Situação" name="situacao" id="situacao"
-            [(ngModel)]='notificado.situacao' [disabled]="true">
-        </mat-form-field>
-      </div>
-
-      <div class="unicorn-dark-theme">
-        <mat-form-field>
-          <input matInput type="text" placeholder="Isento" name="situacao" id="isento" [(ngModel)]='notificado.isento'
-            [disabled]="true">
-        </mat-form-field>
-      </div>
-
-
-    </mat-expansion-panel>
-
-    <mat-expansion-panel class="fastamentoAcordion">
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          Dados da ação
-        </mat-panel-title>
-      </mat-expansion-panel-header>
-
-      <mat-form-field class="unicorn-dark-theme">
-        <input matInput [matDatepicker]="picker" placeholder="Data da ação" [(ngModel)]='notificado.dataacao'>
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
-      </mat-form-field>
-
-      <div class="unicorn-dark-theme">
-        <mat-form-field>
-          <input matInput placeholder="Local da infração" ngx-google-places-autocomplete [options]='options'
-            (onAddressChange)="handleAddressChange($event)" [(ngModel)]='notificado.localacao' />
-        </mat-form-field>
-      </div>
-
-      <div class="unicorn-dark-theme">
-        <mat-form-field>
-          <input matInput type="text" placeholder="Bairro" name="bairro" id="bairro"
-            [disabled]="true" [(ngModel)]='notificado.bairroacao'>
-        </mat-form-field>
-      </div>
-
-    </mat-expansion-panel>
-
-    <mat-expansion-panel class="fastamentoAcordion">
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          Dados do Auto
-        </mat-panel-title>
-      </mat-expansion-panel-header>
-
-      <div class="unicorn-dark-theme">
-        <mat-form-field>
-          <input matInput type="text" placeholder="Número do Auto" name="numerodoauto" id="numerodoauto" maxlength="6"
-            [(ngModel)]='notificado.infracao'>
-        </mat-form-field>
-      </div>
-
-
-      <mat-form-field class="unicorn-dark-theme">
-        <input matInput [matDatepicker]="picker2" placeholder="Data da autuação" [(ngModel)]='notificado.dataInfracao'>
-        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
-        <mat-datepicker #picker2></mat-datepicker>
-      </mat-form-field>
-
-      <div class="unicorn-dark-theme">
-        <mat-form-field>
-          <input matInput placeholder="CEP" ngx-google-places-autocomplete [options]='options'
-            (onAddressChange)="handleAddressChangeCep($event)" [(ngModel)]='notificado.cep' />
-        </mat-form-field>
-      </div>
-
-      <div class="unicorn-dark-theme">
-        <mat-form-field>
-          <input matInput type="text" placeholder="Endereço" name="endereco" id="endereco" [disabled]="true"
-            [(ngModel)]='notificado.endereco'>
-        </mat-form-field>
-      </div>
-
-      <div class="unicorn-dark-theme">
-        <mat-form-field>
-          <input matInput type="text" placeholder="Número" name="numero" id="numero" [(ngModel)]='notificado.numero'>
-        </mat-form-field>
-      </div>
-
-      <div class="unicorn-dark-theme">
-        <mat-form-field>
-          <input matInput type="text" placeholder="Complemento" name="complemento" id="complemento" [(ngModel)]='notificado.complemento'>
-        </mat-form-field>
-      </div>
-
-      <div class="unicorn-dark-theme">
-        <mat-form-field>
-          <input matInput type="text" placeholder="Município" name="municipio" id="municipio" [(ngModel)]='notificado.municipio' [disabled]="true">
-        </mat-form-field>
-      </div>
-
-      <div class="unicorn-dark-theme">
-        <mat-form-field>
-          <input matInput type="text" placeholder="Bairro" name="bairro" id="bairro" [(ngModel)]='notificado.bairro' [disabled]="true">
-        </mat-form-field>
-      </div>
-
-      <div>
-        <mat-form-field class="unicorn-dark-theme">
-          <mat-label>Pontos</mat-label>
-          <mat-select color="primary" [(ngModel)]='notificado.pontos'>
-            <mat-option *ngFor="let ponto of [2,5]" [value]="ponto">
-              {{ponto}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-
-    </mat-expansion-panel>
-
-
-  </mat-accordion>
 
 
   <div class="alinhamentoButton unicorn-dark-theme">
-    <button mat-button color="primary" (click)="onSubmit()" #submitButton>Gerar Notificação</button>
+    <button mat-button color="primary"  #submitButton>Gerar Notificação</button>
   </div>
+</div>
+
+<div *ngIf='autorizado === 2'  class="alinhamentoItens">
+  <div class="unicorn-dark-theme">
+    <mat-form-field>
+        <input matInput type="text" placeholder="Nome" name="nome" id="nome" [(ngModel)]="nome">
+    </mat-form-field>
+</div>
+
+<div>
+    <mat-form-field class="unicorn-dark-theme">
+        <mat-label>Setor</mat-label>
+        <mat-select color="primary" [(ngModel)]="cadastro.destino" >
+          <mat-option  *ngFor="let setor of [1,2]" [value]="setor">
+            {{setor}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+</div>
+
+<div >
+<mat-form-field class="unicorn-dark-theme">
+        <mat-label>Documento</mat-label>
+        <mat-select [(ngModel)]="cadastro.documento" class="example-select">
+          <mat-option *ngFor="let docs of [1,2]" [value]="docs">
+            {{docs}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+</div>
+
+<div class="unicorn-dark-theme">
+    <mat-form-field >
+        <input matInput
+          type="text"
+          placeholder="Número"
+          name="numero"
+          id="numero"
+          [(ngModel)]="cadastro.numero"
+          (change)="changeEvent($event)">
+    </mat-form-field>
+</div>
 </div>

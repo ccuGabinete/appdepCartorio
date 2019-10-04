@@ -12,6 +12,7 @@ import { Router } from '@angular/router';
 import { Usuario } from '../models/usuario/usuario';
 import { Notificado } from '../models/notificado/notificado';
 import { PdfService } from '../services/pdf/pdf.service';
+import { Cadastro } from '../models/cadastro/cadastro';
 const googleUrl = 'https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=https://https://ccuapi.herokuapp.com/resposta/';
 
 
@@ -32,11 +33,14 @@ export class DadosComponent implements OnInit, OnDestroy {
     componentRestrictions: { country: 'BR' },
     location: [-22.921712, -43.449187]
   };
+  autorizado = 0;
+
+  testeAutorizado: string;
 
 
   constructor(
     private router: Router,
-    public notificado: Notificado,
+    public cadastro: Cadastro,
     public inscmunservice: InscricaomunicipalService,
     private _snackBar: MatSnackBar,
     private serviceCampos: AvisocamposService,
@@ -49,74 +53,82 @@ export class DadosComponent implements OnInit, OnDestroy {
 
   @ViewChild('submitButton', { static: true }) submitButton;
   ngOnInit() {
-    this.notificado = new Notificado();
+    this.cadastro = new Cadastro();
     this.local = new Localmulta();
 
     this.logado.currentMessage.subscribe(user => {
       this.usuario = user.nome;
       (user.link) ? this.link = user.link.replace('open', 'uc') : this.link = '';
-      this.notificado.agenterespcadastro = user.nome;
+      this.cadastro.agenterespcadastro = user.nome;
     });
   }
 
-  downloadPDF() {
-    this.pdfservice.downloadPDF(this.notificado);
-  }
+  // downloadPDF() {
+  //   this.pdfservice.downloadPDF(this.notificado);
+  // }
 
-  onSubmit() {
-    if (this.testaCampos()) {
-
-      this.logado.currentMessage.subscribe(user => {
-        this.notificado.data = this.gerarData();
-        this.notificado.dataInfracao  = this.gerarMomentData(this.notificado.dataInfracao);
-        this.notificado.dataacao  = this.gerarMomentData(this.notificado.dataacao);
-        this.notificado.agenterespcadastro = user.nome;
-        this.salvarnotificado.buscarCadastro().subscribe(data => {
-
-          this.notificado.notificacao = data.body.total + 2007;
-          this.notificado.notificacao = this.notificado.notificacao.toString();
-
-          if (!this.notificado.complemento) {
-            this.notificado.complemento = '';
-          }
-          this.notificado.dataTexto = this.pdfservice.getDataExtenso(this.gerarData());
-
-          // tslint:disable-next-line: max-line-length
-          this.notificado.qrcode = googleUrl + this.notificado.infracao;
-
-          this.salvarnotificado.salvarCadastro(this.notificado).subscribe(() => {
-            this.downloadPDF();
-          }, error => this.serviceCampos.mudarAviso(4)
-          );
-        });
-      });
+  onAutorizado(value: string) {
+    if (value === 'sim') {
+      this.autorizado = 1;
     } else {
-      this.serviceCampos.mudarAviso(2);
-      this.openSnackBarCampos();
+      this.autorizado = 2;
     }
   }
 
-  testaCampos(): boolean {
-    if (
-      !this.notificado.matricula ||
-      !this.notificado.nome ||
-      !this.notificado.endereco ||
-      !this.notificado.numero ||
-      !this.notificado.municipio ||
-      !this.notificado.bairro ||
-      !this.notificado.cep ||
-      !this.notificado.infracao ||
-      !this.notificado.dataInfracao ||
-      !this.notificado.dataacao ||
-      !this.notificado.localacao ||
-      !this.notificado.bairroacao ||
-      !this.notificado.pontos
-    ) {
-      return false;
-    } else {
-      return true;
-    }
-  }
+  // onSubmit() {
+  //   if (this.testaCampos()) {
+
+  //     this.logado.currentMessage.subscribe(user => {
+  //       this.notificado.data = this.gerarData();
+  //       this.notificado.dataInfracao = this.gerarMomentData(this.notificado.dataInfracao);
+  //       this.notificado.dataacao = this.gerarMomentData(this.notificado.dataacao);
+  //       this.notificado.agenterespcadastro = user.nome;
+  //       this.salvarnotificado.buscarCadastro().subscribe(data => {
+
+  //         this.notificado.notificacao = data.body.total + 2007;
+  //         this.notificado.notificacao = this.notificado.notificacao.toString();
+
+  //         if (!this.notificado.complemento) {
+  //           this.notificado.complemento = '';
+  //         }
+  //         this.notificado.dataTexto = this.pdfservice.getDataExtenso(this.gerarData());
+
+  //         // tslint:disable-next-line: max-line-length
+  //         this.notificado.qrcode = googleUrl + this.notificado.infracao;
+
+  //         this.salvarnotificado.salvarCadastro(this.notificado).subscribe(() => {
+  //           this.downloadPDF();
+  //         }, error => this.serviceCampos.mudarAviso(4)
+  //         );
+  //       });
+  //     });
+  //   } else {
+  //     this.serviceCampos.mudarAviso(2);
+  //     this.openSnackBarCampos();
+  //   }
+  // }
+
+  // testaCampos(): boolean {
+  //   if (
+  //     !this.notificado.matricula ||
+  //     !this.notificado.nome ||
+  //     !this.notificado.endereco ||
+  //     !this.notificado.numero ||
+  //     !this.notificado.municipio ||
+  //     !this.notificado.bairro ||
+  //     !this.notificado.cep ||
+  //     !this.notificado.infracao ||
+  //     !this.notificado.dataInfracao ||
+  //     !this.notificado.dataacao ||
+  //     !this.notificado.localacao ||
+  //     !this.notificado.bairroacao ||
+  //     !this.notificado.pontos
+  //   ) {
+  //     return false;
+  //   } else {
+  //     return true;
+  //   }
+  // }
 
   changeEvent() {
     this.submitButton.focus();
@@ -156,37 +168,37 @@ export class DadosComponent implements OnInit, OnDestroy {
   buscaNotificado(value) {
     if (value && value.length === 8) {
       this.inscmunservice.buscarCadastro(value).subscribe(resp => {
-        this.notificado = resp.body;
-      }, () => this.notificado.nome = 'Inscrição Municipal inexistente'
+        this.cadastro = resp.body;
+      }, () => this.cadastro.nome = 'Inscrição Municipal inexistente'
       );
     } else {
-      this.notificado.nome = 'A matrícula tem 8 dígitos e foram digitados ' + value.length;
+      this.cadastro.nome = 'A matrícula tem 8 dígitos e foram digitados ' + value.length;
     }
   }
 
   limpaCampo() {
-    this.notificado = new Notificado();
+    this.cadastro = new Cadastro();
     this.local = new Localmulta();
   }
 
-  public handleAddressChange(address: any) {
-    if (address.address_components.length < 5) {
-      this.notificado.bairroacao = '';
-    } else {
-      this.notificado.bairroacao = address.address_components[1].long_name;
-    }
-  }
+  // public handleAddressChange(address: any) {
+  //   if (address.address_components.length < 5) {
+  //     this.notificado.bairroacao = '';
+  //   } else {
+  //     this.notificado.bairroacao = address.address_components[1].long_name;
+  //   }
+  // }
 
-  public handleAddressChangeCep(address: any) {
-    // tslint:disable-next-line: prefer-const
-    let cep = address.address_components[0].long_name;
-    this.buscacepService.buscarCEP(cep).subscribe(data => {
-      this.notificado.cep = data.body.cep;
-      this.notificado.endereco = data.body.logradouro;
-      this.notificado.municipio = data.body.localidade;
-      this.notificado.bairro = data.body.bairro;
-    });
-  }
+  // public handleAddressChangeCep(address: any) {
+  //   // tslint:disable-next-line: prefer-const
+  //   let cep = address.address_components[0].long_name;
+  //   this.buscacepService.buscarCEP(cep).subscribe(data => {
+  //     this.notificado.cep = data.body.cep;
+  //     this.notificado.endereco = data.body.logradouro;
+  //     this.notificado.municipio = data.body.localidade;
+  //     this.notificado.bairro = data.body.bairro;
+  //   });
+  // }
 
   ngOnDestroy(): void {
     this.serviceCampos.mudarAviso(1);

@@ -1,3 +1,4 @@
+import { Cadastro } from './models/cadastro/cadastro';
 import { BuscacepService } from './services/buscacep/buscacep.service';
 import { GooglePlaceModule } from 'ngx-google-places-autocomplete';
 import { InscricaomunicipalService } from './services/inscricaomunicipal/InscricaomunicipalService';
@@ -90,6 +91,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     })
   ],
   providers: [
+    Cadastro,
     PdfService,
     Localmulta,
     Aviso,

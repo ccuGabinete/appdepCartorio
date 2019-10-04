@@ -1,8 +1,8 @@
+import { Cadastro } from './../../models/cadastro/cadastro';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { Notificado } from '../../models/notificado/notificado';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -14,8 +14,8 @@ const apiUrl = 'https://ccuapi.herokuapp.com/notificado?inscricao';
 })
 export class InscricaomunicipalService {
   constructor(private http: HttpClient) { }
-  buscarCadastro(matricula: string): Observable<HttpResponse<Notificado>> {
-    return this.http.post<Notificado>(apiUrl, { matricula: matricula }, { observe: 'response' })
+  buscarCadastro(matricula: string): Observable<HttpResponse<Cadastro>> {
+    return this.http.post<Cadastro>(apiUrl, { matricula: matricula }, { observe: 'response' })
       .pipe(catchError(this.handleError));
   }
   private handleError(error: HttpErrorResponse) {

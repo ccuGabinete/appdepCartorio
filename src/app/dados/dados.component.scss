@@ -4,12 +4,21 @@
   padding-left: 1em;
 }
 
+.selectAutorizado {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: 2%;
+  width: 15%;
+  margin-left: 25%;
+}
+
 .alinhamentoItens {
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin-top: 10%;
   width: 50%;
   margin-left: 25%;
 }
