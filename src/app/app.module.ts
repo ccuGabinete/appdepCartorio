@@ -1,3 +1,4 @@
+import { Abertura } from './models/abertura/abertura';
 import { Cadastro } from './models/cadastro/cadastro';
 import { BuscacepService } from './services/buscacep/buscacep.service';
 import { GooglePlaceModule } from 'ngx-google-places-autocomplete';
@@ -8,7 +9,7 @@ import '../polyfills';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { CoreModule } from './core/core.module';
@@ -18,6 +19,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { AppRoutingModule } from './app-routing.module';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { NgxMaskModule, IConfig } from 'ngx-mask';
 
 // NG Translate
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
@@ -48,11 +50,15 @@ import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { Localmulta } from './models/localmulta/localmulta';
 import { PdfService } from './services/pdf/pdf.service';
+import { ValidacpfService } from './services/validacpf/validacpf.service';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
+
+export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
+
 
 @NgModule({
   declarations: [
@@ -63,6 +69,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     AvisocamposComponent
   ],
   imports: [
+    ReactiveFormsModule,
+    NgxMaskModule.forRoot(options),
     GooglePlaceModule,
     BrowserModule,
     FormsModule,
@@ -91,6 +99,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     })
   ],
   providers: [
+    Abertura,
+    ValidacpfService,
     Cadastro,
     PdfService,
     Localmulta,
@@ -106,7 +116,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     Notificado,
     MatDatepickerModule,
     InscricaomunicipalService,
-    {provide: MAT_DATE_LOCALE, useValue: 'pt-BR'},
+    { provide: MAT_DATE_LOCALE, useValue: 'pt-BR' },
     BuscacepService
   ],
   bootstrap: [AppComponent],

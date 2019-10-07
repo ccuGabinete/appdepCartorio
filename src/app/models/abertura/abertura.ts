@@ -1,25 +1,15 @@
-export class Cadastro {
-  motivo: string;
-  documento: string;
-  numero: string;
+export class Abertura {
   agenterespcadastro: string;
+  numero: string;
   data: Date;
-  matricula: string;
-  concessao: Date;
-  isento: string;
-  equipamento: string;
-  local: string;
-  situacao: string;
+  nacionalidade: string;
   nome: string;
   cpf: string;
-  nomeaux: string;
-  cpfaux: string;
   endereco: string;
   complemento: string;
   municipio: string;
   bairro: string;
   cep: string;
-  qrcode: string;
   identidade: string;
   expedicao: string;
   dataExpediçao: string;
@@ -29,5 +19,6 @@ export class Cadastro {
   email: string;
   informacaocomplementar: string;
   localapreensao: string;
+  dataapreensao: Date;
   tipocomprobatorio: string;
 }

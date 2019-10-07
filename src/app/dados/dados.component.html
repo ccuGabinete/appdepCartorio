@@ -5,7 +5,7 @@
 <div class="unicorn-dark-theme">
   <mat-toolbar color="primary">
     <mat-toolbar-row>
-      <span>NOTIFICAÇÃO</span>
+      <span>ATENDIMENTO</span>
       <mat-icon matTooltip="logout" (click)="onLogout()"> directions_run</mat-icon>
     </mat-toolbar-row>
   </mat-toolbar>
@@ -27,10 +27,23 @@
 
 
 <!--#endregion -->
+
+<!--#region triagem  -->
 <div class="selectAutorizado" style="width: 15%">
   <div>
     <mat-form-field class="unicorn-dark-theme">
-      <mat-label>Autorizado</mat-label>
+      <mat-label>Motivo</mat-label>
+      <mat-select color="primary" [(ngModel)]="cadastro.motivo" (selectionChange)='onMotivo(cadastro.motivo)'>
+        <mat-option *ngFor="let motivo of opcoes" [value]="motivo">
+          {{motivo}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div *ngIf='autorizado'>
+    <mat-form-field class="unicorn-dark-theme">
+      <mat-label>Autorizado?</mat-label>
       <mat-select color="primary" [(ngModel)]='testeAutorizado' (selectionChange)='onAutorizado(testeAutorizado)'>
         <mat-option *ngFor="let resp of ['sim','não']" [value]="resp">
           {{resp}}
@@ -39,9 +52,10 @@
     </mat-form-field>
   </div>
 </div>
+<!--#endregion -->
 
-
-<div *ngIf='autorizado === 1'>
+<!--#region autorizado  -->
+<div *ngIf='onAutorizadotipo === 1'>
   <div class="alinhamentoItens">
     <div class="unicorn-dark-theme">
       <mat-form-field>
@@ -132,49 +146,166 @@
 
 
 
-  <div class="alinhamentoButton unicorn-dark-theme">
-    <button mat-button color="primary"  #submitButton>Gerar Notificação</button>
-  </div>
-</div>
 
-<div *ngIf='autorizado === 2'  class="alinhamentoItens">
+</div>
+<!--#endregion -->
+
+<!--#region não autorizado  -->
+<div *ngIf='onAutorizadotipo === 2' class="alinhamentoItens">
   <div class="unicorn-dark-theme">
     <mat-form-field>
-        <input matInput type="text" placeholder="Nome" name="nome" id="nome" [(ngModel)]="nome">
+      <input matInput type="text" placeholder="Nome" name="nome" id="nome" [(ngModel)]="cadastro.nome">
     </mat-form-field>
-</div>
+  </div>
 
-<div>
+  <div class="unicorn-dark-theme">
+    <mat-form-field>
+      <input matInput type="text" placeholder="CPF" name="cpf" id="cpf" (change)='onCPF(cadastro.cpf)'
+        [(ngModel)]="cadastro.cpf" maxlength="11">
+    </mat-form-field>
+  </div>
+</div>
+<!--#endregion -->
+
+<!--#region abertura  -->
+
+<div class="unicorn-dark-theme alinhamentoItens"
+  *ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2) && exibicao === 1'>
+  <mat-expansion-panel class="fastamentoAcordion">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Abertura de processo
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+
+    <div class="unicorn-dark-theme">
+      <mat-form-field>
+        <input matInput type="text" placeholder="Identidade" name="identidade" id="identidade"
+          [(ngModel)]='abertura.identidade'>
+      </mat-form-field>
+    </div>
+
+    <div>
+      <mat-form-field class="unicorn-dark-theme">
+        <mat-label>Expedição</mat-label>
+        <mat-select color="primary" [(ngModel)]="abertura.expedicao" (selectionChange)='onMotivo(abertura.expedicao)'>
+          <mat-option *ngFor="let org of orgaos" [value]="org.sigla">
+            {{org.orgao}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
     <mat-form-field class="unicorn-dark-theme">
-        <mat-label>Setor</mat-label>
-        <mat-select color="primary" [(ngModel)]="cadastro.destino" >
-          <mat-option  *ngFor="let setor of [1,2]" [value]="setor">
-            {{setor}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-</div>
-
-<div >
-<mat-form-field class="unicorn-dark-theme">
-        <mat-label>Documento</mat-label>
-        <mat-select [(ngModel)]="cadastro.documento" class="example-select">
-          <mat-option *ngFor="let docs of [1,2]" [value]="docs">
-            {{docs}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-</div>
-
-<div class="unicorn-dark-theme">
-    <mat-form-field >
-        <input matInput
-          type="text"
-          placeholder="Número"
-          name="numero"
-          id="numero"
-          [(ngModel)]="cadastro.numero"
-          (change)="changeEvent($event)">
+      <input matInput [matDatepicker]="picker" placeholder="Data da abertura" [(ngModel)]='abertura.data'>
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
     </mat-form-field>
+
+    <div>
+      <mat-form-field class="unicorn-dark-theme">
+        <mat-label>Nacionalidade</mat-label>
+        <mat-select color="primary" [(ngModel)]="abertura.nacionalidade"
+          (selectionChange)='onMotivo(abertura.expedicao)'>
+          <mat-option *ngFor="let n of nacionalidades" [value]="n">
+            {{n}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div>
+      <mat-form-field class="unicorn-dark-theme">
+        <mat-label>Estado Civil</mat-label>
+        <mat-select color="primary" [(ngModel)]="abertura.estadocivil" (selectionChange)='onMotivo(abertura.expedicao)'>
+          <mat-option *ngFor="let e of estadocivil" [value]="e">
+            {{e}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="unicorn-dark-theme">
+      <mat-form-field>
+        <input matInput placeholder="CEP" ngx-google-places-autocomplete [options]='options'
+          (onAddressChange)="handleAddressChangeCep($event)" [(ngModel)]='abertura.cep' mask='00000-000'/>
+      </mat-form-field>
+    </div>
+
+    <div class="unicorn-dark-theme">
+      <mat-form-field>
+        <input matInput type="text" placeholder="Endereço" name="endereco" id="endereco" [disabled]="true"
+          [(ngModel)]='abertura.endereco'>
+      </mat-form-field>
+    </div>
+
+    <div class="unicorn-dark-theme">
+      <mat-form-field>
+        <input matInput type="text" placeholder="Número" name="numero" id="numero" [(ngModel)]='abertura.numero'>
+      </mat-form-field>
+    </div>
+
+    <div class="unicorn-dark-theme">
+      <mat-form-field>
+        <input matInput type="text" placeholder="Complemento" name="complemento" id="complemento"
+          [(ngModel)]='abertura.complemento'>
+      </mat-form-field>
+    </div>
+
+    <div class="unicorn-dark-theme">
+      <mat-form-field>
+        <input matInput type="text" placeholder="Município" name="municipio" id="municipio"
+          [(ngModel)]='abertura.municipio' [disabled]="true">
+      </mat-form-field>
+    </div>
+
+    <div class="unicorn-dark-theme">
+      <mat-form-field>
+        <input matInput type="text" placeholder="Bairro" name="bairro" id="bairro" [(ngModel)]='abertura.bairro'
+          [disabled]="true">
+      </mat-form-field>
+    </div>
+
+    <div class="unicorn-dark-theme">
+      <mat-form-field>
+        <input matInput type="text" placeholder="Telefone residencial" name="telres" id="telres"
+          [(ngModel)]='abertura.telresidencial' mask='(00) 0000-0000'>
+      </mat-form-field>
+    </div>
+
+    <div class="unicorn-dark-theme">
+      <mat-form-field>
+        <input matInput type="text" placeholder="Telefone celular" name="telres" id="telres"
+          [(ngModel)]='abertura.telcelular' mask='(00) 000-000-000'>
+      </mat-form-field>
+    </div>
+
+    <div class="unicorn-dark-theme">
+      <mat-form-field>
+        <input matInput type="email" placeholder="E-mail" name="email" id="email" [(ngModel)]='abertura.email'
+          [email]="true">
+      </mat-form-field>
+    </div>
+
+    <div class="unicorn-dark-theme">
+      <mat-form-field>
+        <input matInput placeholder="CEP" ngx-google-places-autocomplete [options]='options'
+          (onAddressChange)="handleAddressChange($event)" [(ngModel)]='abertura.localapreensao' />
+      </mat-form-field>
+    </div>
+
+    <mat-form-field class="unicorn-dark-theme">
+      <input matInput [matDatepicker]="picker2" placeholder="Data da apreensão" [(ngModel)]='abertura.dataapreensao' (change)="changeEvent($event)">
+      <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+      <mat-datepicker #picker2></mat-datepicker>
+    </mat-form-field>
+
+
+  </mat-expansion-panel>
 </div>
+
+<!--#endregion -->
+
+<div class="alinhamentoButton unicorn-dark-theme">
+  <button mat-button color="primary" #submitButton>Gerar Notificação</button>
 </div>
