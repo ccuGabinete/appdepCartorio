@@ -1,4 +1,7 @@
-import { Abertura } from './models/abertura/abertura';
+import { Viewescolha } from './views/models/viewescolha';
+import { EscolhaService } from './views/services/escolha/escolha.service';
+import { AtendimentoComponent } from './views/views/atendimento/atendimento.component';
+import { AberturaComponent } from './views/views/abertura/abertura.component';
 import { Cadastro } from './models/cadastro/cadastro';
 import { BuscacepService } from './services/buscacep/buscacep.service';
 import { GooglePlaceModule } from 'ngx-google-places-autocomplete';
@@ -51,6 +54,11 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { Localmulta } from './models/localmulta/localmulta';
 import { PdfService } from './services/pdf/pdf.service';
 import { ValidacpfService } from './services/validacpf/validacpf.service';
+import { ConsultaComponent } from './views/views/consulta/consulta.component';
+import { DoacaoComponent } from './views/views/doacao/doacao.component';
+import { EntregaComponent } from './views/views/entrega/entrega.component';
+import { RecursoComponent } from './views/views/recurso/recurso.component';
+import { Abertura } from './views/models/abertura/abertura';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -62,11 +70,17 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
 
 @NgModule({
   declarations: [
+    AberturaComponent,
     AppComponent,
+    AtendimentoComponent,
     DadosComponent,
     HomeComponent,
     AlertaComponent,
-    AvisocamposComponent
+    AvisocamposComponent,
+    ConsultaComponent,
+    DoacaoComponent,
+    EntregaComponent,
+    RecursoComponent
   ],
   imports: [
     ReactiveFormsModule,
@@ -99,6 +113,8 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
     })
   ],
   providers: [
+    Viewescolha,
+    EscolhaService,
     Abertura,
     ValidacpfService,
     Cadastro,

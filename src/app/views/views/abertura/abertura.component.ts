@@ -1,34 +1,29 @@
-import { Subscription } from 'rxjs';
-import { Viewescolha } from './../views/models/viewescolha';
-import { EscolhaService } from './../views/services/escolha/escolha.service';
-import { ValidacpfService } from './../services/validacpf/validacpf.service';
-import { SalvarcadastroService } from './../services/salvarcadastro/salvarcadastro.service';
-import { BuscacepService } from './../services/buscacep/buscacep.service';
-import { Localmulta } from './../models/localmulta/localmulta';
-import { InscricaomunicipalService } from '../services/inscricaomunicipal/InscricaomunicipalService';
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { MatSnackBar, MatSnackBarConfig } from '@angular/material';
-import { AvisocamposComponent } from '../avisocampos/avisocampos.component';
-import { LogadoService } from '../services/logado/logado.service';
-import { AvisocamposService } from '../services/avisocampos/avisocampos.service';
-import * as moment from 'moment-timezone';
+import { EscolhaService } from './../../services/escolha/escolha.service';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import { Usuario } from '../models/usuario/usuario';
-import { PdfService } from '../services/pdf/pdf.service';
-import { Cadastro } from '../models/cadastro/cadastro';
-const googleUrl = 'https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=https://https://ccuapi.herokuapp.com/resposta/';
-
+import { Cadastro } from '../../../models/cadastro/cadastro';
+import { InscricaomunicipalService } from '../../../services/inscricaomunicipal/InscricaomunicipalService';
+import { MatSnackBar, MatSnackBarConfig } from '@angular/material';
+import { AvisocamposService } from '../../../services/avisocampos/avisocampos.service';
+import { LogadoService } from '../../../services/logado/logado.service';
+import { Localmulta } from '../../../models/localmulta/localmulta';
+import { BuscacepService } from '../../../services/buscacep/buscacep.service';
+import { PdfService } from '../../../services/pdf/pdf.service';
+import { SalvarcadastroService } from '../../../services/salvarcadastro/salvarcadastro.service';
+import { ValidacpfService } from '../../../services/validacpf/validacpf.service';
+import { Usuario } from '../../../models/usuario/usuario';
+import { AvisocamposComponent } from '../../../avisocampos/avisocampos.component';
+import * as moment from 'moment-timezone';
+import { Abertura } from '../../models/abertura/abertura';
 
 @Component({
-  selector: 'app-dados',
-  templateUrl: './dados.component.html',
-  styleUrls: ['./dados.component.scss']
+  selector: 'app-abertura',
+  templateUrl: './abertura.component.html',
+  styleUrls: ['./abertura.component.scss']
 })
-
-export class DadosComponent implements OnInit, OnDestroy {
+export class AberturaComponent implements OnInit, OnDestroy {
 
   //#region variaveis
-  subscription: Subscription;
   nome: string;
   usuario: string;
   link: string;
@@ -39,16 +34,16 @@ export class DadosComponent implements OnInit, OnDestroy {
     componentRestrictions: { country: 'BR' },
     location: [-22.921712, -43.449187]
   };
-  autorizado = false;
-  onAutorizadotipo = 0;
-  exibicao = 0;
+  indice = 0;
+  autorizado = 0;
   opcoes = [
     'Abertura',
     'Consulta',
     'Recurso',
     'Entrega',
     'Doação',
-    'Atendimento'
+    'Outros',
+    'Reunião'
   ].sort();
   testeAutorizado: string;
   orgaos = [
@@ -206,94 +201,24 @@ export class DadosComponent implements OnInit, OnDestroy {
   //#region construtor
   constructor(
     private router: Router,
-    public cadastro: Cadastro,
     public inscmunservice: InscricaomunicipalService,
     private _snackBar: MatSnackBar,
     private serviceCampos: AvisocamposService,
-    private logado: LogadoService,
-    public local: Localmulta,
     public buscacepService: BuscacepService,
     private pdfservice: PdfService,
     private salvarnotificado: SalvarcadastroService,
     private validacpf: ValidacpfService,
-    private escolhaservice: EscolhaService,
-    private viewescolha: Viewescolha
+    public abertura: Abertura,
   ) { }
   //#endregion
 
   @ViewChild('submitButton', { static: true }) submitButton;
   ngOnInit() {
-    this.viewescolha = new Viewescolha();
-    this.cadastro = new Cadastro();
-    this.local = new Localmulta();
-
-    this.logado.currentMessage.subscribe(user => {
-      this.usuario = user.nome;
-      (user.link) ? this.link = user.link.replace('open', 'uc') : this.link = '';
-      this.cadastro.agenterespcadastro = user.nome;
-    });
+    this.abertura = new Abertura();
   }
-
-  onMotivo() {
-    this.autorizado = true;
-    if (this.cadastro.motivo === 'Abertura') {
-      this.exibicao = 1;
-    }
-
-    if (this.cadastro.motivo === 'Consulta') {
-      this.exibicao = 2;
-    }
-
-    if (this.cadastro.motivo === 'Doação') {
-      this.exibicao = 3;
-    }
-
-    if (this.cadastro.motivo === 'Entrega') {
-      this.exibicao = 4;
-    }
-
-    if (this.cadastro.motivo === 'Atendimento') {
-      this.exibicao = 5;
-    }
-
-    if (this.cadastro.motivo === 'Recurso') {
-      this.exibicao = 6;
-    }
-
-  }
-
-  onAutorizado(value: string) {
-    if (value === 'sim') {
-      this.onAutorizadotipo = 1;
-    } else {
-      this.onAutorizadotipo = 2;
-    }
-  }
-
-  onCPF(cpf) {
-    const res = this.validacpf.TestaCPF(cpf);
-    if (res === false) {
-      this.cadastro.cpf = 'CPF INVÁLIDO';
-    }
-  }
-
-  // downloadPDF() {
-  //   this.pdfservice.downloadPDF(this.notificado);
-  // }
 
   changeEvent() {
     this.submitButton.focus();
-  }
-
-  onLogout() {
-    const userLogout = new Usuario();
-    userLogout.nome = '';
-    userLogout.link = '';
-    userLogout.senha = '';
-    userLogout.isValid = false;
-    userLogout.login = '';
-    this.logado.mudarUsuario(userLogout);
-    this.router.navigateByUrl('');
   }
 
   openSnackBarCampos() {
@@ -302,8 +227,6 @@ export class DadosComponent implements OnInit, OnDestroy {
     config.verticalPosition = 'top';
     this._snackBar.openFromComponent(AvisocamposComponent, config);
   }
-
-
 
   gerarData() {
     const data = Date.now();
@@ -316,25 +239,20 @@ export class DadosComponent implements OnInit, OnDestroy {
     return dateMoment.tz('America/Sao_Paulo').format('DD/MM/YYYY');
   }
 
-  buscaNotificado(value) {
-    if (value && value.length === 8) {
-      this.inscmunservice.buscarCadastro(value).subscribe(resp => {
-        this.cadastro = resp.body;
-      }, () => this.cadastro.nome = 'Inscrição Municipal inexistente'
-      );
-    } else {
-      this.cadastro.nome = 'A matrícula tem 8 dígitos e foram digitados ' + value.length;
-    }
+  public handleAddressChange(address: any) {
+    this.abertura.localapreensao = address.address_components[0].long_name;
   }
 
-  limpaCampo() {
-    this.cadastro = new Cadastro();
-    this.local = new Localmulta();
+  public handleAddressChangeCep(address: any) {
+    // tslint:disable-next-line: prefer-const
+    let cep = address.address_components[0].long_name;
+    this.buscacepService.buscarCEP(cep).subscribe(data => {
+      this.abertura.cep = data.body.cep;
+      this.abertura.endereco = data.body.logradouro;
+      this.abertura.municipio = data.body.localidade;
+      this.abertura.bairro = data.body.bairro;
+    });
   }
-
-  // public handleAddressChange(address: any) {
-  //   this.abertura.localapreensao = address.address_components[0].long_name;
-  // }
 
   ngOnDestroy(): void {
     this.serviceCampos.mudarAviso(1);

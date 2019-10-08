@@ -12,7 +12,6 @@
   margin-top: 2%;
   width: 15%;
   margin-left: 25%;
-
 }
 
 .alinhamentoItens {
@@ -22,7 +21,6 @@
   justify-content: center;
   width: 50%;
   margin-left: 25%;
-  color: white;
 }
 
 .alinhamentoButton {
@@ -41,31 +39,11 @@
   .mat-form-field-label {
     color: white;
   }
-  // .mat-form-field-underline {
-  //     background-color: blue;
-  // }
+
   .mat-form-field-ripple {
     background-color: white;
   }
-  // .mat-form-field-required-marker {
-  //     color: white;
-  // }
 }
-
-// ::ng-deep .mat-form-field.mat-focused {
-//   .mat-form-field-label {
-//       color: white;
-//   }
-//   .mat-form-field-ripple {
-//       background-color: white;
-//   }
-//   .mat-form-field-required-marker {
-//       color: white;
-//   }
-//   .mat-input-element {
-//       color: white;
-//   }
-// }
 
 span {
   text-align: center;
