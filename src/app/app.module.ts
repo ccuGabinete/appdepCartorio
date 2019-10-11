@@ -1,5 +1,4 @@
-import { Viewescolha } from './views/models/viewescolha';
-import { EscolhaService } from './views/services/escolha/escolha.service';
+import { AberturaService } from './views/services/abertura/abertura.service';
 import { AtendimentoComponent } from './views/views/atendimento/atendimento.component';
 import { AberturaComponent } from './views/views/abertura/abertura.component';
 import { Cadastro } from './models/cadastro/cadastro';
@@ -59,6 +58,8 @@ import { DoacaoComponent } from './views/views/doacao/doacao.component';
 import { EntregaComponent } from './views/views/entrega/entrega.component';
 import { RecursoComponent } from './views/views/recurso/recurso.component';
 import { Abertura } from './views/models/abertura/abertura';
+import { TitleCasePipe, LowerCasePipe } from '@angular/common';
+import { Lacre } from './views/models/lacre/lacre';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -113,9 +114,11 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
     })
   ],
   providers: [
-    Viewescolha,
-    EscolhaService,
+    Lacre,
+    LowerCasePipe,
+    TitleCasePipe,
     Abertura,
+    AberturaService,
     ValidacpfService,
     Cadastro,
     PdfService,

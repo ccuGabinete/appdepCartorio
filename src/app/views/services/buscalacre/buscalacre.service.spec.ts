@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 
-import { EscolhaService } from './escolha.service';
+import { BuscalacreService } from './buscalacre.service';
 
-describe('EscolhaService', () => {
+describe('BuscalacreService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 
   it('should be created', () => {
-    const service: EscolhaService = TestBed.get(EscolhaService);
+    const service: BuscalacreService = TestBed.get(BuscalacreService);
     expect(service).toBeTruthy();
   });
 });

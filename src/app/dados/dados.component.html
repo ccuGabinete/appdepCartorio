@@ -2,7 +2,10 @@
 <div class="unicorn-dark-theme">
   <mat-toolbar color="primary">
     <mat-toolbar-row>
-      <span style="font-size: 1.1em; color:rgb(224, 231, 255)"><span style="color:darkblue; font-size: 1em;">G</span>erência de <span style="color:darkblue; font-size: 1em;">C</span>ontrole e <span style="color:darkblue; font-size: 1em;">D</span>epósito</span>
+      <span style="font-size: 1.1em; color:rgb(224, 231, 255)"><span
+          style="color:darkblue; font-size: 1em;">G</span>erência de <span
+          style="color:darkblue; font-size: 1em;">C</span>ontrole e <span
+          style="color:darkblue; font-size: 1em;">D</span>epósito</span>
       <mat-icon matTooltip="logout" (click)="onLogout()"> directions_run</mat-icon>
     </mat-toolbar-row>
   </mat-toolbar>
@@ -27,7 +30,7 @@
   <div>
     <mat-form-field class="unicorn-dark-theme">
       <mat-label>Motivo</mat-label>
-      <mat-select color="primary" [(ngModel)]="cadastro.motivo" (selectionChange)='onMotivo(cadastro.motivo)'>
+      <mat-select color="primary" [(ngModel)]="motivo" (selectionChange)='onMotivo(cadastro.motivo)'>
         <mat-option *ngFor="let motivo of opcoes" [value]="motivo">
           {{motivo}}
         </mat-option>
@@ -35,22 +38,38 @@
     </mat-form-field>
   </div>
 
-  <div *ngIf='autorizado'>
-    <mat-form-field class="unicorn-dark-theme">
+  <div *ngIf='autorizado' class="unicorn-dark-theme">
+    <mat-form-field>
       <mat-label>Autorizado?</mat-label>
-      <mat-select color="primary" [(ngModel)]='testeAutorizado' (selectionChange)='onAutorizado(testeAutorizado)'>
-        <mat-option *ngFor="let resp of ['sim','não']" [value]="resp">
-          {{resp}}
+      <mat-select color="primary" [(ngModel)]='listenautorizado' (selectionChange)='onAutorizado(listenautorizado)'>
+        <mat-option *ngFor="let resp of [{value: true, text: 'SIM'}, {value: false, text: 'NÃO'}]" [value]="resp.value">
+          {{resp.text}}
         </mat-option>
       </mat-select>
     </mat-form-field>
+
+    <div class="unicorn-dark-theme" *ngIf='onAutorizadotipo === 1 || onAutorizadotipo === 2'>
+      <mat-form-field>
+        <input style='font-size: 10pt' matInput type="text" placeholder="Processo" name="numeroprocesso" id="numeroprocesso"
+          [(ngModel)]='processo' mask='0000/000.000/0000' (change)='onProcesso()' (focus)='onfocusProcesso()'>
+      </mat-form-field>
+    </div>
+
   </div>
+
+
+
+
 </div>
 <!--#endregion -->
 
 <!--#region autorizado  -->
-<div *ngIf='onAutorizadotipo === 1'>
+<div *ngIf='onAutorizadotipo === 1 && listenprocesso'>
+
+
   <div class="alinhamentoItens">
+
+
     <div class="unicorn-dark-theme">
       <mat-form-field>
         <input matInput type="text" placeholder="Inscriçao Municipal" name="inscricaomunicipal" id="inscricaomunicipal"
@@ -145,7 +164,8 @@
 <!--#endregion -->
 
 <!--#region não autorizado  -->
-<div *ngIf='onAutorizadotipo === 2' class="alinhamentoItens">
+<div *ngIf='onAutorizadotipo === 2  && listenprocesso' class="alinhamentoItens">
+
   <div class="unicorn-dark-theme">
     <mat-form-field>
       <input matInput type="text" placeholder="Nome" name="nome" id="nome" [(ngModel)]="cadastro.nome">
@@ -163,28 +183,31 @@
 
 <!--#region views  -->
 
-<div id='abertura' *ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2) && exibicao === 1'>
+<!-- <div id='abertura' *ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2) && exibicao === 1 && listenprocesso && listenpreenchimento'> -->
+<div>
   <app-abertura></app-abertura>
 </div>
 
-<div id='consulta' *ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2) && exibicao === 2' class="alinhamentoItens">
+<div id='consulta' *ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2) && exibicao === 2  && listenprocesso && listenpreenchimento'
+  class="alinhamentoItens">
   <app-consulta></app-consulta>
 </div>
 
-<div id='doacao'*ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2) && exibicao === 3' class="alinhamentoItens">
+<div id='doacao' *ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2) && exibicao === 3  && listenprocesso && listenpreenchimento' class="alinhamentoItens">
   <app-doacao></app-doacao>
 </div>
 
-<div id='entrega' *ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2) && exibicao === 4' class="alinhamentoItens">
+<div id='entrega' *ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2) && exibicao === 4 && listenprocesso && listenpreenchimento' class="alinhamentoItens">
   <app-entrega></app-entrega>
 </div>
 
-<div id='atendimento' *ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2) && exibicao === 5' class="alinhamentoItens">
+<div id='atendimento' *ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2) && exibicao === 5 && listenprocesso && listenpreenchimento'
+  class="alinhamentoItens">
   <app-atendimento></app-atendimento>
 </div>
 
-<div id='recurso' *ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2) && exibicao === 6' class="alinhamentoItens">
- <app-recurso></app-recurso>
+<div id='recurso' *ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2) && exibicao === 6 && listenprocesso && listenpreenchimento' class="alinhamentoItens">
+  <app-recurso></app-recurso>
 </div>
 
 <!--#endregion -->

@@ -1,136 +1,206 @@
 <div class="unicorn-dark-theme alinhamentoItens">
-  <mat-expansion-panel class="fastamentoAcordion">
-    <mat-expansion-panel-header>
-      <mat-panel-title>
-        Abertura de processo
-      </mat-panel-title>
-    </mat-expansion-panel-header>
+  <mat-accordion>
+    <mat-expansion-panel class="fastamentoAcordion">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Identificação
+        </mat-panel-title>
+      </mat-expansion-panel-header>
 
-    <div class="unicorn-dark-theme">
-      <mat-form-field>
-        <input matInput type="text" placeholder="Identidade" name="identidade" id="identidade"
-          [(ngModel)]='abertura.identidade'>
-      </mat-form-field>
-    </div>
+      <div class="unicorn-dark-theme">
+        <mat-form-field>
+          <input matInput type="text" placeholder="Identidade" name="identidade" id="identidade"
+            [(ngModel)]='abertura.identidade' (change)='onIdentidade()'>
+        </mat-form-field>
+      </div>
 
-    <div>
+      <div>
+        <mat-form-field class="unicorn-dark-theme">
+          <mat-label>Expedição</mat-label>
+          <mat-select color="primary" [(ngModel)]="abertura.expedicao">
+            <mat-option *ngFor="let org of orgaos" [value]="org.sigla">
+              {{org.orgao}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
       <mat-form-field class="unicorn-dark-theme">
-        <mat-label>Expedição</mat-label>
-        <mat-select color="primary" [(ngModel)]="abertura.expedicao">
-          <mat-option *ngFor="let org of orgaos" [value]="org.sigla">
-            {{org.orgao}}
-          </mat-option>
-        </mat-select>
+        <input matInput [matDatepicker]="picker" placeholder="Data da expedição" [(ngModel)]='dataexpedicao'>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
-    </div>
 
-    <mat-form-field class="unicorn-dark-theme">
-      <input matInput [matDatepicker]="picker" placeholder="Data da expedição" [(ngModel)]='abertura.data'>
-      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-      <mat-datepicker #picker></mat-datepicker>
-    </mat-form-field>
+      <div>
+        <mat-form-field class="unicorn-dark-theme">
+          <mat-label>Nacionalidade</mat-label>
+          <mat-select color="primary" [(ngModel)]="abertura.nacionalidade">
+            <mat-option *ngFor="let n of nacionalidades" [value]="n">
+              {{n}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
 
-    <div>
+        <mat-form-field class="unicorn-dark-theme">
+          <mat-label>Estado Civil</mat-label>
+          <mat-select color="primary" [(ngModel)]="abertura.estadocivil">
+            <mat-option *ngFor="let e of estadocivil" [value]="e">
+              {{e}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel class="fastamentoAcordion">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Endereço
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <div class="unicorn-dark-theme">
+        <mat-form-field>
+          <input matInput placeholder="CEP" ngx-google-places-autocomplete [options]='options'
+            (onAddressChange)="handleAddressChangeCep($event)" [(ngModel)]='abertura.cep' mask='00000-000' />
+        </mat-form-field>
+      </div>
+
+      <div class="unicorn-dark-theme">
+        <mat-form-field>
+          <input matInput type="text" placeholder="Endereço" name="endereco" id="endereco" [disabled]="true"
+            [(ngModel)]='abertura.endereco'>
+        </mat-form-field>
+      </div>
+
+      <div class="unicorn-dark-theme">
+        <mat-form-field>
+          <input matInput type="text" placeholder="Número" name="numero" id="numero" [(ngModel)]='abertura.numero'>
+        </mat-form-field>
+      </div>
+
+      <div class="unicorn-dark-theme">
+        <mat-form-field>
+          <input matInput type="text" placeholder="Complemento" name="complemento" id="complemento"
+            [(ngModel)]='abertura.complemento'>
+        </mat-form-field>
+      </div>
+
+      <div class="unicorn-dark-theme">
+        <mat-form-field>
+          <input matInput type="text" placeholder="Município" name="municipio" id="municipio"
+            [(ngModel)]='abertura.municipio' [disabled]="true">
+        </mat-form-field>
+      </div>
+
+      <div class="unicorn-dark-theme">
+        <mat-form-field>
+          <input matInput type="text" placeholder="Bairro" name="bairro" id="bairro" [(ngModel)]='abertura.bairro'
+            [disabled]="true">
+        </mat-form-field>
+      </div>
+
+    </mat-expansion-panel>
+
+    <mat-expansion-panel class="fastamentoAcordion">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Contato
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <div class="unicorn-dark-theme">
+        <mat-form-field>
+          <input matInput type="text" placeholder="Telefone residencial" name="telres" id="telres"
+            [(ngModel)]='abertura.telresidencial' mask='(00) 0000-0000'>
+        </mat-form-field>
+      </div>
+
+      <div class="unicorn-dark-theme">
+        <mat-form-field>
+          <input matInput type="text" placeholder="Telefone celular" name="telres" id="telres"
+            [(ngModel)]='abertura.telcelular' mask='(00) 000-000-000'>
+        </mat-form-field>
+      </div>
+
+      <div class="unicorn-dark-theme">
+        <mat-form-field>
+          <input matInput type="email" placeholder="E-mail" name="email" id="email" [(ngModel)]='abertura.email'
+            [email]="true">
+        </mat-form-field>
+      </div>
+
+    </mat-expansion-panel>
+
+    <mat-expansion-panel class="fastamentoAcordion">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Dados da apreensão
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+
+      <div class="unicorn-dark-theme">
+        <mat-form-field>
+          <input matInput type="text" placeholder="Auto" name="autodeapreensao" id="itensdiscriminados"
+            [(ngModel)]='abertura.autodeapreensao' maxlength='8' (change)='onAuto()' mask="00.00.00">
+        </mat-form-field>
+      </div>
+
+
+      <div class="unicorn-dark-theme">
+        <mat-form-field>
+          <input matInput type="text" placeholder="Itens discriminados" name="itensdiscriminados"
+            id="itensdiscriminados" [(ngModel)]='abertura.itensdiscriminados' maxlength='92'>
+        </mat-form-field>
+      </div>
+
+      <div class="unicorn-dark-theme">
+        <mat-form-field>
+          <input matInput placeholder="Local da apreesão" ngx-google-places-autocomplete [options]='options'
+            (onAddressChange)="handleAddressChange($event)" [(ngModel)]='abertura.localapreensao' />
+        </mat-form-field>
+      </div>
+
       <mat-form-field class="unicorn-dark-theme">
-        <mat-label>Nacionalidade</mat-label>
-        <mat-select color="primary" [(ngModel)]="abertura.nacionalidade">
-          <mat-option *ngFor="let n of nacionalidades" [value]="n">
-            {{n}}
-          </mat-option>
-        </mat-select>
+        <input matInput [matDatepicker]="picker2" placeholder="Data da apreensão" [(ngModel)]='dataapreensao'
+          (change)="changeEvent($event)">
+        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+        <mat-datepicker #picker2></mat-datepicker>
       </mat-form-field>
-    </div>
 
-    <div>
-      <mat-form-field class="unicorn-dark-theme">
-        <mat-label>Estado Civil</mat-label>
-        <mat-select color="primary" [(ngModel)]="abertura.estadocivil">
-          <mat-option *ngFor="let e of estadocivil" [value]="e">
-            {{e}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
+      <div class="unicorn-dark-theme">
+        <mat-form-field>
+          <input matInput type="text" placeholder="Lacre" name="lacre" id="lacre" [(ngModel)]='objlacre' maxlength='8'
+            (change)='onLacre(objlacre)' (focus)='onFocusLacre()'>
+        </mat-form-field>
+      </div>
 
-    <div class="unicorn-dark-theme">
-      <mat-form-field>
-        <input matInput placeholder="CEP" ngx-google-places-autocomplete [options]='options'
-          (onAddressChange)="handleAddressChangeCep($event)" [(ngModel)]='abertura.cep' mask='00000-000' />
-      </mat-form-field>
-    </div>
+      <div>
+        <table class="table table-dark">
+          <thead>
+            <tr>
+              <th scope="col">lacre</th>
+              <th scope="col">posição</th>
+              <th scope="col">data</th>
+              <th scope="col">ação</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor='let lacre of listalacres'>
+              <td>{{lacre.id}}</td>
+              <td>{{lacre.pos}}</td>
+              <td>{{lacre.atualizado}}</td>
+              <td><span id='deletar' (click)='onDeletar(lacre)'>Remover</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-    <div class="unicorn-dark-theme">
-      <mat-form-field>
-        <input matInput type="text" placeholder="Endereço" name="endereco" id="endereco" [disabled]="true"
-          [(ngModel)]='abertura.endereco'>
-      </mat-form-field>
-    </div>
+      <div class="alinhamentoButton unicorn-dark-theme">
+        <button mat-button color="primary" #submitButton (click)='onSubmit()'>Gerar declaraçao</button>
+      </div>
 
-    <div class="unicorn-dark-theme">
-      <mat-form-field>
-        <input matInput type="text" placeholder="Número" name="numero" id="numero" [(ngModel)]='abertura.numero'>
-      </mat-form-field>
-    </div>
-
-    <div class="unicorn-dark-theme">
-      <mat-form-field>
-        <input matInput type="text" placeholder="Complemento" name="complemento" id="complemento"
-          [(ngModel)]='abertura.complemento'>
-      </mat-form-field>
-    </div>
-
-    <div class="unicorn-dark-theme">
-      <mat-form-field>
-        <input matInput type="text" placeholder="Município" name="municipio" id="municipio"
-          [(ngModel)]='abertura.municipio' [disabled]="true">
-      </mat-form-field>
-    </div>
-
-    <div class="unicorn-dark-theme">
-      <mat-form-field>
-        <input matInput type="text" placeholder="Bairro" name="bairro" id="bairro" [(ngModel)]='abertura.bairro'
-          [disabled]="true">
-      </mat-form-field>
-    </div>
-
-    <div class="unicorn-dark-theme">
-      <mat-form-field>
-        <input matInput type="text" placeholder="Telefone residencial" name="telres" id="telres"
-          [(ngModel)]='abertura.telresidencial' mask='(00) 0000-0000'>
-      </mat-form-field>
-    </div>
-
-    <div class="unicorn-dark-theme">
-      <mat-form-field>
-        <input matInput type="text" placeholder="Telefone celular" name="telres" id="telres"
-          [(ngModel)]='abertura.telcelular' mask='(00) 000-000-000'>
-      </mat-form-field>
-    </div>
-
-    <div class="unicorn-dark-theme">
-      <mat-form-field>
-        <input matInput type="email" placeholder="E-mail" name="email" id="email" [(ngModel)]='abertura.email'
-          [email]="true">
-      </mat-form-field>
-    </div>
-
-    <div class="unicorn-dark-theme">
-      <mat-form-field>
-        <input matInput placeholder="Local da apreesão" ngx-google-places-autocomplete [options]='options'
-          (onAddressChange)="handleAddressChange($event)" [(ngModel)]='abertura.localapreensao' />
-      </mat-form-field>
-    </div>
-
-    <mat-form-field class="unicorn-dark-theme">
-      <input matInput [matDatepicker]="picker2" placeholder="Data da apreensão" [(ngModel)]='abertura.dataapreensao'
-        (change)="changeEvent($event)">
-      <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
-      <mat-datepicker #picker2></mat-datepicker>
-    </mat-form-field>
-
-    <div class="alinhamentoButton unicorn-dark-theme">
-      <button mat-button color="primary" #submitButton>Gerar declaraçao</button>
-    </div>
-
-  </mat-expansion-panel>
+    </mat-expansion-panel>
+  </mat-accordion>
 </div>

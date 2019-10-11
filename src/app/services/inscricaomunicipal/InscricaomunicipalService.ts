@@ -8,7 +8,7 @@ const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
 };
 
-const apiUrl = 'https://ccuapi.herokuapp.com/notificado?inscricao';
+const apiUrl = 'https://gcdApi.herokuapp.com/notificado?inscricao';
 @Injectable({
   providedIn: 'root'
 })

@@ -4,6 +4,21 @@
   padding-left: 1em;
 }
 
+th,
+td {
+  font-size: 1em;
+}
+
+#deletar {
+  font-size: 1em;
+  color: SteelBlue	;
+  text-decoration: underline LightSkyBlue;
+}
+
+#deletar:hover {
+  color: LightCyan;
+}
+
 .selectAutorizado {
   position: relative;
   display: flex;

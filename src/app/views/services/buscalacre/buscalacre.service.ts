@@ -1,10 +1,8 @@
-import { Cep } from './../../models/cep/cep';
+import { HttpHeaders, HttpClient, HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpResponse, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { Notificado } from '../../models/notificado/notificado';
-
+const url = 'https://gcdapi.herokuapp.com/';
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
 };
@@ -12,12 +10,14 @@ const httpOptions = {
 @Injectable({
   providedIn: 'root'
 })
-export class BuscacepService {
+
+
+export class BuscalacreService {
 
   constructor(private http: HttpClient) { }
 
-  buscarCEP(cep: string): Observable<HttpResponse<Cep>> {
-    return this.http.get<Cep>('https://viacep.com.br/ws/' + cep + '/json/',  { observe: 'response' })
+  buscarLacre(lacre: string): Observable<HttpResponse<any>> {
+    return this.http.post<any>(url + 'gcd/buscarLacre', {numero: lacre}, { observe: 'response' })
       .pipe(catchError(this.handleError));
   }
   private handleError(error: HttpErrorResponse) {
@@ -34,5 +34,3 @@ export class BuscacepService {
     return throwError('Something bad happened; please try again later.');
   }
 }
-
-

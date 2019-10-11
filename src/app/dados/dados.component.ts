@@ -1,8 +1,6 @@
+import { AberturaService } from './../views/services/abertura/abertura.service';
 import { Subscription } from 'rxjs';
-import { Viewescolha } from './../views/models/viewescolha';
-import { EscolhaService } from './../views/services/escolha/escolha.service';
 import { ValidacpfService } from './../services/validacpf/validacpf.service';
-import { SalvarcadastroService } from './../services/salvarcadastro/salvarcadastro.service';
 import { BuscacepService } from './../services/buscacep/buscacep.service';
 import { Localmulta } from './../models/localmulta/localmulta';
 import { InscricaomunicipalService } from '../services/inscricaomunicipal/InscricaomunicipalService';
@@ -16,7 +14,8 @@ import { Router } from '@angular/router';
 import { Usuario } from '../models/usuario/usuario';
 import { PdfService } from '../services/pdf/pdf.service';
 import { Cadastro } from '../models/cadastro/cadastro';
-const googleUrl = 'https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=https://https://ccuapi.herokuapp.com/resposta/';
+import { Abertura } from '../views/models/abertura/abertura';
+
 
 
 @Component({
@@ -32,6 +31,8 @@ export class DadosComponent implements OnInit, OnDestroy {
   nome: string;
   usuario: string;
   link: string;
+  processo: String;
+  motivo: string;
   panelOpenState = false;
   base64Image: string;
   options = {
@@ -42,6 +43,9 @@ export class DadosComponent implements OnInit, OnDestroy {
   autorizado = false;
   onAutorizadotipo = 0;
   exibicao = 0;
+  listenprocesso = false;
+  listenpreenchimento = false;
+  listenautorizado: boolean;
   opcoes = [
     'Abertura',
     'Consulta',
@@ -213,19 +217,17 @@ export class DadosComponent implements OnInit, OnDestroy {
     private logado: LogadoService,
     public local: Localmulta,
     public buscacepService: BuscacepService,
-    private pdfservice: PdfService,
-    private salvarnotificado: SalvarcadastroService,
     private validacpf: ValidacpfService,
-    private escolhaservice: EscolhaService,
-    private viewescolha: Viewescolha
+    private aberturaservice: AberturaService,
+    private abertura: Abertura
   ) { }
   //#endregion
 
   @ViewChild('submitButton', { static: true }) submitButton;
   ngOnInit() {
-    this.viewescolha = new Viewescolha();
     this.cadastro = new Cadastro();
     this.local = new Localmulta();
+    this.abertura = new Abertura();
 
     this.logado.currentMessage.subscribe(user => {
       this.usuario = user.nome;
@@ -234,36 +236,51 @@ export class DadosComponent implements OnInit, OnDestroy {
     });
   }
 
-  onMotivo() {
+  onfocusProcesso() {
+    this.processo = '';
+    this.listenprocesso = false;
+    this.listenpreenchimento = false;
+    this.limpaCampo();
+  }
+
+  onProcesso() {
+    if (typeof this.processo !== 'undefined') {
+      if (this.processo.length === 14) {
+        this.listenprocesso = true;
+      }
+    }
+  }
+
+    onMotivo() {
     this.autorizado = true;
-    if (this.cadastro.motivo === 'Abertura') {
+    if (this.motivo === 'Abertura') {
       this.exibicao = 1;
     }
 
-    if (this.cadastro.motivo === 'Consulta') {
+    if (this.motivo === 'Consulta') {
       this.exibicao = 2;
     }
 
-    if (this.cadastro.motivo === 'Doação') {
+    if (this.motivo === 'Doação') {
       this.exibicao = 3;
     }
 
-    if (this.cadastro.motivo === 'Entrega') {
+    if (this.motivo === 'Entrega') {
       this.exibicao = 4;
     }
 
-    if (this.cadastro.motivo === 'Atendimento') {
+    if (this.motivo === 'Atendimento') {
       this.exibicao = 5;
     }
 
-    if (this.cadastro.motivo === 'Recurso') {
+    if (this.motivo === 'Recurso') {
       this.exibicao = 6;
     }
 
   }
 
-  onAutorizado(value: string) {
-    if (value === 'sim') {
+  onAutorizado(value: any) {
+    if (value === true) {
       this.onAutorizadotipo = 1;
     } else {
       this.onAutorizadotipo = 2;
@@ -274,12 +291,28 @@ export class DadosComponent implements OnInit, OnDestroy {
     const res = this.validacpf.TestaCPF(cpf);
     if (res === false) {
       this.cadastro.cpf = 'CPF INVÁLIDO';
+    } else {
+      this.onIdentificado();
+      this.listenpreenchimento = true;
     }
   }
 
-  // downloadPDF() {
-  //   this.pdfservice.downloadPDF(this.notificado);
-  // }
+  onIdentificado() {
+    this.logado.currentMessage.subscribe(user => {
+      this.abertura.cpf = this.cadastro.cpf;
+      this.abertura.nome = this.cadastro.nome;
+      this.abertura.agenterespcadastro = user.nome;
+      this.abertura.processo = this.processo;
+      this.aberturaservice.atualizarAbertura(this.abertura);
+      this.abertura.autorizado = this.listenautorizado;
+
+      if (this.onAutorizadotipo === 1) {
+        this.abertura.autorizado = true;
+      } else {
+        this.abertura.autorizado = false;
+      }
+    });
+  }
 
   changeEvent() {
     this.submitButton.focus();
@@ -303,8 +336,6 @@ export class DadosComponent implements OnInit, OnDestroy {
     this._snackBar.openFromComponent(AvisocamposComponent, config);
   }
 
-
-
   gerarData() {
     const data = Date.now();
     const dateMoment = moment(data);
@@ -320,6 +351,8 @@ export class DadosComponent implements OnInit, OnDestroy {
     if (value && value.length === 8) {
       this.inscmunservice.buscarCadastro(value).subscribe(resp => {
         this.cadastro = resp.body;
+        this.onIdentificado();
+        this.listenpreenchimento = true;
       }, () => this.cadastro.nome = 'Inscrição Municipal inexistente'
       );
     } else {
@@ -330,11 +363,8 @@ export class DadosComponent implements OnInit, OnDestroy {
   limpaCampo() {
     this.cadastro = new Cadastro();
     this.local = new Localmulta();
+    this.cadastro.motivo = this.motivo;
   }
-
-  // public handleAddressChange(address: any) {
-  //   this.abertura.localapreensao = address.address_components[0].long_name;
-  // }
 
   ngOnDestroy(): void {
     this.serviceCampos.mudarAviso(1);

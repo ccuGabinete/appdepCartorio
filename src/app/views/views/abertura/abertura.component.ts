@@ -1,20 +1,15 @@
-import { EscolhaService } from './../../services/escolha/escolha.service';
+import { BuscalacreService } from './../../services/buscalacre/buscalacre.service';
+import { PdfService } from './../../../services/pdf/pdf.service';
+import { AberturaService } from './../../services/abertura/abertura.service';
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
-import { Cadastro } from '../../../models/cadastro/cadastro';
 import { InscricaomunicipalService } from '../../../services/inscricaomunicipal/InscricaomunicipalService';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material';
 import { AvisocamposService } from '../../../services/avisocampos/avisocampos.service';
-import { LogadoService } from '../../../services/logado/logado.service';
-import { Localmulta } from '../../../models/localmulta/localmulta';
 import { BuscacepService } from '../../../services/buscacep/buscacep.service';
-import { PdfService } from '../../../services/pdf/pdf.service';
-import { SalvarcadastroService } from '../../../services/salvarcadastro/salvarcadastro.service';
-import { ValidacpfService } from '../../../services/validacpf/validacpf.service';
-import { Usuario } from '../../../models/usuario/usuario';
 import { AvisocamposComponent } from '../../../avisocampos/avisocampos.component';
 import * as moment from 'moment-timezone';
 import { Abertura } from '../../models/abertura/abertura';
+import { Lacre } from '../../models/lacre/lacre';
 
 @Component({
   selector: 'app-abertura',
@@ -24,6 +19,10 @@ import { Abertura } from '../../models/abertura/abertura';
 export class AberturaComponent implements OnInit, OnDestroy {
 
   //#region variaveis
+  dataexpedicao: Date;
+  dataapreensao: Date;
+  telresformatado: string;
+  telcelformatado: string;
   nome: string;
   usuario: string;
   link: string;
@@ -192,29 +191,33 @@ export class AberturaComponent implements OnInit, OnDestroy {
     'Solteiro',
     'Casado',
     'Viúvo',
-    'Separado judicialmente',
+    'Separado',
     'Divorciado'
   ].sort();
+
+  listalacres = [];
+  objlacre: string;
 
   //#endregion
 
   //#region construtor
   constructor(
-    private router: Router,
     public inscmunservice: InscricaomunicipalService,
     private _snackBar: MatSnackBar,
     private serviceCampos: AvisocamposService,
     public buscacepService: BuscacepService,
-    private pdfservice: PdfService,
-    private salvarnotificado: SalvarcadastroService,
-    private validacpf: ValidacpfService,
     public abertura: Abertura,
+    private aberturaservice: AberturaService,
+    private pdfservice: PdfService,
+    private buscalacre: BuscalacreService,
+    public lacre: Lacre
   ) { }
   //#endregion
 
   @ViewChild('submitButton', { static: true }) submitButton;
   ngOnInit() {
     this.abertura = new Abertura();
+    this.lacre = new Lacre();
   }
 
   changeEvent() {
@@ -228,15 +231,65 @@ export class AberturaComponent implements OnInit, OnDestroy {
     this._snackBar.openFromComponent(AvisocamposComponent, config);
   }
 
-  gerarData() {
+  testaCampo(object: Abertura, len): boolean {
+    if (
+      typeof this.abertura.complemento === 'undefined'
+    ) {
+      len--;
+    }
+
+    if (
+      typeof this.abertura.telcelular === 'undefined'
+    ) {
+      len--;
+    }
+
+    if (
+      typeof this.abertura.telresidencial === 'undefined'
+    ) {
+      len--;
+    }
+
+    if (
+      typeof this.abertura.email === 'undefined'
+    ) {
+      len--;
+    }
+
+    let count = 0;
+    // tslint:disable-next-line: prefer-const
+    for (let key in object) {
+      if (key) {
+        count++;
+        console.log(key);
+      }
+    }
+    console.log(count);
+
+    if (count === len) {
+      return true;
+    }
+
+    return false;
+  }
+
+  gerarData(bd?: boolean) {
     const data = Date.now();
     const dateMoment = moment(data);
-    return dateMoment.tz('America/Sao_Paulo').format('DD/MM/YYYY');
+    if (bd) {
+      return dateMoment.tz('America/Sao_Paulo').format('DD/MM/YY');
+    } else {
+      return dateMoment.tz('America/Sao_Paulo').format('DD/MM/YYYY');
+    }
+
   }
 
   gerarMomentData(date) {
-    const dateMoment = moment(date);
-    return dateMoment.tz('America/Sao_Paulo').format('DD/MM/YYYY');
+    moment.defineLocale('America/Sao_Paulo', {
+      parentLocale: 'pt-BR'
+    });
+    const dateMoment = moment(date).format('DD/MM/YYYY');
+    return dateMoment;
   }
 
   public handleAddressChange(address: any) {
@@ -252,6 +305,85 @@ export class AberturaComponent implements OnInit, OnDestroy {
       this.abertura.municipio = data.body.localidade;
       this.abertura.bairro = data.body.bairro;
     });
+  }
+
+  onIdentidade() {
+    this.aberturaservice.correnteAbertura.subscribe(abertura => {
+      this.abertura.cpf = abertura.cpf;
+      this.abertura.nome = abertura.nome;
+      this.abertura.agenterespcadastro = abertura.agenterespcadastro;
+      this.abertura.autorizado = abertura.autorizado;
+      this.abertura.processo = abertura.processo;
+    });
+  }
+
+  onSubmit() {
+
+    if (this.testaCampo(this.abertura, 21)) {
+      if (
+        typeof this.abertura.complemento === 'undefined'
+        || typeof this.abertura.telcelular === 'undefined'
+        || typeof this.abertura.telresidencial === 'undefined'
+        || typeof this.abertura.email === 'undefined'
+      ) {
+        this.abertura.complemento = '';
+        this.abertura.telcelular = '';
+        this.abertura.telresidencial = '';
+        this.abertura.email = '';
+      }
+      this.abertura.dataapreensao = this.gerarMomentData(this.dataapreensao);
+      this.abertura.dataexpedicao = this.gerarMomentData(this.dataexpedicao);
+      this.pdfservice.downloadPDF(this.abertura);
+    } else {
+      this.serviceCampos.mudarAviso(2);
+      this.openSnackBarCampos();
+    }
+  }
+
+  onEmail() {
+    this.abertura.telcelular = this.telcelformatado;
+    this.abertura.telresidencial = this.telcelformatado;
+  }
+
+  onAuto() {
+    console.log(this.abertura.autodeapreensao);
+  }
+
+  onLacre(val: string) {
+    const tamanho = val.length;
+    if (tamanho < 8) {
+      for (let i = 0; i < (8 - tamanho); i++) {
+        val = '0' + val;
+      }
+    }
+    this.objlacre = val;
+    this.buscalacre.buscarLacre(this.objlacre).subscribe(data => {
+      let obj = {};
+      if (typeof data.body[0].response === 'undefined') {
+        data.body.forEach(dt => {
+          this.listalacres.push(dt);
+        });
+      } else {
+        obj = {
+          atualizado: this.gerarData(true),
+          id: this.objlacre,
+          pos: '0000',
+          status: '00',
+          processo: this.abertura.processo
+        };
+        this.listalacres.push(obj);
+      }
+
+    });
+  }
+
+  onFocusLacre() {
+    this.objlacre = '';
+  }
+
+  onDeletar(obj) {
+    const index = this.listalacres.findIndex(lacre => lacre.id === obj.id);
+    this.listalacres.splice(index, 1);
   }
 
   ngOnDestroy(): void {
