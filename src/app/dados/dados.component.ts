@@ -303,8 +303,10 @@ export class DadosComponent implements OnInit, OnDestroy {
       this.abertura.nome = this.cadastro.nome;
       this.abertura.agenterespcadastro = user.nome;
       this.abertura.processo = this.processo;
-      this.aberturaservice.atualizarAbertura(this.abertura);
       this.abertura.autorizado = this.listenautorizado;
+      this.abertura.matricula = this.cadastro.matricula;
+      this.aberturaservice.atualizarAbertura(this.abertura);
+      
 
       if (this.onAutorizadotipo === 1) {
         this.abertura.autorizado = true;

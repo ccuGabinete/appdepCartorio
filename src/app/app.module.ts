@@ -29,6 +29,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
 import { DadosComponent } from './dados/dados.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatRadioModule } from '@angular/material/radio';
 import { LoginService } from './services/acesso/login.service';
 import { HomeComponent } from './home/home.component';
 
@@ -60,6 +61,8 @@ import { RecursoComponent } from './views/views/recurso/recurso.component';
 import { Abertura } from './views/models/abertura/abertura';
 import { TitleCasePipe, LowerCasePipe } from '@angular/common';
 import { Lacre } from './views/models/lacre/lacre';
+import { Auto } from './views/models/auto/auto';
+import { BuscarautoService } from './views/services/buscarauto/buscarauto.service';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -94,6 +97,7 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
     SharedModule,
     AppRoutingModule,
     BrowserAnimationsModule,
+    MatRadioModule,
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
@@ -114,6 +118,8 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
     })
   ],
   providers: [
+    Auto,
+    BuscarautoService,
     Lacre,
     LowerCasePipe,
     TitleCasePipe,

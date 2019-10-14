@@ -46,6 +46,8 @@ export class PdfService {
     abertura.itensdiscriminados = this.lowercasePipe.transform(abertura.itensdiscriminados);
     //#endregion
 
+    console.log(abertura);
+
     const coord = {
 
       text01: {
@@ -174,6 +176,24 @@ export class PdfService {
         y: 153.96
       },
 
+      text22: {
+        texto: abertura.listaautos,
+        x: 77.07,
+        y: 171
+      },
+
+      text23: {
+        texto: abertura.listatrms,
+        x: 49.22,
+        y: 180.75
+      },
+
+      text24: {
+        texto: abertura.listalacres,
+        x: 49.22,
+        y: 190.33
+      },
+
       imageBody: {
         x: 27,
         y: 5,
@@ -217,6 +237,9 @@ export class PdfService {
     doc.text(coord.text15.texto, coord.text15.x, coord.text15.y);
     doc.text(coord.text16.texto, coord.text16.x, coord.text16.y);
     doc.text(coord.text20.texto, coord.text20.x, coord.text20.y);
+    doc.text(coord.text22.texto, coord.text22.x, coord.text22.y);
+    doc.text(coord.text23.texto, coord.text23.x, coord.text23.y);
+    doc.text(coord.text24.texto, coord.text24.x, coord.text24.y);
     doc.setFontSize(11);
     doc.text(coord.text18.texto, coord.text18.x, coord.text18.y);
     doc.text(coord.text21.texto, coord.text21.x, coord.text21.y);

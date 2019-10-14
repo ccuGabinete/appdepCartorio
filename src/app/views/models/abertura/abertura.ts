@@ -1,6 +1,9 @@
 export class Abertura {
-  lacres: string;
+  listalacres: string;
+  listaautos: string;
+  listatrms: string;
   autodeapreensao: string;
+  trm: string;
   itensdiscriminados: string;
   dataabertura: string;
   processo: String;

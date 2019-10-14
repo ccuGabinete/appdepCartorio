@@ -2,29 +2,26 @@ import { HttpHeaders, HttpClient, HttpResponse, HttpErrorResponse } from '@angul
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { Auto } from '../../models/auto/auto';
 const url = 'https://gcdapi.herokuapp.com/';
 const httpOptions = {
-  headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+  headers: new HttpHeaders({
+    'Content-Type': 'application/json', observe: 'response'
+  })
 };
 
 @Injectable({
   providedIn: 'root'
 })
-
-
-export class BuscalacreService {
+export class BuscarautoService {
 
   constructor(private http: HttpClient) { }
-
-  buscarLacre(lacre: string): Observable<HttpResponse<any>> {
-    return this.http.post<any>(url + 'gcd/buscarLacre', {numero: lacre}, { observe: 'response' })
+ 
+  buscarAuto(auto: string): Observable<HttpResponse<Auto>> {
+    return this.http.post<any>(url + 'gcd/autos/buscarAuto', { numero: auto }, {observe: 'response'})
       .pipe(catchError(this.handleError));
   }
-
-  buscarPosicao(posicao: string): Observable<HttpResponse<any>> {
-    return this.http.post<any>(url + 'gcd/buscarPosicao', {pos: posicao}, { observe: 'response' })
-      .pipe(catchError(this.handleError));
-  }
+  
   private handleError(error: HttpErrorResponse) {
     if (error.error instanceof ErrorEvent) {
       // A client-side or network error occurred. Handle it accordingly.

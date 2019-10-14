@@ -140,65 +140,98 @@
       </mat-expansion-panel-header>
 
 
-      <div class="unicorn-dark-theme">
-        <mat-form-field>
-          <input matInput type="text" placeholder="Auto" name="autodeapreensao" id="itensdiscriminados"
-            [(ngModel)]='abertura.autodeapreensao' maxlength='8' (change)='onAuto()' mask="00.00.00">
+      <mat-radio-group aria-labelledby="example-radio-group-label" class="example-radio-group"
+        [(ngModel)]="comprobatorio">
+        <mat-radio-button class="example-radio-button" *ngFor="let doc of docs" [value]="doc"
+          (change)='onComprobatorio()'>
+          {{doc}}
+        </mat-radio-button>
+      </mat-radio-group>
+
+      <div *ngIf="comprobatorio !== ''">
+
+        <div class="unicorn-dark-theme" *ngIf="comprobatorio === 'Auto'">
+          <mat-form-field>
+            <input matInput type="text" placeholder="Auto" name="autodeapreensao" id="itensdiscriminados"
+              [(ngModel)]='abertura.autodeapreensao' maxlength='8' (change)='onAuto()' (focus)='onFocusAuto()'
+              mask="00.00.00">
+          </mat-form-field>
+
+          <ul *ngIf='listaAutos.length > 0'>
+            <div *ngFor='let a of listaAutos'>
+              <li style="color: #CAE1FF" (click)='onDeletarAuto(a)'>{{a.autodeapreensao}}</li>
+            </div>
+          </ul>
+        </div>
+
+        <div class="unicorn-dark-theme" *ngIf="comprobatorio === 'TRM'">
+          <mat-form-field>
+            <input matInput type="text" placeholder="TRM" name="trm" id="trm" [(ngModel)]='abertura.trm' maxlength='8'
+              (change)='onTRM()' (focus)='onFocusTRM()'>
+          </mat-form-field>
+
+          <ul *ngIf='listaTRM.length > 0' matTooltip="clicque para excluir">
+            <div *ngFor='let l of listaTRM'>
+              <li (click)='onDeletarTRM(l)' style="color: #CAE1FF">{{l}}</li>
+            </div>
+          </ul>
+        </div>
+
+        <div class="unicorn-dark-theme">
+          <mat-form-field>
+            <input matInput type="text" placeholder="Itens discriminados" name="itensdiscriminados"
+              id="itensdiscriminados" [(ngModel)]='abertura.itensdiscriminados' maxlength='92'>
+          </mat-form-field>
+        </div>
+
+        <div class="unicorn-dark-theme">
+          <mat-form-field>
+            <input matInput placeholder="Local da apreesão" ngx-google-places-autocomplete [options]='options'
+              (onAddressChange)="handleAddressChange($event)" [(ngModel)]='abertura.localapreensao' />
+          </mat-form-field>
+        </div>
+
+        <mat-form-field class="unicorn-dark-theme">
+          <input matInput [matDatepicker]="picker2" placeholder="Data da apreensão" [(ngModel)]='dataapreensao'
+            (change)="changeEvent($event)">
+          <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+          <mat-datepicker #picker2></mat-datepicker>
         </mat-form-field>
-      </div>
 
 
-      <div class="unicorn-dark-theme">
-        <mat-form-field>
-          <input matInput type="text" placeholder="Itens discriminados" name="itensdiscriminados"
-            id="itensdiscriminados" [(ngModel)]='abertura.itensdiscriminados' maxlength='92'>
-        </mat-form-field>
-      </div>
 
-      <div class="unicorn-dark-theme">
-        <mat-form-field>
-          <input matInput placeholder="Local da apreesão" ngx-google-places-autocomplete [options]='options'
-            (onAddressChange)="handleAddressChange($event)" [(ngModel)]='abertura.localapreensao' />
-        </mat-form-field>
-      </div>
+        <div *ngIf="comprobatorio !== 'Nenhum'">
+          <div class="unicorn-dark-theme">
+            <mat-form-field>
+              <input matInput type="text" placeholder="Lacre" name="lacre" id="lacre" [(ngModel)]='objlacre'
+                maxlength='8' (change)='onLacre(objlacre)' (focus)='onFocusLacre()'>
+            </mat-form-field>
+          </div>
 
-      <mat-form-field class="unicorn-dark-theme">
-        <input matInput [matDatepicker]="picker2" placeholder="Data da apreensão" [(ngModel)]='dataapreensao'
-          (change)="changeEvent($event)">
-        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
-        <mat-datepicker #picker2></mat-datepicker>
-      </mat-form-field>
+          <table class="table table-dark">
+            <thead>
+              <tr>
+                <th scope="col">lacre</th>
+                <th scope="col">posição</th>
+                <th scope="col">data</th>
+                <th scope="col">ação</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor='let lacre of listalacres'>
+                <td>{{lacre.id}}</td>
+                <td>{{lacre.pos}}</td>
+                <td>{{lacre.atualizado}}</td>
+                <td><span id='deletar' (click)='onDeletar(lacre)'>Remover</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-      <div class="unicorn-dark-theme">
-        <mat-form-field>
-          <input matInput type="text" placeholder="Lacre" name="lacre" id="lacre" [(ngModel)]='objlacre' maxlength='8'
-            (change)='onLacre(objlacre)' (focus)='onFocusLacre()'>
-        </mat-form-field>
-      </div>
+        <div class="alinhamentoButton unicorn-dark-theme">
+          <button mat-button color="primary" #submitButton (click)='onSubmit()'>Gerar declaraçao</button>
+        </div>
 
-      <div>
-        <table class="table table-dark">
-          <thead>
-            <tr>
-              <th scope="col">lacre</th>
-              <th scope="col">posição</th>
-              <th scope="col">data</th>
-              <th scope="col">ação</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor='let lacre of listalacres'>
-              <td>{{lacre.id}}</td>
-              <td>{{lacre.pos}}</td>
-              <td>{{lacre.atualizado}}</td>
-              <td><span id='deletar' (click)='onDeletar(lacre)'>Remover</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="alinhamentoButton unicorn-dark-theme">
-        <button mat-button color="primary" #submitButton (click)='onSubmit()'>Gerar declaraçao</button>
       </div>
 
     </mat-expansion-panel>

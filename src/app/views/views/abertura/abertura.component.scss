@@ -1,3 +1,14 @@
+.example-radio-group {
+  display: flex;
+  flex-direction: column;
+  margin: 15px 0;
+}
+
+.example-radio-button {
+  margin: 5px;
+}
+
+
 .mat-form-field {
   width: 95%;
   padding-right: 1em;
@@ -75,4 +86,9 @@ span {
 
 .fastamentoAcordion {
   margin: 0.5em;
+}
+
+.table {
+  margin-left: 2.5%;
+  width: 90%;
 }

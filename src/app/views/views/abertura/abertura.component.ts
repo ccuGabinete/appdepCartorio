@@ -10,6 +10,8 @@ import { AvisocamposComponent } from '../../../avisocampos/avisocampos.component
 import * as moment from 'moment-timezone';
 import { Abertura } from '../../models/abertura/abertura';
 import { Lacre } from '../../models/lacre/lacre';
+import { BuscarautoService } from '../../services/buscarauto/buscarauto.service';
+import { Auto } from '../../models/auto/auto';
 
 @Component({
   selector: 'app-abertura',
@@ -196,7 +198,16 @@ export class AberturaComponent implements OnInit, OnDestroy {
   ].sort();
 
   listalacres = [];
+  listaAutos = [];
+  listaTRM = [];
   objlacre: string;
+  comprobatorio = '';
+  docs = [
+    'Auto',
+    'TRM',
+    'Lacre',
+    'Nenhum'
+  ]
 
   //#endregion
 
@@ -210,7 +221,9 @@ export class AberturaComponent implements OnInit, OnDestroy {
     private aberturaservice: AberturaService,
     private pdfservice: PdfService,
     private buscalacre: BuscalacreService,
-    public lacre: Lacre
+    public lacre: Lacre,
+    public auto: Auto,
+    public buscarauto: BuscarautoService
   ) { }
   //#endregion
 
@@ -218,6 +231,7 @@ export class AberturaComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.abertura = new Abertura();
     this.lacre = new Lacre();
+    this.auto = new Auto();
   }
 
   changeEvent() {
@@ -231,46 +245,36 @@ export class AberturaComponent implements OnInit, OnDestroy {
     this._snackBar.openFromComponent(AvisocamposComponent, config);
   }
 
-  testaCampo(object: Abertura, len): boolean {
-    if (
-      typeof this.abertura.complemento === 'undefined'
-    ) {
-      len--;
-    }
+  testaCampo(): boolean {
+    let response: boolean;
 
     if (
-      typeof this.abertura.telcelular === 'undefined'
+      typeof this.abertura.autorizado !== 'undefined' ||
+      typeof this.abertura.bairro !== 'undefined' ||
+      typeof this.abertura.cep !== 'undefined' ||
+      typeof this.abertura.cpf !== 'undefined' ||
+      typeof this.abertura.endereco !== 'undefined' ||
+      typeof this.abertura.estadocivil !== 'undefined' ||
+      typeof this.abertura.expedicao !== 'undefined' ||
+      typeof this.abertura.identidade !== 'undefined' ||
+      typeof this.abertura.itensdiscriminados !== 'undefined' ||
+      typeof this.abertura.localapreensao !== 'undefined' ||
+      typeof this.abertura.matricula !== 'undefined' ||
+      typeof this.abertura.municipio !== 'undefined' ||
+      typeof this.abertura.nacionalidade !== 'undefined' ||
+      typeof this.abertura.nome !== 'undefined' ||
+      typeof this.abertura.numero !== 'undefined' ||
+      typeof this.abertura.processo !== 'undefined'
+
     ) {
-      len--;
+      response =  true;
+    }else {
+      response =  false;
     }
 
-    if (
-      typeof this.abertura.telresidencial === 'undefined'
-    ) {
-      len--;
-    }
+    console.log(response);
+    return response;
 
-    if (
-      typeof this.abertura.email === 'undefined'
-    ) {
-      len--;
-    }
-
-    let count = 0;
-    // tslint:disable-next-line: prefer-const
-    for (let key in object) {
-      if (key) {
-        count++;
-        console.log(key);
-      }
-    }
-    console.log(count);
-
-    if (count === len) {
-      return true;
-    }
-
-    return false;
   }
 
   gerarData(bd?: boolean) {
@@ -314,12 +318,13 @@ export class AberturaComponent implements OnInit, OnDestroy {
       this.abertura.agenterespcadastro = abertura.agenterespcadastro;
       this.abertura.autorizado = abertura.autorizado;
       this.abertura.processo = abertura.processo;
+      this.abertura.matricula = abertura.matricula;
     });
   }
 
   onSubmit() {
 
-    if (this.testaCampo(this.abertura, 21)) {
+    if (this.testaCampo()) {
       if (
         typeof this.abertura.complemento === 'undefined'
         || typeof this.abertura.telcelular === 'undefined'
@@ -331,6 +336,7 @@ export class AberturaComponent implements OnInit, OnDestroy {
         this.abertura.telresidencial = '';
         this.abertura.email = '';
       }
+      this.populaListas();
       this.abertura.dataapreensao = this.gerarMomentData(this.dataapreensao);
       this.abertura.dataexpedicao = this.gerarMomentData(this.dataexpedicao);
       this.pdfservice.downloadPDF(this.abertura);
@@ -338,6 +344,7 @@ export class AberturaComponent implements OnInit, OnDestroy {
       this.serviceCampos.mudarAviso(2);
       this.openSnackBarCampos();
     }
+   
   }
 
   onEmail() {
@@ -346,7 +353,17 @@ export class AberturaComponent implements OnInit, OnDestroy {
   }
 
   onAuto() {
-    console.log(this.abertura.autodeapreensao);
+    if (typeof this.abertura.autodeapreensao !== 'undefined') {
+      this.buscarauto.buscarAuto(this.abertura.autodeapreensao).subscribe(data => {
+        this.auto.pos = data.body.pos;
+        this.auto.numero = data.body.numero;
+        this.buscalacre.buscarPosicao(this.auto.pos).subscribe(data => {
+          this.populaLacre(data);
+          this.listaAutos.push({ autodeapreensao: this.auto.numero, pos: this.auto.pos });
+          this.abertura.autodeapreensao = '';
+        })
+      })
+    }
   }
 
   onLacre(val: string) {
@@ -358,22 +375,7 @@ export class AberturaComponent implements OnInit, OnDestroy {
     }
     this.objlacre = val;
     this.buscalacre.buscarLacre(this.objlacre).subscribe(data => {
-      let obj = {};
-      if (typeof data.body[0].response === 'undefined') {
-        data.body.forEach(dt => {
-          this.listalacres.push(dt);
-        });
-      } else {
-        obj = {
-          atualizado: this.gerarData(true),
-          id: this.objlacre,
-          pos: '0000',
-          status: '00',
-          processo: this.abertura.processo
-        };
-        this.listalacres.push(obj);
-      }
-
+      this.populaLacre(data);
     });
   }
 
@@ -381,13 +383,99 @@ export class AberturaComponent implements OnInit, OnDestroy {
     this.objlacre = '';
   }
 
+  onFocusAuto() {
+    this.abertura.autodeapreensao = '';
+  }
+
   onDeletar(obj) {
     const index = this.listalacres.findIndex(lacre => lacre.id === obj.id);
     this.listalacres.splice(index, 1);
   }
 
+  populaLacre(data: any) {
+    let obj = {};
+    if (typeof data.body[0].response === 'undefined') {
+      data.body.forEach(dt => {
+        this.listalacres.push(dt);
+      });
+    } else {
+      obj = {
+        atualizado: this.gerarData(true),
+        id: this.objlacre,
+        pos: '0000',
+        status: '00',
+        processo: this.abertura.processo
+      };
+      this.listalacres.push(obj);
+    }
+  }
+
+  onTRM() {
+    const tamanho = this.abertura.trm.length;
+    let str = this.abertura.trm;
+    if (tamanho < 8) {
+      for (let i = 0; i < (8 - tamanho); i++) {
+        str = '0' + str;
+      }
+    }
+    this.abertura.trm = str;
+    this.listaTRM.push(str);
+    this.abertura.trm = '';
+  }
+
+  onFocusTRM() {
+    this.abertura.trm = '';
+  }
+
   ngOnDestroy(): void {
     this.serviceCampos.mudarAviso(1);
+  }
+
+  onDeletarTRM(trm: string) {
+    const index = this.listaTRM.indexOf(trm);
+    this.listaTRM.splice(index, 1);
+  }
+
+  onDeletarAuto(auto: Auto) {
+    const index = this.listaTRM.findIndex(x => x.autodeapreensao === auto.numero);
+    this.listaAutos.splice(index, 1);
+
+    const filterLacre = (lacre) => {
+      return lacre.pos !== auto.pos;
+    }
+
+    this.listalacres = this.listalacres.filter(filterLacre);
+    console.log(this.listalacres);
+  }
+
+  onComprobatorio() {
+    this.listaAutos = [];
+    this.listaTRM = [];
+    this.listalacres = [];
+  }
+
+  populaListas() {
+    this.abertura.listalacres = '';
+    this.abertura.listaautos = '';
+    this.abertura.listatrms = this.listaTRM.toString();
+
+    this.listalacres.forEach((lacre, pos, array) => {
+      if (pos !== array.length - 1) {
+        this.abertura.listalacres += lacre.id + ' - ';
+      } else {
+        this.abertura.listalacres += lacre.id
+      }
+    })
+
+    this.listaAutos.forEach((auto, pos, array) => {
+      if (pos !== array.length - 1) {
+        this.abertura.listaautos += auto.autodeapreensao + ' - ';
+      } else {
+        this.abertura.listaautos += auto.autodeapreensao;
+      }
+    })
+
+    console.log(this.abertura);
   }
 
 }
