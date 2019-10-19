@@ -1,6 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { Abertura } from '../../models/abertura/abertura';
+import { Cadastro } from '../../../models/cadastro/cadastro';
 
 @Injectable({
   providedIn: 'root'

@@ -10,14 +10,14 @@
       <div class="unicorn-dark-theme">
         <mat-form-field>
           <input matInput type="text" placeholder="Identidade" name="identidade" id="identidade"
-            [(ngModel)]='abertura.identidade' (change)='onIdentidade()'>
+            [(ngModel)]='abertura.identidade' (change)='onIdentidade()' [required]=true>
         </mat-form-field>
       </div>
 
       <div>
         <mat-form-field class="unicorn-dark-theme">
           <mat-label>Expedição</mat-label>
-          <mat-select color="primary" [(ngModel)]="abertura.expedicao">
+          <mat-select color="primary" [(ngModel)]="abertura.expedicao" [required]=true>
             <mat-option *ngFor="let org of orgaos" [value]="org.sigla">
               {{org.orgao}}
             </mat-option>
@@ -26,7 +26,7 @@
       </div>
 
       <mat-form-field class="unicorn-dark-theme">
-        <input matInput [matDatepicker]="picker" placeholder="Data da expedição" [(ngModel)]='dataexpedicao'>
+        <input matInput [matDatepicker]="picker" placeholder="Data da expedição" [(ngModel)]='abertura.dataexpedicao' [required]=true>
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
@@ -34,7 +34,7 @@
       <div>
         <mat-form-field class="unicorn-dark-theme">
           <mat-label>Nacionalidade</mat-label>
-          <mat-select color="primary" [(ngModel)]="abertura.nacionalidade">
+          <mat-select color="primary" [(ngModel)]="abertura.nacionalidade" [required]=true>
             <mat-option *ngFor="let n of nacionalidades" [value]="n">
               {{n}}
             </mat-option>
@@ -43,7 +43,7 @@
 
         <mat-form-field class="unicorn-dark-theme">
           <mat-label>Estado Civil</mat-label>
-          <mat-select color="primary" [(ngModel)]="abertura.estadocivil">
+          <mat-select color="primary" [(ngModel)]="abertura.estadocivil" [required]=true>
             <mat-option *ngFor="let e of estadocivil" [value]="e">
               {{e}}
             </mat-option>
@@ -62,20 +62,20 @@
       <div class="unicorn-dark-theme">
         <mat-form-field>
           <input matInput placeholder="CEP" ngx-google-places-autocomplete [options]='options'
-            (onAddressChange)="handleAddressChangeCep($event)" [(ngModel)]='abertura.cep' mask='00000-000' />
+            (onAddressChange)="handleAddressChangeCep($event)" [(ngModel)]='abertura.cep' mask='00000-000' [required]=true/>
         </mat-form-field>
       </div>
 
       <div class="unicorn-dark-theme">
         <mat-form-field>
           <input matInput type="text" placeholder="Endereço" name="endereco" id="endereco" [disabled]="true"
-            [(ngModel)]='abertura.endereco'>
+            [(ngModel)]='abertura.endereco' [required]=true>
         </mat-form-field>
       </div>
 
       <div class="unicorn-dark-theme">
         <mat-form-field>
-          <input matInput type="text" placeholder="Número" name="numero" id="numero" [(ngModel)]='abertura.numero'>
+          <input matInput type="text" placeholder="Número" name="numero" id="numero" [(ngModel)]='abertura.numero' [required]=true>
         </mat-form-field>
       </div>
 
@@ -153,13 +153,13 @@
         <div class="unicorn-dark-theme" *ngIf="comprobatorio === 'Auto'">
           <mat-form-field>
             <input matInput type="text" placeholder="Auto" name="autodeapreensao" id="itensdiscriminados"
-              [(ngModel)]='abertura.autodeapreensao' maxlength='8' (change)='onAuto()' (focus)='onFocusAuto()'
+              [(ngModel)]='abertura.autodeapreensao' maxlength='8' (change)='onAuto(abertura.autodeapreensao)' (focus)='onFocusAuto()'
               mask="00.00.00">
           </mat-form-field>
 
           <ul *ngIf='listaAutos.length > 0'>
-            <div *ngFor='let a of listaAutos'>
-              <li style="color: #CAE1FF" (click)='onDeletarAuto(a)'>{{a.autodeapreensao}}</li>
+            <div *ngFor='let a of listaAutos'  matTooltip="clique para excluir">
+              <li style="color: #CAE1FF" (click)='onDeletarAuto(a)'>{{a.numero}}</li>
             </div>
           </ul>
         </div>
@@ -170,7 +170,7 @@
               (change)='onTRM()' (focus)='onFocusTRM()'>
           </mat-form-field>
 
-          <ul *ngIf='listaTRM.length > 0' matTooltip="clicque para excluir">
+          <ul *ngIf='listaTRM.length > 0' matTooltip="clique para excluir">
             <div *ngFor='let l of listaTRM'>
               <li (click)='onDeletarTRM(l)' style="color: #CAE1FF">{{l}}</li>
             </div>
@@ -180,20 +180,20 @@
         <div class="unicorn-dark-theme">
           <mat-form-field>
             <input matInput type="text" placeholder="Itens discriminados" name="itensdiscriminados"
-              id="itensdiscriminados" [(ngModel)]='abertura.itensdiscriminados' maxlength='92'>
+              id="itensdiscriminados" [(ngModel)]='abertura.itensdiscriminados' maxlength='92' [required]=true>
           </mat-form-field>
         </div>
 
         <div class="unicorn-dark-theme">
           <mat-form-field>
             <input matInput placeholder="Local da apreesão" ngx-google-places-autocomplete [options]='options'
-              (onAddressChange)="handleAddressChange($event)" [(ngModel)]='abertura.localapreensao' />
+              (onAddressChange)="handleAddressChange($event)" [(ngModel)]='abertura.localapreensao'  [required]=true/>
           </mat-form-field>
         </div>
 
         <mat-form-field class="unicorn-dark-theme">
-          <input matInput [matDatepicker]="picker2" placeholder="Data da apreensão" [(ngModel)]='dataapreensao'
-            (change)="changeEvent($event)">
+          <input matInput [matDatepicker]="picker2" placeholder="Data da apreensão" [(ngModel)]='abertura.dataapreensao'
+            (change)="changeEvent($event)" [required]=true>
           <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
           <mat-datepicker #picker2></mat-datepicker>
         </mat-form-field>
@@ -203,8 +203,8 @@
         <div *ngIf="comprobatorio !== 'Nenhum'">
           <div class="unicorn-dark-theme">
             <mat-form-field>
-              <input matInput type="text" placeholder="Lacre" name="lacre" id="lacre" [(ngModel)]='objlacre'
-                maxlength='8' (change)='onLacre(objlacre)' (focus)='onFocusLacre()'>
+              <input matInput type="text" placeholder="Lacre" name="lacre" id="lacre" [(ngModel)]='this.abertura.lacre'
+                maxlength='8' (change)='onLacre(this.abertura.lacre)' (focus)='onFocusLacre()'>
             </mat-form-field>
           </div>
 
@@ -213,15 +213,15 @@
               <tr>
                 <th scope="col">lacre</th>
                 <th scope="col">posição</th>
-                <th scope="col">data</th>
+                <th scope="col">atualizado</th>
                 <th scope="col">ação</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor='let lacre of listalacres'>
-                <td>{{lacre.id}}</td>
+                <td>{{lacre.numero}}</td>
                 <td>{{lacre.pos}}</td>
-                <td>{{lacre.atualizado}}</td>
+                <td>{{lacre.data}}</td>
                 <td><span id='deletar' (click)='onDeletar(lacre)'>Remover</span></td>
               </tr>
             </tbody>
@@ -229,7 +229,7 @@
         </div>
 
         <div class="alinhamentoButton unicorn-dark-theme">
-          <button mat-button color="primary" #submitButton (click)='onSubmit()'>Gerar declaraçao</button>
+          <button type ='submit' mat-button color="primary" #submitButton (click)='onSubmit()'>Gerar declaraçao</button>
         </div>
 
       </div>

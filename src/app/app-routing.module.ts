@@ -1,5 +1,6 @@
+import { CommonModule } from '@angular/common';
 import { AberturaComponent } from './views/views/abertura/abertura.component';
-import { NgModule } from '@angular/core';
+import { NgModule, Component } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { PageNotFoundComponent } from './shared/components';
 import { DadosComponent } from './dados/dados.component';
@@ -13,6 +14,10 @@ const routes: Routes = [
   {
     path: 'dados',
     component: DadosComponent
+  },
+  {
+    path: 'abertura',
+    component: AberturaComponent
   }
 ];
 

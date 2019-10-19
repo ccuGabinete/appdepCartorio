@@ -1,15 +1,13 @@
-import { AlertaComponent } from './../alerta/alerta.component';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { LoginService } from './../services/acesso/login.service';
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { MatSnackBar, MatSnackBarConfig } from '@angular/material';
-import { SucessoService } from '../services/sucesso/SucessoService';
+import { MatSnackBarConfig } from '@angular/material';
 import { LogadoService } from '../services/logado/logado.service';
-import { first } from 'rxjs/operators';
 import { Usuario } from '../models/usuario/usuario';
 import { AvisocamposComponent } from '../avisocampos/avisocampos.component';
 import { AvisocamposService } from '../services/avisocampos/avisocampos.service';
+import { OpensnackbarService } from '../views/services/opensnackbar/opensnackbar.service';
 
 
 @Component({
@@ -29,10 +27,9 @@ export class HomeComponent implements OnInit {
     private router: Router,
     public usuario: Usuario,
     public login: LoginService,
-    private _snackBar: MatSnackBar,
-    private aviso: SucessoService,
     private logado: LogadoService,
-    private serviceCampos: AvisocamposService
+    private serviceCampos: AvisocamposService,
+    private opensnack: OpensnackbarService
   ) { }
 
   observer: Subscription;
@@ -40,32 +37,22 @@ export class HomeComponent implements OnInit {
 
   @ViewChild('submitButton', { static: true }) submitButton;
 
-  openSnackBar() {
-    const config = new MatSnackBarConfig();
-    config.duration = 5000;
-    config.verticalPosition = 'top';
-    this._snackBar.openFromComponent(AlertaComponent, config);
-  }
 
   ngOnInit(): void {
     this.usuario.login = '';
     this.usuario.senha = '';
   }
 
-  changeEvent($event) {
+  changeEvent() {
     this.submitButton.focus();
   }
 
-  openSnackBarCampos() {
-    const config = new MatSnackBarConfig();
-    config.duration = 5000;
-    config.verticalPosition = 'top';
-    this._snackBar.openFromComponent(AvisocamposComponent, config);
-  }
+
 
   onSubmit() {
     if (!this.usuario.login || !this.usuario.senha) {
-      this.openSnackBar();
+      this.serviceCampos.mudarAviso(6);
+      this.opensnack.openSnackBarCampos(AvisocamposComponent, 2000);
     } else {
 
       this.login.getUser(this.usuario)
@@ -78,12 +65,13 @@ export class HomeComponent implements OnInit {
             this.router.navigateByUrl('dados');
           } else {
             this.serviceCampos.mudarAviso(5);
-            this.openSnackBarCampos();
+            this.opensnack.openSnackBarCampos(AvisocamposComponent, 2000);
           }
         },
 
-          error => {
-            this.openSnackBar();
+          () => {
+            this.serviceCampos.mudarAviso(4);
+            this.opensnack.openSnackBarCampos(AvisocamposComponent, 2000);
           }
 
         );

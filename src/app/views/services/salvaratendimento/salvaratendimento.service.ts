@@ -1,9 +1,10 @@
-import { Cep } from './../../models/cep/cep';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Lacre } from '../../models/lacre/lacre';
+import { Observable, throwError, BehaviorSubject } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-
+import { Abertura } from '../../models/abertura/abertura';
+const url = 'https://gcdapi.herokuapp.com/';
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
 };
@@ -11,14 +12,16 @@ const httpOptions = {
 @Injectable({
   providedIn: 'root'
 })
-export class BuscacepService {
+export class SalvaratendimentoService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+  }
 
-  buscarCEP(cep: string): Observable<HttpResponse<Cep>> {
-    return this.http.get<Cep>('https://viacep.com.br/ws/' + cep + '/json/',  { observe: 'response' })
+  salvarAtendimento(abertura: Abertura): Observable<HttpResponse<Abertura>> {
+    return this.http.post<Abertura>(url + 'gcd/atendimento/salvar', abertura, { observe: 'response' })
       .pipe(catchError(this.handleError));
   }
+
   private handleError(error: HttpErrorResponse) {
     if (error.error instanceof ErrorEvent) {
       // A client-side or network error occurred. Handle it accordingly.
@@ -33,5 +36,3 @@ export class BuscacepService {
     return throwError('Something bad happened; please try again later.');
   }
 }
-
-

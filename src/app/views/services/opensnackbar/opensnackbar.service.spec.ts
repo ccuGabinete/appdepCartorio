@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 
-import { SucessoService } from './sucesso.service';
+import { OpensnackbarService } from './opensnackbar.service';
 
-describe('SucessoService', () => {
+describe('OpensnackbarService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 
   it('should be created', () => {
-    const service: SucessoService = TestBed.get(SucessoService);
+    const service: OpensnackbarService = TestBed.get(OpensnackbarService);
     expect(service).toBeTruthy();
   });
 });

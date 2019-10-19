@@ -1,18 +1,16 @@
+import { ProcessoService } from './../views/services/processo/processo.service';
+import { BuscalacreService } from './../views/services/buscalacre/buscalacre.service';
 import { AberturaService } from './../views/services/abertura/abertura.service';
 import { Subscription } from 'rxjs';
 import { ValidacpfService } from './../services/validacpf/validacpf.service';
 import { BuscacepService } from './../services/buscacep/buscacep.service';
-import { Localmulta } from './../models/localmulta/localmulta';
 import { InscricaomunicipalService } from '../services/inscricaomunicipal/InscricaomunicipalService';
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { MatSnackBar, MatSnackBarConfig } from '@angular/material';
-import { AvisocamposComponent } from '../avisocampos/avisocampos.component';
+import { MatSnackBar } from '@angular/material';
 import { LogadoService } from '../services/logado/logado.service';
 import { AvisocamposService } from '../services/avisocampos/avisocampos.service';
-import * as moment from 'moment-timezone';
 import { Router } from '@angular/router';
 import { Usuario } from '../models/usuario/usuario';
-import { PdfService } from '../services/pdf/pdf.service';
 import { Cadastro } from '../models/cadastro/cadastro';
 import { Abertura } from '../views/models/abertura/abertura';
 
@@ -31,8 +29,7 @@ export class DadosComponent implements OnInit, OnDestroy {
   nome: string;
   usuario: string;
   link: string;
-  processo: String;
-  motivo: string;
+  sexo: string;
   panelOpenState = false;
   base64Image: string;
   options = {
@@ -40,12 +37,9 @@ export class DadosComponent implements OnInit, OnDestroy {
     componentRestrictions: { country: 'BR' },
     location: [-22.921712, -43.449187]
   };
-  autorizado = false;
   onAutorizadotipo = 0;
   exibicao = 0;
-  listenprocesso = false;
   listenpreenchimento = false;
-  listenautorizado: boolean;
   opcoes = [
     'Abertura',
     'Consulta',
@@ -215,18 +209,18 @@ export class DadosComponent implements OnInit, OnDestroy {
     private _snackBar: MatSnackBar,
     private serviceCampos: AvisocamposService,
     private logado: LogadoService,
-    public local: Localmulta,
     public buscacepService: BuscacepService,
     private validacpf: ValidacpfService,
     private aberturaservice: AberturaService,
-    private abertura: Abertura
+    private abertura: Abertura,
+    private buscarLacre: BuscalacreService,
+    private processoservice: ProcessoService
   ) { }
   //#endregion
 
   @ViewChild('submitButton', { static: true }) submitButton;
   ngOnInit() {
     this.cadastro = new Cadastro();
-    this.local = new Localmulta();
     this.abertura = new Abertura();
 
     this.logado.currentMessage.subscribe(user => {
@@ -237,54 +231,79 @@ export class DadosComponent implements OnInit, OnDestroy {
   }
 
   onfocusProcesso() {
-    this.processo = '';
-    this.listenprocesso = false;
-    this.listenpreenchimento = false;
-    this.limpaCampo();
+    this.cadastro.processo = '';
   }
 
-  onProcesso() {
-    if (typeof this.processo !== 'undefined') {
-      if (this.processo.length === 14) {
-        this.listenprocesso = true;
+  // função para carregar o array de lacres
+  // para disponibilizar esse array com atecedência
+  // dado o possível iato no carregamento dos dados
+  carregaLacres() {
+    this.buscarLacre.buscarLacre().subscribe(arr => {
+      const resp = this.buscarLacre.converteParaArrayDeLacres(arr.body);
+      this.buscarLacre.atualizarArrayLacres(resp);
+    });
+  }
+
+  onMotivo() {
+    switch (this.cadastro.motivo) {
+      case 'Abertura': {
+        this.exibicao = 1;
+        this.carregaLacres();
+        break;
+      }
+      case 'Consulta': {
+        this.exibicao = 2;
+        break;
+      }
+      case 'Doação': {
+        this.exibicao = 3;
+        break;
+      }
+      case 'Entrega': {
+        this.exibicao = 4;
+        break;
+      }
+      case 'Atendimento': {
+        this.exibicao = 5;
+        break;
+      }
+      case 'Recurso': {
+        this.exibicao = 6;
+        break;
+      }
+      default: {
+        this.exibicao = 0;
+        break;
       }
     }
-  }
-
-    onMotivo() {
-    this.autorizado = true;
-    if (this.motivo === 'Abertura') {
-      this.exibicao = 1;
-    }
-
-    if (this.motivo === 'Consulta') {
-      this.exibicao = 2;
-    }
-
-    if (this.motivo === 'Doação') {
-      this.exibicao = 3;
-    }
-
-    if (this.motivo === 'Entrega') {
-      this.exibicao = 4;
-    }
-
-    if (this.motivo === 'Atendimento') {
-      this.exibicao = 5;
-    }
-
-    if (this.motivo === 'Recurso') {
-      this.exibicao = 6;
-    }
 
   }
 
-  onAutorizado(value: any) {
+  onAutorizado(value: boolean) {
+
     if (value === true) {
       this.onAutorizadotipo = 1;
     } else {
       this.onAutorizadotipo = 2;
     }
+  }
+
+  // ao clicar no campo matricula reseta os atributos
+  // do objeto cadastro ligados a matrícula
+  onMatricula() {
+    this.cadastro.matricula = null;
+    this.cadastro.nome = null;
+    this.cadastro.autorizado = null;
+    this.cadastro.concessao = null;
+    this.cadastro.cpf = null;
+    this.cadastro.equipamento = null;
+    this.cadastro.isento = null;
+    this.cadastro.local = null;
+    this.cadastro.matricula = null;
+    this.cadastro.nomeaux = null;
+    this.cadastro.cpfaux = null;
+    this.cadastro.numero = null;
+    this.cadastro.documento = null;
   }
 
   onCPF(cpf) {
@@ -297,27 +316,38 @@ export class DadosComponent implements OnInit, OnDestroy {
     }
   }
 
+  // carrega o objeto abertura que poderá utilizado por outras views
   onIdentificado() {
     this.logado.currentMessage.subscribe(user => {
       this.abertura.cpf = this.cadastro.cpf;
       this.abertura.nome = this.cadastro.nome;
       this.abertura.agenterespcadastro = user.nome;
-      this.abertura.processo = this.processo;
-      this.abertura.autorizado = this.listenautorizado;
-      this.abertura.matricula = this.cadastro.matricula;
-      this.aberturaservice.atualizarAbertura(this.abertura);
-      
-
-      if (this.onAutorizadotipo === 1) {
-        this.abertura.autorizado = true;
+      this.abertura.processo = this.cadastro.processo;
+      this.abertura.autorizado = this.cadastro.listenautorizado;
+      this.abertura.motivo = this.cadastro.motivo;
+      this.abertura.sexo = this.cadastro.sexo;
+      if (typeof this.cadastro.matricula !== 'undefined') {
+        this.abertura.matricula = this.cadastro.matricula;
       } else {
-        this.abertura.autorizado = false;
+        this.abertura.matricula = '';
       }
+      if (typeof this.cadastro.equipamento !== 'undefined') {
+        this.abertura.equipamento = this.cadastro.equipamento;
+        this.abertura.localequipamento = this.cadastro.local;
+      } else {
+        this.abertura.equipamento = '';
+        this.abertura.localequipamento = '';
+      }
+      this.aberturaservice.atualizarAbertura(this.abertura);
     });
   }
 
   changeEvent() {
     this.submitButton.focus();
+  }
+
+  onSexo(value) {
+    (value) ? this.sexo = 'homem' : this.sexo = 'mulher';
   }
 
   onLogout() {
@@ -331,41 +361,28 @@ export class DadosComponent implements OnInit, OnDestroy {
     this.router.navigateByUrl('');
   }
 
-  openSnackBarCampos() {
-    const config = new MatSnackBarConfig();
-    config.duration = 5000;
-    config.verticalPosition = 'top';
-    this._snackBar.openFromComponent(AvisocamposComponent, config);
-  }
-
-  gerarData() {
-    const data = Date.now();
-    const dateMoment = moment(data);
-    return dateMoment.tz('America/Sao_Paulo').format('DD/MM/YYYY');
-  }
-
-  gerarMomentData(date) {
-    const dateMoment = moment(date);
-    return dateMoment.tz('America/Sao_Paulo').format('DD/MM/YYYY');
-  }
-
   buscaNotificado(value) {
     if (value && value.length === 8) {
       this.inscmunservice.buscarCadastro(value).subscribe(resp => {
-        this.cadastro = resp.body;
-        this.onIdentificado();
+        this.cadastro.nome = resp.body.nome;
+        this.cadastro.autorizado = resp.body.autorizado;
+        this.cadastro.concessao = resp.body.concessao;
+        this.cadastro.cpf = resp.body.cpf;
+        this.cadastro.equipamento = resp.body.equipamento;
+        this.cadastro.isento = resp.body.isento;
+        this.cadastro.local = resp.body.local;
+        this.cadastro.matricula = resp.body.matricula;
+        this.cadastro.nomeaux = resp.body.nomeaux;
+        this.cadastro.cpfaux = resp.body.cpfaux;
+        this.cadastro.numero = resp.body.numero;
+        this.cadastro.documento = resp.body.documento;
         this.listenpreenchimento = true;
+        this.onIdentificado();
       }, () => this.cadastro.nome = 'Inscrição Municipal inexistente'
       );
     } else {
       this.cadastro.nome = 'A matrícula tem 8 dígitos e foram digitados ' + value.length;
     }
-  }
-
-  limpaCampo() {
-    this.cadastro = new Cadastro();
-    this.local = new Localmulta();
-    this.cadastro.motivo = this.motivo;
   }
 
   ngOnDestroy(): void {

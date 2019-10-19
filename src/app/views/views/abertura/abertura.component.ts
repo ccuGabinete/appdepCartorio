@@ -1,13 +1,18 @@
+import { Router } from '@angular/router';
+import { SalvaratendimentoService } from './../../services/salvaratendimento/salvaratendimento.service';
+import { OpensnackbarService } from './../../services/opensnackbar/opensnackbar.service';
+import { FormatacoesService } from './../../services/formatacoes/formatacoes.service';
+import { GerardataService } from './../../services/gerardata/gerardata.service';
+import { Atendimento } from './../../models/atendimento/atendimento';
+import { SalvarlacreService } from './../../services/salvarlacre/salvarlacre.service';
 import { BuscalacreService } from './../../services/buscalacre/buscalacre.service';
 import { PdfService } from './../../../services/pdf/pdf.service';
 import { AberturaService } from './../../services/abertura/abertura.service';
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { InscricaomunicipalService } from '../../../services/inscricaomunicipal/InscricaomunicipalService';
-import { MatSnackBar, MatSnackBarConfig } from '@angular/material';
 import { AvisocamposService } from '../../../services/avisocampos/avisocampos.service';
 import { BuscacepService } from '../../../services/buscacep/buscacep.service';
 import { AvisocamposComponent } from '../../../avisocampos/avisocampos.component';
-import * as moment from 'moment-timezone';
 import { Abertura } from '../../models/abertura/abertura';
 import { Lacre } from '../../models/lacre/lacre';
 import { BuscarautoService } from '../../services/buscarauto/buscarauto.service';
@@ -21,6 +26,7 @@ import { Auto } from '../../models/auto/auto';
 export class AberturaComponent implements OnInit, OnDestroy {
 
   //#region variaveis
+  processo: string;
   dataexpedicao: Date;
   dataapreensao: Date;
   telresformatado: string;
@@ -189,16 +195,25 @@ export class AberturaComponent implements OnInit, OnDestroy {
     'Zimbabuensa'
   ];
 
-  estadocivil = [
+  homem = [
     'Solteiro',
     'Casado',
     'Viúvo',
     'Separado',
     'Divorciado'
-  ].sort();
+  ];
 
-  listalacres = [];
-  listaAutos = [];
+  mulher = [
+    'Solteira',
+    'Casada',
+    'Viúva',
+    'Separada',
+    'Divorciada'
+  ];
+
+  estadocivil: Array<string>;
+  listalacres: Array<Lacre> = [];
+  listaAutos: Array<Auto> = [];
   listaTRM = [];
   objlacre: string;
   comprobatorio = '';
@@ -207,14 +222,13 @@ export class AberturaComponent implements OnInit, OnDestroy {
     'TRM',
     'Lacre',
     'Nenhum'
-  ]
+  ];
 
   //#endregion
 
   //#region construtor
   constructor(
     public inscmunservice: InscricaomunicipalService,
-    private _snackBar: MatSnackBar,
     private serviceCampos: AvisocamposService,
     public buscacepService: BuscacepService,
     public abertura: Abertura,
@@ -223,7 +237,14 @@ export class AberturaComponent implements OnInit, OnDestroy {
     private buscalacre: BuscalacreService,
     public lacre: Lacre,
     public auto: Auto,
-    public buscarauto: BuscarautoService
+    public buscarauto: BuscarautoService,
+    private salvarlacre: SalvarlacreService,
+    public atendimento: Atendimento,
+    private gerardata: GerardataService,
+    private formata: FormatacoesService,
+    private opensnack: OpensnackbarService,
+    private salvaratendimento: SalvaratendimentoService,
+    private router: Router
   ) { }
   //#endregion
 
@@ -232,68 +253,67 @@ export class AberturaComponent implements OnInit, OnDestroy {
     this.abertura = new Abertura();
     this.lacre = new Lacre();
     this.auto = new Auto();
+    this.atendimento = new Atendimento();
+    this.aberturaservice.correnteAbertura.subscribe(abertura => {
+      this.abertura = abertura;
+      if (!this.abertura.sexo) {
+        this.estadocivil = this.mulher;
+      } else {
+        this.estadocivil = this.homem;
+      }
+    });
   }
 
   changeEvent() {
     this.submitButton.focus();
   }
 
-  openSnackBarCampos() {
-    const config = new MatSnackBarConfig();
-    config.duration = 5000;
-    config.verticalPosition = 'top';
-    this._snackBar.openFromComponent(AvisocamposComponent, config);
-  }
-
-  testaCampo(): boolean {
+  testaCampo(abertura: Abertura): boolean {
     let response: boolean;
 
     if (
-      typeof this.abertura.autorizado !== 'undefined' ||
-      typeof this.abertura.bairro !== 'undefined' ||
-      typeof this.abertura.cep !== 'undefined' ||
-      typeof this.abertura.cpf !== 'undefined' ||
-      typeof this.abertura.endereco !== 'undefined' ||
-      typeof this.abertura.estadocivil !== 'undefined' ||
-      typeof this.abertura.expedicao !== 'undefined' ||
-      typeof this.abertura.identidade !== 'undefined' ||
-      typeof this.abertura.itensdiscriminados !== 'undefined' ||
-      typeof this.abertura.localapreensao !== 'undefined' ||
-      typeof this.abertura.matricula !== 'undefined' ||
-      typeof this.abertura.municipio !== 'undefined' ||
-      typeof this.abertura.nacionalidade !== 'undefined' ||
-      typeof this.abertura.nome !== 'undefined' ||
-      typeof this.abertura.numero !== 'undefined' ||
-      typeof this.abertura.processo !== 'undefined'
+      typeof abertura.autorizado !== 'undefined' &&
+      typeof abertura.bairro !== 'undefined' &&
+      typeof abertura.cep !== 'undefined' &&
+      typeof abertura.cpf !== 'undefined' &&
+      typeof abertura.endereco !== 'undefined' &&
+      typeof abertura.estadocivil !== 'undefined' &&
+      typeof abertura.dataexpedicao !== 'undefined' &&
+      typeof abertura.identidade !== 'undefined' &&
+      typeof abertura.itensdiscriminados !== 'undefined' &&
+      typeof abertura.localapreensao !== 'undefined' &&
+      typeof abertura.dataapreensao !== 'undefined' &&
+      typeof abertura.matricula !== 'undefined' &&
+      typeof abertura.municipio !== 'undefined' &&
+      typeof abertura.nacionalidade !== 'undefined' &&
+      typeof abertura.nome !== 'undefined' &&
+      typeof abertura.numero !== 'undefined'
 
     ) {
-      response =  true;
-    }else {
-      response =  false;
-    }
 
-    console.log(response);
-    return response;
+      if (typeof abertura.complemento === 'undefined') {
+        abertura.complemento = '';
+      }
 
-  }
+      if (typeof abertura.telresidencial === 'undefined') {
+        abertura.telresidencial = '';
+      }
 
-  gerarData(bd?: boolean) {
-    const data = Date.now();
-    const dateMoment = moment(data);
-    if (bd) {
-      return dateMoment.tz('America/Sao_Paulo').format('DD/MM/YY');
+      if (typeof abertura.telcelular === 'undefined') {
+        abertura.telcelular = '';
+      }
+
+      if (typeof abertura.email === 'undefined') {
+        abertura.email = '';
+      }
+
+      response = true;
     } else {
-      return dateMoment.tz('America/Sao_Paulo').format('DD/MM/YYYY');
+      this.serviceCampos.mudarAviso(2);
+      this.opensnack.openSnackBarCampos(AvisocamposComponent, 2000);
+      response = false;
     }
-
-  }
-
-  gerarMomentData(date) {
-    moment.defineLocale('America/Sao_Paulo', {
-      parentLocale: 'pt-BR'
-    });
-    const dateMoment = moment(date).format('DD/MM/YYYY');
-    return dateMoment;
+    return response;
   }
 
   public handleAddressChange(address: any) {
@@ -319,32 +339,10 @@ export class AberturaComponent implements OnInit, OnDestroy {
       this.abertura.autorizado = abertura.autorizado;
       this.abertura.processo = abertura.processo;
       this.abertura.matricula = abertura.matricula;
+      this.abertura.equipamento = abertura.equipamento;
+      this.abertura.localequipamento = abertura.localequipamento;
+      this.abertura.motivo = abertura.motivo;
     });
-  }
-
-  onSubmit() {
-
-    if (this.testaCampo()) {
-      if (
-        typeof this.abertura.complemento === 'undefined'
-        || typeof this.abertura.telcelular === 'undefined'
-        || typeof this.abertura.telresidencial === 'undefined'
-        || typeof this.abertura.email === 'undefined'
-      ) {
-        this.abertura.complemento = '';
-        this.abertura.telcelular = '';
-        this.abertura.telresidencial = '';
-        this.abertura.email = '';
-      }
-      this.populaListas();
-      this.abertura.dataapreensao = this.gerarMomentData(this.dataapreensao);
-      this.abertura.dataexpedicao = this.gerarMomentData(this.dataexpedicao);
-      this.pdfservice.downloadPDF(this.abertura);
-    } else {
-      this.serviceCampos.mudarAviso(2);
-      this.openSnackBarCampos();
-    }
-   
   }
 
   onEmail() {
@@ -352,35 +350,65 @@ export class AberturaComponent implements OnInit, OnDestroy {
     this.abertura.telresidencial = this.telcelformatado;
   }
 
-  onAuto() {
-    if (typeof this.abertura.autodeapreensao !== 'undefined') {
-      this.buscarauto.buscarAuto(this.abertura.autodeapreensao).subscribe(data => {
-        this.auto.pos = data.body.pos;
-        this.auto.numero = data.body.numero;
-        this.buscalacre.buscarPosicao(this.auto.pos).subscribe(data => {
-          this.populaLacre(data);
-          this.listaAutos.push({ autodeapreensao: this.auto.numero, pos: this.auto.pos });
-          this.abertura.autodeapreensao = '';
-        })
-      })
-    }
+  onAuto(numerodoauto) {
+    this.buscarauto.buscarAuto(numerodoauto).subscribe(data => {
+      this.auto = data.body;
+
+      // caso o auto seja encontrado será carregado o array de lacres
+      // pertencentes a esse
+      if (data.body.pos !== '') {
+        const response = this.buscarauto.filtraPosicao(this.auto);
+        response.forEach(t => {
+
+          // aqui nesse ponto indexa o número de processo a esses lacres
+          t.processo = this.abertura.processo.toString();
+          this.listalacres.push(t);
+        });
+      } else {
+        // Se esse auto ainda não deu entrada no PF
+        // entao, fixa valores default de numero e pos
+        // e não reetorna nenhum lacre
+        this.auto.numero = this.abertura.autodeapreensao;
+        this.auto.pos = '0000';
+      }
+
+      // sempre será inserido o número do auto na listaautos
+
+      this.listaAutos.push(this.auto);
+      this.abertura.autodeapreensao = '';
+
+    });
   }
 
   onLacre(val: string) {
-    const tamanho = val.length;
-    if (tamanho < 8) {
-      for (let i = 0; i < (8 - tamanho); i++) {
-        val = '0' + val;
+    this.abertura.lacre = this.formata.colocaZeros(this.abertura.lacre);
+    val = this.formata.colocaZeros(val);
+    this.buscalacre.arrayAtual.subscribe(arr => {
+      // busca o lacre nos array de lacres
+      // e caso não exista delimita valores default para o mesmo
+      // e adiciona a this.listaLacres
+      const response = this.buscalacre.filtrarPorLacre(arr, val);
+      if (response.length === 0) {
+        const lacre = new Lacre();
+        lacre.numero = val;
+        lacre.data = this.gerardata.gerarData(true);
+        lacre.pos = '0000';
+        lacre.auto = '0';
+        lacre.trm = '0';
+        response.push(lacre);
+        lacre.processo = this.abertura.processo.toString();
       }
-    }
-    this.objlacre = val;
-    this.buscalacre.buscarLacre(this.objlacre).subscribe(data => {
-      this.populaLacre(data);
+
+      response.forEach(t => {
+        this.listalacres.push(t);
+      });
+
+      this.abertura.lacre = '';
     });
   }
 
   onFocusLacre() {
-    this.objlacre = '';
+    this.abertura.lacre = '';
   }
 
   onFocusAuto() {
@@ -388,47 +416,18 @@ export class AberturaComponent implements OnInit, OnDestroy {
   }
 
   onDeletar(obj) {
-    const index = this.listalacres.findIndex(lacre => lacre.id === obj.id);
+    const index = this.listalacres.findIndex(lacre => lacre.numero === obj.numero);
     this.listalacres.splice(index, 1);
   }
 
-  populaLacre(data: any) {
-    let obj = {};
-    if (typeof data.body[0].response === 'undefined') {
-      data.body.forEach(dt => {
-        this.listalacres.push(dt);
-      });
-    } else {
-      obj = {
-        atualizado: this.gerarData(true),
-        id: this.objlacre,
-        pos: '0000',
-        status: '00',
-        processo: this.abertura.processo
-      };
-      this.listalacres.push(obj);
-    }
-  }
-
   onTRM() {
-    const tamanho = this.abertura.trm.length;
-    let str = this.abertura.trm;
-    if (tamanho < 8) {
-      for (let i = 0; i < (8 - tamanho); i++) {
-        str = '0' + str;
-      }
-    }
-    this.abertura.trm = str;
-    this.listaTRM.push(str);
+    this.abertura.trm = this.formata.colocaZeros(this.abertura.trm);
+    this.listaTRM.push(this.abertura.trm);
     this.abertura.trm = '';
   }
 
   onFocusTRM() {
     this.abertura.trm = '';
-  }
-
-  ngOnDestroy(): void {
-    this.serviceCampos.mudarAviso(1);
   }
 
   onDeletarTRM(trm: string) {
@@ -437,23 +436,25 @@ export class AberturaComponent implements OnInit, OnDestroy {
   }
 
   onDeletarAuto(auto: Auto) {
-    const index = this.listaTRM.findIndex(x => x.autodeapreensao === auto.numero);
+    const index = this.listaAutos.findIndex(x => x.numero === auto.numero);
     this.listaAutos.splice(index, 1);
 
     const filterLacre = (lacre) => {
       return lacre.pos !== auto.pos;
-    }
+    };
 
     this.listalacres = this.listalacres.filter(filterLacre);
-    console.log(this.listalacres);
+    this.abertura.autodeapreensao = '';
   }
 
   onComprobatorio() {
     this.listaAutos = [];
     this.listaTRM = [];
     this.listalacres = [];
+    this.objlacre = '';
   }
 
+  // função sem uso definido aguardando exclusão
   populaListas() {
     this.abertura.listalacres = '';
     this.abertura.listaautos = '';
@@ -461,21 +462,117 @@ export class AberturaComponent implements OnInit, OnDestroy {
 
     this.listalacres.forEach((lacre, pos, array) => {
       if (pos !== array.length - 1) {
-        this.abertura.listalacres += lacre.id + ' - ';
+        this.abertura.listalacres += lacre.numero + ' - ';
       } else {
-        this.abertura.listalacres += lacre.id
+        this.abertura.listalacres += lacre.numero;
       }
-    })
+    });
 
     this.listaAutos.forEach((auto, pos, array) => {
       if (pos !== array.length - 1) {
-        this.abertura.listaautos += auto.autodeapreensao + ' - ';
+        this.abertura.listaautos += auto.numero + ' - ';
       } else {
-        this.abertura.listaautos += auto.autodeapreensao;
+        this.abertura.listaautos += auto.numero;
       }
-    })
+    });
 
-    console.log(this.abertura);
   }
 
+
+  onAtendimento() {
+
+  }
+
+  onSubmit() {
+    if (this.testaCampo(this.abertura)) {
+      this.populaitensComporbatorios();
+
+      this.abertura.dataexpedicao = this.gerardata.gerarMomentData(this.abertura.dataexpedicao);
+      this.abertura.dataapreensao = this.gerardata.gerarMomentData(this.abertura.dataapreensao);
+      this.abertura.dataabertura = this.gerardata.gerarMomentData(this.abertura.dataabertura);
+
+      this.salvaratendimento.salvarAtendimento(this.abertura).subscribe(() => {
+        this.serviceCampos.mudarAviso(3);
+        this.opensnack.openSnackBarCampos(AvisocamposComponent, 2000);
+        this.onEnviaLacres();
+        this.pdfservice.downloadPDF(this.abertura);
+        this.pdfservice.pdfavisocorrente.subscribe(() => {
+          console.log(this.abertura);
+          setTimeout(() => {
+            this.refresh();
+          }, 4000);
+        });
+      },
+        () => {
+          this.serviceCampos.mudarAviso(4);
+          this.opensnack.openSnackBarCampos(AvisocamposComponent, 2000);
+        });
+    }
+  }
+
+  // função rsponsável por salvar e/ou atualizar os lacres
+  onEnviaLacres() {
+    const arrenvio = this.salvarlacre.converteParaPlanilhaExcel(this.listalacres);
+    arrenvio.forEach(obj => {
+      if (obj.pos !== '0000') {
+        this.salvarlacre.atualizarLacre(obj).subscribe(data => {
+          console.log(data);
+        }, () => {
+          this.serviceCampos.mudarAviso(4);
+          this.opensnack.openSnackBarCampos(AvisocamposComponent, 2000);
+        });
+
+      } else {
+        this.salvarlacre.salvarLacre(obj).subscribe(data => {
+          console.log(data);
+        });
+      }
+    }, () => {
+      this.serviceCampos.mudarAviso(4);
+      this.opensnack.openSnackBarCampos(AvisocamposComponent, 2000);
+    });
+  }
+
+  // função responsável por atribuir os valores de autos, lacres e trms para
+  // serem usados pelo servico pdf.service
+  populaitensComporbatorios() {
+    this.abertura.listatrms = this.listaTRM.toString();
+    this.abertura.listaautos = '';
+    this.abertura.listalacres = '';
+    this.listaAutos.forEach((t, p, a) => {
+      if (p !== a.length - 1) {
+        if (t.pos !== '0000') {
+          this.abertura.listaautos += t.numero + '(' + t.pos + ')' + ',';
+        } else {
+          this.abertura.listaautos += t.numero + ',';
+        }
+      } else {
+        if (t.pos !== '0000') {
+          this.abertura.listaautos += t.numero + '(' + t.pos + ')';
+        } else {
+          this.abertura.listaautos += t.numero;
+        }
+      }
+
+    });
+
+    this.listalacres.forEach((t, p, a) => {
+      if (p !== a.length - 1) {
+        this.abertura.listalacres += t.numero + ',';
+      } else {
+        this.abertura.listalacres += t.numero;
+      }
+
+    });
+  }
+
+  refresh(): void {
+    this.router.navigateByUrl('/abertura', { skipLocationChange: true }).then(() => {
+      this.router.navigate(['dados']);
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.serviceCampos.mudarAviso(1);
+  }
 }

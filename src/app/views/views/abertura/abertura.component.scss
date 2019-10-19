@@ -1,13 +1,13 @@
 .example-radio-group {
   display: flex;
   flex-direction: column;
-  margin: 15px 0;
+  margin-bottom: 1em;
 }
 
 .example-radio-button {
-  margin: 5px;
+  font-size: 0.8em;
+  color: #00ffff;
 }
-
 
 .mat-form-field {
   width: 95%;
@@ -15,14 +15,22 @@
   padding-left: 1em;
 }
 
-th,
-td {
+th {
   font-size: 1em;
+  color: turquoise;
+  font-style: normal;
+  font-family: "Times New Roman", Times, serif;
+  text-align: center;
+}
+
+td {
+  font-size: 0.8em;
+  text-align: center;
 }
 
 #deletar {
   font-size: 1em;
-  color: SteelBlue	;
+  color: SteelBlue;
   text-decoration: underline LightSkyBlue;
 }
 

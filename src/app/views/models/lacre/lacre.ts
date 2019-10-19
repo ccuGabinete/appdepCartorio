@@ -1,12 +1,13 @@
 export class Lacre {
-  data: Date;
-  linha: number;
-  coluna: number;
-  id: string;
-  pos: string;
-  processo: string;
-  status: string;
-  atualizado: string;
-  codigo: string;
+  auto: string;
+  data: Date;
+  grupo: string;
+  quantidade: string;
+  lacre: string;
+  linha: number;
+  numero: string;
+  pos: string;
+  processo: string;
+  trm: string;
 }
 

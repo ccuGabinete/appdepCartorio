@@ -1,19 +1,21 @@
 export class Cadastro {
-  processo: string;
-  autorizado: boolean;
-  motivo: string;
-  documento: string;
-  numero: string;
+  sexo: boolean;
   agenterespcadastro: string;
-  data: Date;
-  matricula: string;
+  autorizado: boolean;
   concessao: Date;
-  isento: string;
-  equipamento: string;
-  local: string;
-  situacao: string;
-  nome: string;
   cpf: string;
-  nomeaux: string;
   cpfaux: string;
+  data: Date;
+  documento: string;
+  equipamento: string;
+  isento: string;
+  listenautorizado: boolean;
+  local: string;
+  matricula: string;
+  motivo: string;
+  nome: string;
+  nomeaux: string;
+  numero: string;
+  processo: string;
+  situacao: string;
 }

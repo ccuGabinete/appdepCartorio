@@ -1,3 +1,9 @@
+import { ProcessoService } from './views/services/processo/processo.service';
+import { OpensnackbarService } from './views/services/opensnackbar/opensnackbar.service';
+import { FormatacoesService } from './views/services/formatacoes/formatacoes.service';
+import { GerardataService } from './views/services/gerardata/gerardata.service';
+import { Atendimento } from './views/models/atendimento/atendimento';
+import { GeracodigoService } from './views/services/geracodigo/geracodigo.service';
 import { AberturaService } from './views/services/abertura/abertura.service';
 import { AtendimentoComponent } from './views/views/atendimento/atendimento.component';
 import { AberturaComponent } from './views/views/abertura/abertura.component';
@@ -36,22 +42,16 @@ import { HomeComponent } from './home/home.component';
 import { AppComponent } from './app.component';
 
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { AlertaComponent } from './alerta/alerta.component';
-import { SucessoService } from './services/sucesso/SucessoService';
-import { Aviso } from './models/aviso/aviso';
 import { AvisocamposService } from './services/avisocampos/avisocampos.service';
-import { AvisosalvarService } from './services/avisosalvar/avisosalvar.service';
-import { Avisocamposmodel } from './models/avisoscamposmodel/avisocamposmodel';
-import { Avisosalvarmodel } from './models/avisosalvarmodel/avisosalvarmodel';
 import { AvisocamposComponent } from './avisocampos/avisocampos.component';
 import { LogadoService } from './services/logado/logado.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { Usuario } from './models/usuario/usuario';
-import { Notificado } from './models/notificado/notificado';
 import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { Localmulta } from './models/localmulta/localmulta';
+import { MatCardModule } from '@angular/material/card';
 import { PdfService } from './services/pdf/pdf.service';
 import { ValidacpfService } from './services/validacpf/validacpf.service';
 import { ConsultaComponent } from './views/views/consulta/consulta.component';
@@ -63,6 +63,7 @@ import { TitleCasePipe, LowerCasePipe } from '@angular/common';
 import { Lacre } from './views/models/lacre/lacre';
 import { Auto } from './views/models/auto/auto';
 import { BuscarautoService } from './views/services/buscarauto/buscarauto.service';
+import { SalvarlacreService } from './views/services/salvarlacre/salvarlacre.service';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -79,7 +80,6 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
     AtendimentoComponent,
     DadosComponent,
     HomeComponent,
-    AlertaComponent,
     AvisocamposComponent,
     ConsultaComponent,
     DoacaoComponent,
@@ -97,6 +97,8 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
     SharedModule,
     AppRoutingModule,
     BrowserAnimationsModule,
+    MatCardModule,
+    MatSlideToggleModule,
     MatRadioModule,
     MatInputModule,
     MatSelectModule,
@@ -118,6 +120,13 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
     })
   ],
   providers: [
+    ProcessoService,
+    OpensnackbarService,
+    FormatacoesService,
+    GerardataService,
+    Atendimento,
+    GeracodigoService,
+    SalvarlacreService,
     Auto,
     BuscarautoService,
     Lacre,
@@ -128,17 +137,10 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
     ValidacpfService,
     Cadastro,
     PdfService,
-    Localmulta,
-    Aviso,
     LoginService,
-    SucessoService,
     AvisocamposService,
-    AvisosalvarService,
-    Avisosalvarmodel,
-    Avisocamposmodel,
     LogadoService,
     Usuario,
-    Notificado,
     MatDatepickerModule,
     InscricaomunicipalService,
     { provide: MAT_DATE_LOCALE, useValue: 'pt-BR' },
@@ -146,11 +148,9 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
   ],
   bootstrap: [AppComponent],
   exports: [
-    AlertaComponent,
     AvisocamposComponent
   ],
   entryComponents: [
-    AlertaComponent,
     AvisocamposComponent
   ]
 

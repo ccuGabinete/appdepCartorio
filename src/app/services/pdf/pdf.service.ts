@@ -4,12 +4,23 @@ import * as jsPDF from 'jspdf';
 import * as imagens from '../../services/imagens';
 import * as moment from 'moment-timezone';
 import { TitleCasePipe, LowerCasePipe } from '@angular/common';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PdfService {
+  public pdfaviso = '';
   imageData = imagens.body;
+  public buscarPdfaAviso = new BehaviorSubject(this.pdfaviso);
+  pdfavisocorrente = this.buscarPdfaAviso.asObservable();
+
+  mudarPdfAviso(aviso: string) {
+    this.buscarPdfaAviso.next(aviso);
+  }
+
+
+
 
   constructor(private titlecasePipe: TitleCasePipe, private lowercasePipe: LowerCasePipe) { }
 
@@ -45,8 +56,6 @@ export class PdfService {
     abertura.email = this.lowercasePipe.transform(abertura.email);
     abertura.itensdiscriminados = this.lowercasePipe.transform(abertura.itensdiscriminados);
     //#endregion
-
-    console.log(abertura);
 
     const coord = {
 
@@ -179,7 +188,7 @@ export class PdfService {
       text22: {
         texto: abertura.listaautos,
         x: 77.07,
-        y: 171
+        y: 172
       },
 
       text23: {
@@ -252,6 +261,7 @@ export class PdfService {
     //#endregion
     doc.addImage(this.imageData, 'PNG', coord.imageBody.x, coord.imageBody.y, coord.imageBody.w, coord.imageBody.h);
     doc.save('Abertura de Processo nº' + '');
+    this.mudarPdfAviso('ok');
 
   }
 
