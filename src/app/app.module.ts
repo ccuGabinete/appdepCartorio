@@ -62,6 +62,7 @@ import { Lacre } from './views/models/lacre/lacre';
 import { Auto } from './views/models/auto/auto';
 import { BuscarautoService } from './views/services/buscarauto/buscarauto.service';
 import { SalvarlacreService } from './views/services/salvarlacre/salvarlacre.service';
+import { ClipboardModule } from 'ngx-clipboard';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -84,6 +85,7 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
     RecursoComponent
   ],
   imports: [
+    ClipboardModule,
     ReactiveFormsModule,
     NgxMaskModule.forRoot(options),
     GooglePlaceModule,

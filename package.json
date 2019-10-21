@@ -98,6 +98,7 @@
     "jquery": "^3.4.1",
     "jspdf": "^1.5.3",
     "moment-timezone": "^0.5.26",
+    "ngx-clipboard": "^12.2.1",
     "ngx-google-places-autocomplete": "^2.0.4",
     "ngx-mask": "^8.0.9",
     "popper": "^1.0.1"
