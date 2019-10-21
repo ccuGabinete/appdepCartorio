@@ -2,10 +2,8 @@ import { ProcessoService } from './views/services/processo/processo.service';
 import { OpensnackbarService } from './views/services/opensnackbar/opensnackbar.service';
 import { FormatacoesService } from './views/services/formatacoes/formatacoes.service';
 import { GerardataService } from './views/services/gerardata/gerardata.service';
-import { Atendimento } from './views/models/atendimento/atendimento';
 import { GeracodigoService } from './views/services/geracodigo/geracodigo.service';
 import { AberturaService } from './views/services/abertura/abertura.service';
-import { AtendimentoComponent } from './views/views/atendimento/atendimento.component';
 import { AberturaComponent } from './views/views/abertura/abertura.component';
 import { Cadastro } from './models/cadastro/cadastro';
 import { BuscacepService } from './services/buscacep/buscacep.service';
@@ -77,7 +75,6 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
   declarations: [
     AberturaComponent,
     AppComponent,
-    AtendimentoComponent,
     DadosComponent,
     HomeComponent,
     AvisocamposComponent,
@@ -124,7 +121,6 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
     OpensnackbarService,
     FormatacoesService,
     GerardataService,
-    Atendimento,
     GeracodigoService,
     SalvarlacreService,
     Auto,

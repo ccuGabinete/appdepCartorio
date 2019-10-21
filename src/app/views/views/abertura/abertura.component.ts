@@ -3,7 +3,6 @@ import { SalvaratendimentoService } from './../../services/salvaratendimento/sal
 import { OpensnackbarService } from './../../services/opensnackbar/opensnackbar.service';
 import { FormatacoesService } from './../../services/formatacoes/formatacoes.service';
 import { GerardataService } from './../../services/gerardata/gerardata.service';
-import { Atendimento } from './../../models/atendimento/atendimento';
 import { SalvarlacreService } from './../../services/salvarlacre/salvarlacre.service';
 import { BuscalacreService } from './../../services/buscalacre/buscalacre.service';
 import { PdfService } from './../../../services/pdf/pdf.service';
@@ -239,7 +238,6 @@ export class AberturaComponent implements OnInit, OnDestroy {
     public auto: Auto,
     public buscarauto: BuscarautoService,
     private salvarlacre: SalvarlacreService,
-    public atendimento: Atendimento,
     private gerardata: GerardataService,
     private formata: FormatacoesService,
     private opensnack: OpensnackbarService,
@@ -253,7 +251,6 @@ export class AberturaComponent implements OnInit, OnDestroy {
     this.abertura = new Abertura();
     this.lacre = new Lacre();
     this.auto = new Auto();
-    this.atendimento = new Atendimento();
     this.aberturaservice.correnteAbertura.subscribe(abertura => {
       this.abertura = abertura;
       if (!this.abertura.sexo) {

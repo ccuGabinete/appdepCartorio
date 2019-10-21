@@ -46,7 +46,7 @@ export class DadosComponent implements OnInit, OnDestroy {
     'Recurso',
     'Entrega',
     'Doação',
-    'Atendimento'
+    'Descarte'
   ].sort();
   testeAutorizado: string;
   orgaos = [
@@ -206,15 +206,13 @@ export class DadosComponent implements OnInit, OnDestroy {
     private router: Router,
     public cadastro: Cadastro,
     public inscmunservice: InscricaomunicipalService,
-    private _snackBar: MatSnackBar,
     private serviceCampos: AvisocamposService,
     private logado: LogadoService,
     public buscacepService: BuscacepService,
     private validacpf: ValidacpfService,
     private aberturaservice: AberturaService,
     private abertura: Abertura,
-    private buscarLacre: BuscalacreService,
-    private processoservice: ProcessoService
+    private buscarLacre: BuscalacreService
   ) { }
   //#endregion
 
@@ -263,10 +261,7 @@ export class DadosComponent implements OnInit, OnDestroy {
         this.exibicao = 4;
         break;
       }
-      case 'Atendimento': {
-        this.exibicao = 5;
-        break;
-      }
+    
       case 'Recurso': {
         this.exibicao = 6;
         break;
@@ -347,7 +342,7 @@ export class DadosComponent implements OnInit, OnDestroy {
   }
 
   onSexo(value) {
-    (value) ? this.sexo = 'homem' : this.sexo = 'mulher';
+    (value) ? this.sexo = 'mulher' : this.sexo = 'homem';
   }
 
   onLogout() {

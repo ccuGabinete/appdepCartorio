@@ -1,4 +1,4 @@
-import { app, BrowserWindow, screen, ipcMain } from 'electron';
+import { app, BrowserWindow, screen, ipcMain, Menu } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 
@@ -39,6 +39,18 @@ function createWindow() {
   if (serve) {
     win.webContents.openDevTools();
   }
+
+  const menu = Menu.buildFromTemplate([
+    {
+        label: 'Menu',
+        submenu: [
+            {label:'Adjust Notification Value'},
+            {label:'CoinMarketCap'},
+            {label:'Exit'}
+        ]
+    }
+])
+Menu.setApplicationMenu(menu);
 
   // Emitted when the window is closed.
   win.on('closed', () => {

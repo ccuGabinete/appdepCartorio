@@ -19,6 +19,13 @@ export class BuscacepService {
     return this.http.get<Cep>('https://viacep.com.br/ws/' + cep + '/json/',  { observe: 'response' })
       .pipe(catchError(this.handleError));
   }
+
+  buscarGoogle(): Observable<HttpResponse<any>> {
+    return this.http.get<any>('https://www.google.com.br',  { observe: 'response' })
+      .pipe(catchError(this.handleError));
+  }
+
+
   private handleError(error: HttpErrorResponse) {
     if (error.error instanceof ErrorEvent) {
       // A client-side or network error occurred. Handle it accordingly.

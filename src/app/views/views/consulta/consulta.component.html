@@ -2,12 +2,24 @@
   <mat-expansion-panel class="fastamentoAcordion">
     <mat-expansion-panel-header>
       <mat-panel-title>
-        Registrar consulta
+        Consultar processo
       </mat-panel-title>
     </mat-expansion-panel-header>
 
-    <div class="alinhamentoButton unicorn-dark-theme">
-      <button mat-button color="primary" #submitButton>Salvar atendimento</button>
+    <h5 class="example-h2">Tipo de consulta</h5>
+    <section class="example-section">
+      <mat-slide-toggle class="example-margin" color='warn' [(ngModel)]='escolha' (change)='onEscolha(escolha)'>
+        {{tipoescolha}}
+      </mat-slide-toggle>
+    </section>
+
+
+    <div *ngIf='escolha' div class="alinhamentoButton unicorn-dark-theme">
+      <button mat-button color="primary" #submitButton (click)='goToLink("https://www.google.com")'>Acessar</button>
+    </div>
+
+    <div *ngIf='!escolha' div class="alinhamentoButton unicorn-dark-theme">
+      <button mat-button color="primary" #submitButton (click)='goToLink("http://www2.rio.rj.gov.br/sicop/")'>Consultar</button>
     </div>
   </mat-expansion-panel>
 </div>

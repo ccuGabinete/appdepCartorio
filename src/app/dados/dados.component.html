@@ -23,6 +23,8 @@
 <div class="alinhamentoItens" *ngIf="false">
   <img src="https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=https://codigofonte.uol.com.br" id='qrcode'>
 </div>
+
+
 <!--#endregion -->
 
 <!--#region triagem  -->
@@ -32,16 +34,13 @@
     <mat-card-content>
       <h5 class="example-h2">Sexo</h5>
       <section class="example-section">
-        <mat-slide-toggle class="example-margin" color='primary' [(ngModel)]='cadastro.sexo' (change)='onSexo(cadastro.sexo)'>
-        {{sexo}}
+        <mat-slide-toggle class="example-margin" color='warn' [(ngModel)]='cadastro.sexo'
+          (change)='onSexo(cadastro.sexo)'>
+          {{sexo}}
         </mat-slide-toggle>
       </section>
     </mat-card-content>
   </mat-card>
-
-  <!--
-  <mat-label class="unicorn-dark-theme">Motivo</mat-label>
-  <mat-slide-toggle color='primary' [(ngModel)]='cadastro.sexo' (change)='onSexo(cadastro.sexo)'>Slide me!</mat-slide-toggle> -->
 </div>
 
 <div class="selectAutorizado" style="width: 15%" *ngIf='this.cadastro.sexo !== undefined'>
@@ -222,12 +221,6 @@
 <div id='entrega' *ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2) && exibicao === 4 && listenpreenchimento'
   class="alinhamentoItens">
   <app-entrega></app-entrega>
-</div>
-
-<div id='atendimento'
-  *ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2) && exibicao === 5 && listenpreenchimento'
-  class="alinhamentoItens">
-  <app-atendimento></app-atendimento>
 </div>
 
 <div id='recurso' *ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2) && exibicao === 6 && listenpreenchimento'
