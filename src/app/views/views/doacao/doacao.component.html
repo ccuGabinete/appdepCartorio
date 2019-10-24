@@ -1,13 +1,124 @@
 <div class="unicorn-dark-theme">
-  <mat-expansion-panel class="fastamentoAcordion">
-    <mat-expansion-panel-header>
-      <mat-panel-title>
-        Registrar doação
-      </mat-panel-title>
-    </mat-expansion-panel-header>
+  <mat-accordion>
+    <mat-expansion-panel class="fastamentoAcordion">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <div class="spinner-border text-info" role="status" *ngIf='cadastrarinstituicao === undefined'>
+            <span class="sr-only">Loading...</span>
+          </div>
+          {{textoescolha}}
+        </mat-panel-title>
+      </mat-expansion-panel-header>
 
-    <div class="alinhamentoButton unicorn-dark-theme">
-      <button mat-button color="primary" #submitButton>Imprimir recibo</button>
-    </div>
-  </mat-expansion-panel>
+      <div *ngIf='!cadastrarinstituicao && cadastrarinstituicao !== undefined'>
+        <div class="unicorn-dark-theme">
+          <mat-form-field>
+            <input matInput type="text" placeholder="Código" name="codigo" id="codigo" [(ngModel)]='instituicao.codigo'
+              (change)='onCodigo()' (focus)='onCodigoFocus()' [required]=true mask='AAAA'>
+          </mat-form-field>
+        </div>
+
+        <div *ngIf='imprimir'>
+          <div class="alinhamentoButton unicorn-dark-theme">
+            <button type='button' mat-button color="primary" (click)='onImprimir()'>Gerar declaraçao</button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf='cadastrarinstituicao'>
+        <div *ngIf='mask'>
+          <div class="unicorn-dark-theme">
+            <mat-form-field>
+              <input matInput type="text" placeholder="CNPJ" name="cnpj" id="cnpj" [(ngModel)]='instituicao.cnpj'
+                (change)='onCnpj(instituicao.cnpj)' (focus)='onCnpjFocus()' [required]=true mask="00.000.000/0000-00">
+            </mat-form-field>
+          </div>
+
+
+          <div class="unicorn-dark-theme">
+            <mat-form-field>
+              <input matInput type="text" placeholder="Razão Social" name="razaosocial" id="razaosocial"
+                [(ngModel)]='instituicao.razaosocial' [required]=true (change)='onRazaoSocial()'>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf='!mask'>
+        <div class="unicorn-dark-theme">
+          <mat-form-field>
+            <input matInput type="text" placeholder="CNPJ" name="cnpj" id="cnpj" [(ngModel)]='instituicao.cnpj'
+              (change)='onCnpj(instituicao.cnpj)' (focus)='onCnpjFocus()' [required]=true>
+          </mat-form-field>
+        </div>
+
+        <div class="unicorn-dark-theme">
+          <mat-form-field>
+            <input matInput type="text" placeholder="Razão Social" name="razaosocial" id="razaosocial"
+              [(ngModel)]='instituicao.razaosocial' [required]=true (change)='onRazaoSocial()' [disabled]='disabled'>
+          </mat-form-field>
+        </div>
+      </div>
+
+    </mat-expansion-panel>
+
+    <mat-expansion-panel class="fastamentoAcordion" *ngIf='cnpj'>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Endereço
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <h6 class="example-h2">Tipo de ação</h6>
+      <div class="unicorn-dark-theme">
+        <mat-form-field>
+          <input matInput placeholder="CEP" ngx-google-places-autocomplete [options]='options'
+            (onAddressChange)="handleAddressChangeCep($event)" [(ngModel)]='instituicao.cep' mask='00000-000'
+            [required]=true />
+        </mat-form-field>
+      </div>
+
+      <div class="unicorn-dark-theme">
+        <mat-form-field>
+          <input matInput type="text" placeholder="Endereço" name="endereco" id="endereco" [disabled]="true"
+            [(ngModel)]='instituicao.endereco' [required]=true>
+        </mat-form-field>
+      </div>
+
+      <div class="unicorn-dark-theme">
+        <mat-form-field>
+          <input matInput type="text" placeholder="Complemento" name="complemento" id="complemento"
+            [(ngModel)]='instituicao.complemento'>
+        </mat-form-field>
+      </div>
+
+      <div class="unicorn-dark-theme">
+        <mat-form-field>
+          <input matInput type="text" placeholder="Número" name="numero" id="numero" [(ngModel)]='instituicao.numero'
+            [required]=true>
+        </mat-form-field>
+      </div>
+
+
+      <div class="unicorn-dark-theme">
+        <mat-form-field>
+          <input matInput type="text" placeholder="Município" name="municipio" id="municipio"
+            [(ngModel)]='instituicao.municipio' [disabled]="true">
+        </mat-form-field>
+      </div>
+
+      <div class="unicorn-dark-theme">
+        <mat-form-field>
+          <input matInput type="text" placeholder="Bairro" name="bairro" id="bairro" [(ngModel)]='instituicao.bairro'
+            [disabled]="true">
+        </mat-form-field>
+      </div>
+
+      <div class="alinhamentoButton unicorn-dark-theme" #submitButton2>
+        <button type='submit' mat-button color="primary" (click)='onSubmit()'>Gerar declaraçao</button>
+      </div>
+
+    </mat-expansion-panel>
+
+  </mat-accordion>
 </div>

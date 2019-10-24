@@ -1,18 +1,16 @@
-import { ProcessoService } from './../views/services/processo/processo.service';
 import { BuscalacreService } from './../views/services/buscalacre/buscalacre.service';
 import { AberturaService } from './../views/services/abertura/abertura.service';
 import { Subscription } from 'rxjs';
-import { ValidacpfService } from './../services/validacpf/validacpf.service';
 import { BuscacepService } from './../services/buscacep/buscacep.service';
 import { InscricaomunicipalService } from '../services/inscricaomunicipal/InscricaomunicipalService';
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { MatSnackBar } from '@angular/material';
 import { LogadoService } from '../services/logado/logado.service';
 import { AvisocamposService } from '../services/avisocampos/avisocampos.service';
 import { Router } from '@angular/router';
 import { Usuario } from '../models/usuario/usuario';
 import { Cadastro } from '../models/cadastro/cadastro';
 import { Abertura } from '../views/models/abertura/abertura';
+import { isCpf } from 'validator-brazil';
 
 
 
@@ -30,13 +28,7 @@ export class DadosComponent implements OnInit, OnDestroy {
   usuario: string;
   link: string;
   sexo: string;
-  panelOpenState = false;
   base64Image: string;
-  options = {
-    types: ['geocode'],
-    componentRestrictions: { country: 'BR' },
-    location: [-22.921712, -43.449187]
-  };
   onAutorizadotipo = 0;
   exibicao = 0;
   listenpreenchimento = false;
@@ -49,155 +41,8 @@ export class DadosComponent implements OnInit, OnDestroy {
     'Descarte'
   ].sort();
   testeAutorizado: string;
-  orgaos = [
-    { sigla: 'SSP', orgao: 'Secretaria de Segurança Pública' },
-    { sigla: 'PM', orgao: 'Polícia Militar' },
-    { sigla: 'PC', orgao: 'Policia Civil' },
-    { sigla: 'CNT', orgao: 'Carteira Nacional de Habilitação' },
-    { sigla: 'DIC', orgao: 'Diretoria de Identificação Civil' },
-    { sigla: 'CTPS', orgao: 'Carteira de Trabaho e Previdência Social' },
-    { sigla: 'FGTS', orgao: 'Fundo de Garantia do Tempo de Serviço' },
-    { sigla: 'IFP', orgao: 'Instituto Félix Pacheco' },
-    { sigla: 'IPF', orgao: 'Instituto Pereira Faustino' },
-    { sigla: 'IML', orgao: 'Instituto Médico-Legal' },
-    { sigla: 'MTE', orgao: 'Ministério do Trabalho e Emprego' },
-    { sigla: 'MMA', orgao: 'Ministério da Marinha' },
-    { sigla: 'MAE', orgao: 'Ministério da Aeronáutica' },
-    { sigla: 'MEX', orgao: 'Ministério do Exército' },
-    { sigla: 'POF', orgao: 'Polícia Federal' },
-    { sigla: 'POM', orgao: 'Polícia Militar' },
-    { sigla: 'SES', orgao: 'Carteira de Estrangeiro' },
-    { sigla: 'SJS', orgao: 'Secretaria da Justiça e Segurança' },
-    { sigla: 'SJTS', orgao: 'Secretaria da Justiça do Trabalho e Segurança' },
-    { sigla: 'OUT', orgao: 'Outros' }
 
-  ].sort((a, b) => {
-    if (a.orgao < b.orgao) {
-      return -1;
-    }
-    return 0;
-  });
 
-  nacionalidades = [
-    'Brasileira',
-    'Afegã',
-    'Alemã',
-    'Americana',
-    'Angolana',
-    'Antiguana',
-    'Árabe, emiratensa',
-    'Argélia',
-    'Argentina',
-    'Armena',
-    'Australiana',
-    'Austríaca',
-    'Bahamensa',
-    'Bangladesa',
-    'Barbadiana',
-    'Bechuana',
-    'Belga',
-    'Belizenha',
-    'Boliviana',
-    'Britânica',
-    'Camaronensa',
-    'Canadense',
-    'Chilena',
-    'Chinesa',
-    'Cingalêsa',
-    'Colombiana',
-    'Comorensa',
-    'Costarriquenha',
-    'Croata',
-    'Cubana',
-    'Dinamarquêa',
-    'Dominicana',
-    'Egípcia',
-    'Equatoriana',
-    'Escocêsa',
-    'Eslovaca',
-    'Eslovena',
-    'Espanhola',
-    'Francêsa',
-    'Galesa',
-    'Ganesa',
-    'Granadina',
-    'Grega',
-    'Guatemalteca',
-    'Guianensa',
-    'Guianêsa',
-    'Haitiana',
-    'Holandêsa',
-    'Hondurenha',
-    'Húngara',
-    'Iemenita',
-    'Indiana',
-    'Indonésa',
-    'Inglêsa',
-    'Iraniana',
-    'Iraquiana',
-    'Irlandêa',
-    'Israelita',
-    'Italiana',
-    'Jamaicana',
-    'Japonêsa',
-    'Líbia',
-    'Malaia',
-    'Marfinensa',
-    'Marroquina',
-    'Mexicana',
-    'Moçambicana',
-    'Neozelandêsa',
-    'Nepalêsa',
-    'Nicaraguensa',
-    'Nigeriana',
-    'Norte-coreana',
-    'Noruega',
-    'Omanensa',
-    'Palestina',
-    'Panamenha',
-    'Paquistanêsa',
-    'Paraguaia',
-    'Peruana',
-    'Polonesa',
-    'Portorriquenha',
-    'Portuguesa',
-    'Qatarensa',
-    'Queniana',
-    'Romena',
-    'Ruandêsa',
-    'Russa',
-    'Salvadorenha',
-    'Santa-lucensa',
-    'São-cristovensa',
-    'São-vicentina',
-    'Saudita',
-    'Sérvia',
-    'Síria',
-    'Somala',
-    'Sueca',
-    'Suíça',
-    'Sul-africana',
-    'Sul-coreana',
-    'Surinamêa',
-    'Tailandêa',
-    'Timorense, maubera',
-    'Trindadensa',
-    'Turca',
-    'Ucraniana',
-    'Ugandensa',
-    'Uruguaia',
-    'Venezuelana',
-    'Vietnamita',
-    'Zimbabuensa'
-  ];
-
-  estadocivil = [
-    'Solteiro',
-    'Casado',
-    'Viúvo',
-    'Separado judicialmente',
-    'Divorciado'
-  ].sort();
 
   //#endregion
 
@@ -209,13 +54,11 @@ export class DadosComponent implements OnInit, OnDestroy {
     private serviceCampos: AvisocamposService,
     private logado: LogadoService,
     public buscacepService: BuscacepService,
-    private validacpf: ValidacpfService,
     private aberturaservice: AberturaService,
     private abertura: Abertura,
     private buscarLacre: BuscalacreService
   ) { }
   //#endregion
-
   @ViewChild('submitButton', { static: true }) submitButton;
   ngOnInit() {
     this.cadastro = new Cadastro();
@@ -253,7 +96,13 @@ export class DadosComponent implements OnInit, OnDestroy {
         this.exibicao = 2;
         break;
       }
+      case 'Descarte': {
+        this.carregaLacres();
+        this.exibicao = 7;
+        break;
+      }
       case 'Doação': {
+        this.carregaLacres();
         this.exibicao = 3;
         break;
       }
@@ -261,7 +110,6 @@ export class DadosComponent implements OnInit, OnDestroy {
         this.exibicao = 4;
         break;
       }
-    
       case 'Recurso': {
         this.exibicao = 6;
         break;
@@ -271,7 +119,6 @@ export class DadosComponent implements OnInit, OnDestroy {
         break;
       }
     }
-
   }
 
   onAutorizado(value: boolean) {
@@ -285,24 +132,24 @@ export class DadosComponent implements OnInit, OnDestroy {
 
   // ao clicar no campo matricula reseta os atributos
   // do objeto cadastro ligados a matrícula
-  onMatricula() {
-    this.cadastro.matricula = null;
-    this.cadastro.nome = null;
-    this.cadastro.autorizado = null;
-    this.cadastro.concessao = null;
-    this.cadastro.cpf = null;
-    this.cadastro.equipamento = null;
-    this.cadastro.isento = null;
-    this.cadastro.local = null;
-    this.cadastro.matricula = null;
-    this.cadastro.nomeaux = null;
-    this.cadastro.cpfaux = null;
-    this.cadastro.numero = null;
-    this.cadastro.documento = null;
-  }
+  // onMatricula() {
+  //   this.cadastro.matricula = null;
+  //   this.cadastro.nome = null;
+  //   this.cadastro.autorizado = null;
+  //   this.cadastro.concessao = null;
+  //   this.cadastro.cpf = null;
+  //   this.cadastro.equipamento = null;
+  //   this.cadastro.isento = null;
+  //   this.cadastro.local = null;
+  //   this.cadastro.matricula = null;
+  //   this.cadastro.nomeaux = null;
+  //   this.cadastro.cpfaux = null;
+  //   this.cadastro.numero = null;
+  //   this.cadastro.documento = null;
+  // }
 
   onCPF(cpf) {
-    const res = this.validacpf.TestaCPF(cpf);
+    const res = isCpf(cpf);
     if (res === false) {
       this.cadastro.cpf = 'CPF INVÁLIDO';
     } else {
@@ -335,6 +182,7 @@ export class DadosComponent implements OnInit, OnDestroy {
       }
       this.aberturaservice.atualizarAbertura(this.abertura);
     });
+
   }
 
   changeEvent() {

@@ -15,7 +15,7 @@
 
 
     <div *ngIf='escolha' div class="alinhamentoButton unicorn-dark-theme">
-      <button mat-button color="primary" #submitButton (click)='goToLink("https://www.google.com")'>Acessar</button>
+      <button mat-button color="primary" #submitButton (click)='goToLink("http://eportal.rio.rj.gov.br/PC201SICOPWEB/pages/NOVOSICOP/LOGINCAPTCHA.aspx")' [disabled]='disabled'>Acessar</button>
     </div>
 
     <div *ngIf='!escolha' div class="alinhamentoButton unicorn-dark-theme">

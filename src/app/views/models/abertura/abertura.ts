@@ -5,6 +5,7 @@ export class Abertura {
   autorizado: boolean;
   bairro: string;
   cep: string;
+  codigo: string; // código para doação ou descarte,
   complemento: string;
   cpf: string;
   dataabertura: string;

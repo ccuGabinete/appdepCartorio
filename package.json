@@ -101,6 +101,7 @@
     "ngx-clipboard": "^12.2.1",
     "ngx-google-places-autocomplete": "^2.0.4",
     "ngx-mask": "^8.0.9",
-    "popper": "^1.0.1"
+    "popper": "^1.0.1",
+    "validator-brazil": "^1.2.0"
   }
 }

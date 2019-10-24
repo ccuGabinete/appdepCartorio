@@ -31,4 +31,5 @@ export class ValidacpfService {
     if (Resto !== parseInt(cpf.substring(10, 11))) { return false; }
     return true;
   }
+
 }

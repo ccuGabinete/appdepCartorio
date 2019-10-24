@@ -59,10 +59,16 @@ export class HomeComponent implements OnInit {
         .subscribe(res => {
           const user = new Usuario();
           if (res.body.setor === 'autos' || res.body.setor === 'gabinete') {
-            user.nome = res.body.nome;
-            user.link = res.body.link;
-            this.logado.mudarUsuario(user);
-            this.router.navigateByUrl('dados');
+            if (res.body.isValid) {
+              user.nome = res.body.nome;
+              user.link = res.body.link;
+              this.logado.mudarUsuario(user);
+              this.router.navigateByUrl('dados');
+            } else {
+              this.serviceCampos.mudarAviso(6);
+              this.opensnack.openSnackBarCampos(AvisocamposComponent, 2000);
+            }
+
           } else {
             this.serviceCampos.mudarAviso(5);
             this.opensnack.openSnackBarCampos(AvisocamposComponent, 2000);

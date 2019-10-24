@@ -9,5 +9,6 @@ export class Lacre {
   pos: string;
   processo: string;
   trm: string;
+  codigo: string;
 }
 

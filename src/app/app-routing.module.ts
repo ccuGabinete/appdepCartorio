@@ -4,6 +4,7 @@ import { DadosComponent } from './dados/dados.component';
 import { HomeComponent } from './home/home.component';
 import { ConsultaComponent } from './views/views/consulta/consulta.component';
 import { AberturaComponent } from './views/views/abertura/abertura.component';
+import { DoacaoComponent } from './views/views/doacao/doacao.component';
 
 const routes: Routes = [
   {
@@ -17,6 +18,10 @@ const routes: Routes = [
   {
     path: 'consulta',
     component: ConsultaComponent
+  },
+  {
+    path: 'doacao',
+    component: DoacaoComponent
   },
   {
     path: 'abertura',

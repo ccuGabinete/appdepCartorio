@@ -32,11 +32,6 @@ export class BuscalacreService {
         catchError(this.handleError));
   }
 
-  buscarPosicao(posicao: string): Observable<HttpResponse<any>> {
-    return this.http.post<any>(url + 'gcd/buscarPosicao', { pos: posicao }, { observe: 'response' })
-      .pipe(catchError(this.handleError));
-  }
-
   // método que guarda o array de lacres para compartilhar com outros componentes
   atualizarArrayLacres(arr: Array<Lacre>) {
     this.buscarArray.next(arr);
@@ -59,8 +54,9 @@ export class BuscalacreService {
         lacre.processo = linha.processo;
         lacre.trm = linha.trm;
         lacre.numero = lc.substring(0, 8);
-        lacre.grupo = lc.substring(9, 11);
-        lacre.quantidade = lc.substring(12, 16);
+        lacre.codigo = lc.substring(21, 25);
+        lacre.grupo = lc.substring(26, 28);
+        lacre.quantidade = lc.substring(29, 33);
         arr.push(lacre);
       });
     });
@@ -72,6 +68,13 @@ export class BuscalacreService {
   filtrarPorLacre(arr: Array<Lacre>, lacrenumero: string) {
     const response = arr.filter((value) => {
       return value.numero === lacrenumero;
+    });
+    return response;
+  }
+
+  filtrarPorCodigp(arr: Array<Lacre>, codigo: string) {
+    const response = arr.filter((value) => {
+      return value.codigo === codigo;
     });
     return response;
   }

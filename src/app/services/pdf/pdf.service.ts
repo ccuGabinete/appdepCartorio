@@ -1,7 +1,9 @@
+import { FormatacoesService } from './../../views/services/formatacoes/formatacoes.service';
+import { Instituicao } from './../../views/models/instituicao/instituicao';
 import { Abertura } from './../../views/models/abertura/abertura';
 import { Injectable } from '@angular/core';
 import * as jsPDF from 'jspdf';
-import * as imagens from '../../services/imagens';
+import { body } from '../../services/imagens';
 import * as moment from 'moment-timezone';
 import { TitleCasePipe, LowerCasePipe } from '@angular/common';
 import { BehaviorSubject } from 'rxjs';
@@ -11,7 +13,10 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class PdfService {
   public pdfaviso = '';
-  imageData = imagens.body;
+  imageData = body.body;
+  imageDespacho = body.despacho;
+  imageDoacao = body.bodydoacao;
+  imageanexodoacao = body.anexodoacao;
   public buscarPdfaAviso = new BehaviorSubject(this.pdfaviso);
   pdfavisocorrente = this.buscarPdfaAviso.asObservable();
 
@@ -19,40 +24,24 @@ export class PdfService {
     this.buscarPdfaAviso.next(aviso);
   }
 
-
-
-
-  constructor(private titlecasePipe: TitleCasePipe, private lowercasePipe: LowerCasePipe) { }
-
-
-  formataRes(tel: string) {
-    const p1 = tel.substring(0, 2);
-    const p2 = tel.substring(2, 6);
-    const p3 = tel.substring(6, 10);
-    return '(' + p1 + ') ' + p2 + '-' + p3;
-  }
-
-  formataCel(res: string) {
-    const sp1 = res.substring(0, 2);
-    const sp2 = res.substring(2, 5);
-    const sp3 = res.substring(5, 8);
-    const sp4 = res.substring(8, 11);
-    return '(' + sp1 + ') ' + sp2 + '-' + sp3 + '-' + sp4;
-
-  }
+  constructor(
+    private titlecasePipe: TitleCasePipe,
+    private lowercasePipe: LowerCasePipe,
+    private formatacao: FormatacoesService
+  ) { }
 
   downloadPDF(abertura: Abertura) {
     //#region variaveis
     const dataexpedicao = abertura.dataexpedicao.toString();
-    abertura.dataabertura = this.getDataExtenso(this.gerarData());
-    const datacarimbo = this.formataDataCarimbo(this.gerarData());
-    abertura.telcelular = this.formataCel(abertura.telcelular);
-    abertura.telresidencial = this.formataRes(abertura.telresidencial);
-    const dataextenso = this.getDataExtenso(this.gerarData()) + '.';
-    abertura.processo = this.formataNumeroProcesso(abertura.processo);
-    const atividadecomercial = this.formataAtividade(abertura.autorizado, abertura.matricula);
+    abertura.dataabertura = this.formatacao.getDataExtenso(this.formatacao.gerarData());
+    const datacarimbo = this.formatacao.formataDataCarimbo(this.formatacao.gerarData());
+    abertura.telcelular = this.formatacao.formataCel(abertura.telcelular);
+    abertura.telresidencial = this.formatacao.formataRes(abertura.telresidencial);
+    const dataextenso = this.formatacao.getDataExtenso(this.formatacao.gerarData()) + '.';
+    abertura.processo = this.formatacao.formataNumeroProcesso(abertura.processo);
+    const atividadecomercial = this.formatacao.formataAtividade(abertura.autorizado, abertura.matricula);
     abertura.nome = this.titlecasePipe.transform(abertura.nome);
-    abertura.cep = this.formataCep(abertura.cep);
+    abertura.cep = this.formatacao.formataCEP(abertura.cep);
     abertura.email = this.lowercasePipe.transform(abertura.email);
     abertura.itensdiscriminados = this.lowercasePipe.transform(abertura.itensdiscriminados);
     //#endregion
@@ -209,6 +198,13 @@ export class PdfService {
         w: 180.121,
         h: 231.21
       },
+
+      imageDespacho: {
+        x: 24.61,
+        y: 5,
+        w: 179.995,
+        h: 197.402
+      }
     };
 
     const doc = new jsPDF({
@@ -260,56 +256,173 @@ export class PdfService {
     doc.text(coord.text17.texto, coord.text17.x, coord.text17.y);
     //#endregion
     doc.addImage(this.imageData, 'PNG', coord.imageBody.x, coord.imageBody.y, coord.imageBody.w, coord.imageBody.h);
+    doc.addPage();
+    doc.addImage(this.imageDespacho, 'PNG', coord.imageBody.x, coord.imageBody.y, coord.imageBody.w, coord.imageBody.h);
     doc.save('Abertura de Processo nº' + '');
     this.mudarPdfAviso('ok');
 
   }
 
-  getDataExtenso(data: string) {
-    const meses = [
-      'Janeiro',
-      'Fevereiro',
-      'Março',
-      'Abril',
-      'Maio',
-      'Junho',
-      'Julho',
-      'Agosto',
-      'Setembro',
-      'Outubro',
-      'Novembro',
-      'dezembro'
-    ];
-
-    // tslint:disable-next-line: prefer-const
-    let mes = data.substring(3, 5);
-    // tslint:disable-next-line: radix
-    return data.substring(0, 2) + ' de ' + meses[parseInt(mes) - 1] + ' de ' + data.substring(6);
-  }
-
-  gerarData() {
-    const data = Date.now();
-    const dateMoment = moment(data);
-    return dateMoment.tz('America/Sao_Paulo').format('DD/MM/YYYY');
-  }
-
-  formataDataCarimbo(data: string) {
-    return data.substring(0, 2) + ' ' + data.substring(3, 5) + ' ' + data.substring(8);
-  }
-
-  formataNumeroProcesso(processo: String) {
-    return processo.substring(4, 7) + '.' + processo.substring(7, 10) + '/' + processo.substring(10);
-  }
-
-  formataAtividade(autorizado: boolean, matricula?: string) {
-    if (autorizado) {
-      return 'Comércio ambulate autorizado - ' + matricula;
-    } else {
-      return 'Comércio ambulante não autorizado';
+  downloadPDFDoacao(instituicao: Instituicao) {
+    //#region variaveis
+    let endereco = '';
+    endereco += instituicao.endereco;
+    endereco += ', ' + instituicao.numero;
+    if (instituicao.complemento !== '0') {
+      endereco += ', ' + instituicao.complemento;
     }
+    endereco += ', ' + instituicao.bairro;
+    endereco += ',' + instituicao.municipio;
+    endereco += ' - ' + instituicao.estado;
+    endereco += ' CEP: ' + instituicao.cep;
+    const data = this.formatacao.getDataExtenso(this.formatacao.gerarData());
+    instituicao.cnpj = this.formatacao.formataCNPJ(instituicao.cnpj);
+    instituicao.processo = this.formatacao.fomataProcesso(instituicao.processo);
+    //#endregion
+
+    const coord = {
+
+      text01: {
+        texto: instituicao.razaosocial,
+        x: 30,
+        y: 69
+      },
+
+      text02: {
+        texto: instituicao.cnpj,
+        x: 30,
+        y: 79
+      },
+
+      text03: {
+        texto: endereco,
+        x: 30,
+        y: 89
+      },
+
+      text04: {
+        texto: instituicao.responsavel,
+        x: 30,
+        y: 99
+      },
+
+      text05: {
+        texto: instituicao.cpf,
+        x: 30,
+        y: 109
+      },
+
+      text06: {
+        texto: instituicao.codigo,
+        x: 30,
+        y: 129
+      },
+
+      text07: {
+        texto: instituicao.responsavel + ' CPF: ' + instituicao.cpf,
+        x: 55,
+        y: 205
+      },
+
+      text08: {
+        texto: data,
+        x: 140,
+        y: 167.43
+      },
+
+      text09: {
+        texto: instituicao.processo,
+        x: 30,
+        y: 119
+      },
+
+      imageBody: {
+        x: 25,
+        y: 15,
+        w: 160,
+        h: 185.857
+      },
+
+      imageAnexo: {
+        x: 25,
+        y: 15,
+        w: 160,
+        h: 44.897
+      },
+    };
+
+    const doc = new jsPDF({
+      orientaion: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    doc.setFontSize(12);
+    doc.setFont('times', 'normal');
+    doc.setProperties({
+      title: 'Auto de Infração nº' + 'notificado.infracao',
+      subject: 'Notificação do(a) Sr(a)' + 'notificado.nome',
+      author: 'notificado.agenterespcadastro',
+      keywords: ' ',
+      creator: 'Coordenadoria de Controle Urbano'
+
+    });
+
+    //#region coordenadas
+    doc.text(coord.text01.texto, coord.text01.x, coord.text01.y);
+    doc.text(coord.text02.texto, coord.text02.x, coord.text02.y);
+    doc.text(coord.text03.texto, coord.text03.x, coord.text03.y);
+    doc.text(coord.text04.texto, coord.text04.x, coord.text04.y);
+    doc.text(coord.text05.texto, coord.text05.x, coord.text05.y);
+    doc.text(coord.text06.texto, coord.text06.x, coord.text06.y);
+    doc.text(coord.text07.texto, coord.text07.x, coord.text07.y);
+    doc.text(coord.text08.texto, coord.text08.x, coord.text08.y);
+    doc.text(coord.text09.texto, coord.text09.x, coord.text09.y);
+    doc.setFontSize(11);
+    //#endregion
+    doc.addImage(this.imageDoacao, 'PNG', coord.imageBody.x, coord.imageBody.y, coord.imageBody.w, coord.imageBody.h);
+    doc.addPage();
+    doc.addImage(this.imageanexodoacao, 'PNG', coord.imageAnexo.x, coord.imageAnexo.y, coord.imageAnexo.w, coord.imageAnexo.h);
+    this.formatafolhacontinuacao(doc, instituicao, 1);
+
+    let posicaoY = 0; // responsavel pelo eixo y
+    let posicaoX = 0; // responsável pelo eixo x
+    let contarcoluna = 0; // responsável por ouvir quando os lacres passarem de 280
+    let contafolha = 1; // para escutar o número da folha de doação
+    instituicao.lacres.forEach((e, pos) => {
+
+      posicaoY = 70 + (pos + 1) * 5 - (200 * contarcoluna);
+
+      const obj = {
+        posx: 25 + posicaoX,
+        posy: posicaoY,
+        texto: ' - ' + e.numero + ';'
+      };
+
+      doc.text(obj.posx, obj.posy, obj.texto);
+
+      if ((pos + 1) % 40 === 0) {
+        contarcoluna++;
+        posicaoX += 30;
+      }
+
+      if ((pos + 1) % 240 === 0) {
+        posicaoX = 0;
+        contafolha++;
+        doc.addPage();
+        doc.addImage(this.imageanexodoacao, 'PNG', coord.imageAnexo.x, coord.imageAnexo.y, coord.imageAnexo.w, coord.imageAnexo.h);
+        this.formatafolhacontinuacao(doc, instituicao, contafolha);
+      }
+
+    });
+
+    doc.save('Recibo de doação nº' + '');
+    this.mudarPdfAviso('ok');
   }
 
-  formataCep(cep: string) {
-    return cep.substring(0, 5) + '-' + cep.substring(5);
+  formatafolhacontinuacao(doc: jsPDF, instituicao: Instituicao, pos: number) {
+    doc.text(instituicao.processo, 30, 49);
+    doc.text(instituicao.codigo, 30, 59);
+    doc.text('folha de anexo nº: ' + pos, 165, 280);
   }
 }

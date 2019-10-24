@@ -43,7 +43,7 @@
   </mat-card>
 </div>
 
-<div class="selectAutorizado" style="width: 15%" *ngIf='this.cadastro.sexo !== undefined'>
+<div class="alinhamentoItens" style="margin-top: 2em;" *ngIf='this.cadastro.sexo !== undefined'>
   <div>
     <mat-form-field class="unicorn-dark-theme">
       <mat-label>Motivo</mat-label>
@@ -92,8 +92,7 @@
     <div class="unicorn-dark-theme">
       <mat-form-field>
         <input matInput type="text" placeholder="Inscriçao Municipal" name="inscricaomunicipal" id="inscricaomunicipal"
-          (change)="buscaNotificado(cadastro.matricula)" [(ngModel)]='cadastro.matricula' (click)='onMatricula()'
-          maxlength="8">
+          (change)="buscaNotificado(cadastro.matricula)" [(ngModel)]='cadastro.matricula' maxlength="8">
       </mat-form-field>
     </div>
 

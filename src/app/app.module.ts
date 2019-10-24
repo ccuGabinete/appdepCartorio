@@ -1,3 +1,4 @@
+import { Instituicao } from './views/models/instituicao/instituicao';
 import { ProcessoService } from './views/services/processo/processo.service';
 import { OpensnackbarService } from './views/services/opensnackbar/opensnackbar.service';
 import { FormatacoesService } from './views/services/formatacoes/formatacoes.service';
@@ -51,13 +52,12 @@ import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatCardModule } from '@angular/material/card';
 import { PdfService } from './services/pdf/pdf.service';
-import { ValidacpfService } from './services/validacpf/validacpf.service';
 import { ConsultaComponent } from './views/views/consulta/consulta.component';
 import { DoacaoComponent } from './views/views/doacao/doacao.component';
 import { EntregaComponent } from './views/views/entrega/entrega.component';
 import { RecursoComponent } from './views/views/recurso/recurso.component';
 import { Abertura } from './views/models/abertura/abertura';
-import { TitleCasePipe, LowerCasePipe } from '@angular/common';
+import { TitleCasePipe, LowerCasePipe, UpperCasePipe } from '@angular/common';
 import { Lacre } from './views/models/lacre/lacre';
 import { Auto } from './views/models/auto/auto';
 import { BuscarautoService } from './views/services/buscarauto/buscarauto.service';
@@ -119,6 +119,7 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
     })
   ],
   providers: [
+    Instituicao,
     ProcessoService,
     OpensnackbarService,
     FormatacoesService,
@@ -129,10 +130,10 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
     BuscarautoService,
     Lacre,
     LowerCasePipe,
+    UpperCasePipe,
     TitleCasePipe,
     Abertura,
     AberturaService,
-    ValidacpfService,
     Cadastro,
     PdfService,
     LoginService,

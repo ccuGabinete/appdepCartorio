@@ -253,7 +253,7 @@ export class AberturaComponent implements OnInit, OnDestroy {
     this.auto = new Auto();
     this.aberturaservice.correnteAbertura.subscribe(abertura => {
       this.abertura = abertura;
-      if (!this.abertura.sexo) {
+      if (this.abertura.sexo) {
         this.estadocivil = this.mulher;
       } else {
         this.estadocivil = this.homem;
