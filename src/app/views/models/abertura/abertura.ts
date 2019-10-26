@@ -1,11 +1,10 @@
 export class Abertura {
-  sexo: boolean;
   agenterespcadastro: string;
   autodeapreensao: string;
   autorizado: boolean;
   bairro: string;
   cep: string;
-  codigo: string; // código para doação ou descarte,
+  codigo: string; // código para doação ou descarte,
   complemento: string;
   cpf: string;
   dataabertura: string;
@@ -35,4 +34,5 @@ export class Abertura {
   telresidencial: string;
   tipocomprobatorio: string;
   trm: string;
+  sexo: boolean;
 }

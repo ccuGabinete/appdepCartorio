@@ -1,3 +1,8 @@
+import { OpensnackbarService } from './../../services/opensnackbar/opensnackbar.service';
+import { AvisocamposService } from './../../../services/avisocampos/avisocampos.service';
+import { AberturaService } from './../../services/abertura/abertura.service';
+import { SalvaratendimentoService } from './../../services/salvaratendimento/salvaratendimento.service';
+import { Abertura } from './../../models/abertura/abertura';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -7,9 +12,27 @@ import { Component, OnInit } from '@angular/core';
 })
 export class EntregaComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    public abertura: Abertura, // objeto de abertura vinda da tela inicial
+    public aberturaremota: Abertura, // objeto abertura vindo da planilha googlesheets
+    private aberturaservice: AberturaService,
+    private salvaratendimento: SalvaratendimentoService,
+    private avisocamposService: AvisocamposService,
+    private opensnackbarService: OpensnackbarService
+
+  ) { }
 
   ngOnInit() {
+    this.abertura = new Abertura();
+    this.aberturaservice.correnteAbertura.subscribe(abertura => {
+      this.abertura = abertura;
+    });
   }
+
+  onImprimir() {
+    console.log(this.abertura);
+  }
+
+
 
 }

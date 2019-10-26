@@ -22,6 +22,11 @@ export class SalvaratendimentoService {
       .pipe(catchError(this.handleError));
   }
 
+  buscarAtendimento(processo: string): Observable<HttpResponse<Abertura>> {
+    return this.http.post<Abertura>(url + 'gcd/atendimento/buscar', {processo: processo}, { observe: 'response' })
+      .pipe(catchError(this.handleError));
+  }
+
   private handleError(error: HttpErrorResponse) {
     if (error.error instanceof ErrorEvent) {
       // A client-side or network error occurred. Handle it accordingly.

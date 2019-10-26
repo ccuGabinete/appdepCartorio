@@ -16,6 +16,7 @@ export class PdfService {
   imageData = body.body;
   imageDespacho = body.despacho;
   imageDoacao = body.bodydoacao;
+  imageDescarte = body.bodydescarte;
   imageanexodoacao = body.anexodoacao;
   public buscarPdfaAviso = new BehaviorSubject(this.pdfaviso);
   pdfavisocorrente = this.buscarPdfaAviso.asObservable();
@@ -417,6 +418,163 @@ export class PdfService {
     });
 
     doc.save('Recibo de doação nº' + '');
+    this.mudarPdfAviso('ok');
+  }
+
+  downloadPDFDescarte(instituicao: Instituicao) {
+    //#region variaveis
+    let endereco = '';
+    endereco += instituicao.endereco;
+    endereco += ', ' + instituicao.numero;
+    if (instituicao.complemento !== '0') {
+      endereco += ', ' + instituicao.complemento;
+    }
+    endereco += ', ' + instituicao.bairro;
+    endereco += ',' + instituicao.municipio;
+    endereco += ' - ' + instituicao.estado;
+    endereco += ' CEP: ' + instituicao.cep;
+    const data = this.formatacao.getDataExtenso(this.formatacao.gerarData());
+    instituicao.cnpj = this.formatacao.formataCNPJ(instituicao.cnpj);
+    instituicao.processo = this.formatacao.fomataProcesso(instituicao.processo);
+    //#endregion
+
+    const coord = {
+
+      text01: {
+        texto: instituicao.razaosocial,
+        x: 30,
+        y: 69
+      },
+
+      text02: {
+        texto: instituicao.cnpj,
+        x: 30,
+        y: 79
+      },
+
+      text03: {
+        texto: endereco,
+        x: 30,
+        y: 89
+      },
+
+      text04: {
+        texto: instituicao.responsavel,
+        x: 30,
+        y: 99
+      },
+
+      text05: {
+        texto: instituicao.cpf,
+        x: 30,
+        y: 109
+      },
+
+      text06: {
+        texto: instituicao.codigo,
+        x: 30,
+        y: 129
+      },
+
+      text07: {
+        texto: instituicao.responsavel + ' CPF: ' + instituicao.cpf,
+        x: 55,
+        y: 205
+      },
+
+      text08: {
+        texto: data,
+        x: 140,
+        y: 167.43
+      },
+
+      text09: {
+        texto: instituicao.processo,
+        x: 30,
+        y: 119
+      },
+
+      imageBody: {
+        x: 25,
+        y: 15,
+        w: 160,
+        h: 185.857
+      },
+
+      imageAnexo: {
+        x: 25,
+        y: 15,
+        w: 160,
+        h: 44.897
+      },
+    };
+
+    const doc = new jsPDF({
+      orientaion: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    doc.setFontSize(12);
+    doc.setFont('times', 'normal');
+    doc.setProperties({
+      title: 'Auto de Infração nº' + 'notificado.infracao',
+      subject: 'Notificação do(a) Sr(a)' + 'notificado.nome',
+      author: 'notificado.agenterespcadastro',
+      keywords: ' ',
+      creator: 'Coordenadoria de Controle Urbano'
+
+    });
+
+    //#region coordenadas
+    doc.text(coord.text01.texto, coord.text01.x, coord.text01.y);
+    doc.text(coord.text02.texto, coord.text02.x, coord.text02.y);
+    doc.text(coord.text03.texto, coord.text03.x, coord.text03.y);
+    doc.text(coord.text04.texto, coord.text04.x, coord.text04.y);
+    doc.text(coord.text05.texto, coord.text05.x, coord.text05.y);
+    doc.text(coord.text06.texto, coord.text06.x, coord.text06.y);
+    doc.text(coord.text07.texto, coord.text07.x, coord.text07.y);
+    doc.text(coord.text08.texto, coord.text08.x, coord.text08.y);
+    doc.text(coord.text09.texto, coord.text09.x, coord.text09.y);
+    doc.setFontSize(11);
+    //#endregion
+    doc.addImage(this.imageDescarte, 'PNG', coord.imageBody.x, coord.imageBody.y, coord.imageBody.w, coord.imageBody.h);
+    doc.addPage();
+    doc.addImage(this.imageanexodoacao, 'PNG', coord.imageAnexo.x, coord.imageAnexo.y, coord.imageAnexo.w, coord.imageAnexo.h);
+    this.formatafolhacontinuacao(doc, instituicao, 1);
+
+    let posicaoY = 0; // responsavel pelo eixo y
+    let posicaoX = 0; // responsável pelo eixo x
+    let contarcoluna = 0; // responsável por ouvir quando os lacres passarem de 280
+    let contafolha = 1; // para escutar o número da folha de doação
+    instituicao.lacres.forEach((e, pos) => {
+
+      posicaoY = 70 + (pos + 1) * 5 - (200 * contarcoluna);
+
+      const obj = {
+        posx: 25 + posicaoX,
+        posy: posicaoY,
+        texto: ' - ' + e.numero + ';'
+      };
+
+      doc.text(obj.posx, obj.posy, obj.texto);
+
+      if ((pos + 1) % 40 === 0) {
+        contarcoluna++;
+        posicaoX += 30;
+      }
+
+      if ((pos + 1) % 240 === 0) {
+        posicaoX = 0;
+        contafolha++;
+        doc.addPage();
+        doc.addImage(this.imageanexodoacao, 'PNG', coord.imageAnexo.x, coord.imageAnexo.y, coord.imageAnexo.w, coord.imageAnexo.h);
+        this.formatafolhacontinuacao(doc, instituicao, contafolha);
+      }
+
+    });
+
+    doc.save('Recibo de descarte processo nº' + instituicao.processo);
     this.mudarPdfAviso('ok');
   }
 

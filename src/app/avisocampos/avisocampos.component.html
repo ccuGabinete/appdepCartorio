@@ -19,9 +19,17 @@
 </div>
 
 <div class="alerta" *ngIf="loadingCampos === 7">
-  <span>Número do processo copiado para área de transferência</span>
+  <span>Processo copiado</span>
 </div>
 
 <div class="alerta" *ngIf="loadingCampos === 8">
   <span>Erro: verifique o código informado</span>
+</div>
+
+<div class="alerta" *ngIf="loadingCampos === 9">
+  <span>Erro: processo não cadastrado</span>
+</div>
+
+<div class="alerta" *ngIf="loadingCampos === 10">
+  <span>Erro: matricula inexistente</span>
 </div>

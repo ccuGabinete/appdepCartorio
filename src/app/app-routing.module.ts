@@ -1,3 +1,4 @@
+import { DescarteComponent } from './views/views/descarte/descarte.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { DadosComponent } from './dados/dados.component';
@@ -26,6 +27,10 @@ const routes: Routes = [
   {
     path: 'abertura',
     component: AberturaComponent
+  },
+  {
+    path: 'descarte',
+    component: DescarteComponent
   }
 ];
 

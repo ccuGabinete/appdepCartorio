@@ -1,3 +1,7 @@
+import { AvisocamposService } from './../services/avisocampos/avisocampos.service';
+import { OpensnackbarService } from './../views/services/opensnackbar/opensnackbar.service';
+import { SalvaratendimentoService } from './../views/services/salvaratendimento/salvaratendimento.service';
+import { AvisocamposComponent } from './../avisocampos/avisocampos.component';
 import { BuscalacreService } from './../views/services/buscalacre/buscalacre.service';
 import { AberturaService } from './../views/services/abertura/abertura.service';
 import { Subscription } from 'rxjs';
@@ -5,7 +9,6 @@ import { BuscacepService } from './../services/buscacep/buscacep.service';
 import { InscricaomunicipalService } from '../services/inscricaomunicipal/InscricaomunicipalService';
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { LogadoService } from '../services/logado/logado.service';
-import { AvisocamposService } from '../services/avisocampos/avisocampos.service';
 import { Router } from '@angular/router';
 import { Usuario } from '../models/usuario/usuario';
 import { Cadastro } from '../models/cadastro/cadastro';
@@ -32,6 +35,10 @@ export class DadosComponent implements OnInit, OnDestroy {
   onAutorizadotipo = 0;
   exibicao = 0;
   listenpreenchimento = false;
+  listenprocesso = false;
+  carregado = false;
+  processoencontrado = false;
+  matriculaencontrada = false;
   opcoes = [
     'Abertura',
     'Consulta',
@@ -56,7 +63,11 @@ export class DadosComponent implements OnInit, OnDestroy {
     public buscacepService: BuscacepService,
     private aberturaservice: AberturaService,
     private abertura: Abertura,
-    private buscarLacre: BuscalacreService
+    private buscarLacre: BuscalacreService,
+    private avisocamposService: AvisocamposService,
+    private salvaratendimento: SalvaratendimentoService,
+    private opensnackbarService: OpensnackbarService,
+
   ) { }
   //#endregion
   @ViewChild('submitButton', { static: true }) submitButton;
@@ -71,8 +82,15 @@ export class DadosComponent implements OnInit, OnDestroy {
     });
   }
 
+  onProcesso() {
+    if (this.cadastro.motivo === 'Entrega') {
+      this.verificarProcessoEntrega(this.cadastro.processo);
+    }
+  }
+
   onfocusProcesso() {
     this.cadastro.processo = '';
+    this.listenprocesso = false;
   }
 
   // função para carregar o array de lacres
@@ -130,23 +148,6 @@ export class DadosComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ao clicar no campo matricula reseta os atributos
-  // do objeto cadastro ligados a matrícula
-  // onMatricula() {
-  //   this.cadastro.matricula = null;
-  //   this.cadastro.nome = null;
-  //   this.cadastro.autorizado = null;
-  //   this.cadastro.concessao = null;
-  //   this.cadastro.cpf = null;
-  //   this.cadastro.equipamento = null;
-  //   this.cadastro.isento = null;
-  //   this.cadastro.local = null;
-  //   this.cadastro.matricula = null;
-  //   this.cadastro.nomeaux = null;
-  //   this.cadastro.cpfaux = null;
-  //   this.cadastro.numero = null;
-  //   this.cadastro.documento = null;
-  // }
 
   onCPF(cpf) {
     const res = isCpf(cpf);
@@ -156,6 +157,11 @@ export class DadosComponent implements OnInit, OnDestroy {
       this.onIdentificado();
       this.listenpreenchimento = true;
     }
+  }
+
+  onFocusCPF() {
+    this.cadastro.cpf = '';
+    this.listenpreenchimento = false;
   }
 
   // carrega o objeto abertura que poderá utilizado por outras views
@@ -189,6 +195,13 @@ export class DadosComponent implements OnInit, OnDestroy {
     this.submitButton.focus();
   }
 
+  onFocusMatricula() {
+    this.cadastro.matricula = '';
+    this.cadastro.nome = '';
+    this.processoencontrado = false;
+    this.listenpreenchimento = false;
+  }
+
   onSexo(value) {
     (value) ? this.sexo = 'mulher' : this.sexo = 'homem';
   }
@@ -205,31 +218,64 @@ export class DadosComponent implements OnInit, OnDestroy {
   }
 
   buscaNotificado(value) {
-    if (value && value.length === 8) {
-      this.inscmunservice.buscarCadastro(value).subscribe(resp => {
-        this.cadastro.nome = resp.body.nome;
-        this.cadastro.autorizado = resp.body.autorizado;
-        this.cadastro.concessao = resp.body.concessao;
-        this.cadastro.cpf = resp.body.cpf;
-        this.cadastro.equipamento = resp.body.equipamento;
-        this.cadastro.isento = resp.body.isento;
-        this.cadastro.local = resp.body.local;
-        this.cadastro.matricula = resp.body.matricula;
-        this.cadastro.nomeaux = resp.body.nomeaux;
-        this.cadastro.cpfaux = resp.body.cpfaux;
-        this.cadastro.numero = resp.body.numero;
-        this.cadastro.documento = resp.body.documento;
-        this.listenpreenchimento = true;
-        this.onIdentificado();
-      }, () => this.cadastro.nome = 'Inscrição Municipal inexistente'
-      );
-    } else {
-      this.cadastro.nome = 'A matrícula tem 8 dígitos e foram digitados ' + value.length;
-    }
-  }
+    this.matriculaencontrada = true;
 
+    this.inscmunservice.buscarCadastro(value).subscribe(resp => {
+      this.cadastro.nome = resp.body.nome;
+      this.cadastro.autorizado = resp.body.autorizado;
+      this.cadastro.concessao = resp.body.concessao;
+      this.cadastro.cpf = resp.body.cpf;
+      this.cadastro.equipamento = resp.body.equipamento;
+      this.cadastro.isento = resp.body.isento;
+      this.cadastro.local = resp.body.local;
+      this.cadastro.matricula = resp.body.matricula;
+      this.cadastro.nomeaux = resp.body.nomeaux;
+      this.cadastro.cpfaux = resp.body.cpfaux;
+      this.cadastro.numero = resp.body.numero;
+      this.cadastro.documento = resp.body.documento;
+      this.listenpreenchimento = true;
+      this.onIdentificado();
+      this.processoencontrado = true;
+      this.matriculaencontrada = false;
+    }, () => {
+      this.processoencontrado = false;
+      this.matriculaencontrada = false;
+      if (!this.cadastro.autorizado) {
+        this.listenpreenchimento = false;
+      } else {
+        this.listenpreenchimento = true;
+      }
+      this.serviceCampos.mudarAviso(10);
+      this.opensnackbarService.openSnackBarCampos(AvisocamposComponent, 2000);
+    }
+    );
+
+
+  }
   ngOnDestroy(): void {
     this.serviceCampos.mudarAviso(1);
   }
 
+  verificarProcessoEntrega(processo: string) {
+    this.carregado = true;
+    this.salvaratendimento.buscarAtendimento(processo)
+      .subscribe(data => {
+        if (data.body === null) {
+          this.avisocamposService.mudarAviso(9);
+          this.opensnackbarService.openSnackBarCampos(AvisocamposComponent, 2000);
+          this.carregado = false;
+        } else {
+          this.abertura = data.body;
+          this.aberturaservice.atualizarAbertura(this.abertura);
+          this.listenprocesso = true;
+          this.carregado = false;
+        }
+      }, erro => {
+        this.listenprocesso = false;
+        this.avisocamposService.mudarAviso(4);
+        this.opensnackbarService.openSnackBarCampos(AvisocamposComponent, 2000);
+        this.carregado = false;
+      }
+      );
+  }
 }
