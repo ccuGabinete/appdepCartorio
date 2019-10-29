@@ -259,9 +259,8 @@ export class PdfService {
     doc.addImage(this.imageData, 'PNG', coord.imageBody.x, coord.imageBody.y, coord.imageBody.w, coord.imageBody.h);
     doc.addPage();
     doc.addImage(this.imageDespacho, 'PNG', coord.imageBody.x, coord.imageBody.y, coord.imageBody.w, coord.imageBody.h);
-    doc.save('Abertura de Processo nº' + '');
+    doc.save('Abertura de Processo nº ' + abertura.processo);
     this.mudarPdfAviso('ok');
-
   }
 
   downloadPDFDoacao(instituicao: Instituicao) {
@@ -417,7 +416,7 @@ export class PdfService {
 
     });
 
-    doc.save('Recibo de doação nº' + '');
+    doc.save('Recibo de doação processo nº ' + instituicao.processo);
   }
 
   downloadPDFDescarte(instituicao: Instituicao) {

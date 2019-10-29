@@ -494,7 +494,6 @@ export class AberturaComponent implements OnInit, OnDestroy {
         this.onEnviaLacres();
         this.pdfservice.downloadPDF(this.abertura);
         this.pdfservice.pdfavisocorrente.subscribe(() => {
-          console.log(this.abertura);
           setTimeout(() => {
             this.refresh();
           }, 4000);
@@ -513,7 +512,6 @@ export class AberturaComponent implements OnInit, OnDestroy {
     arrenvio.forEach(obj => {
       if (obj.pos !== '0000') {
         this.salvarlacre.atualizarLacre(obj).subscribe(data => {
-          console.log(data);
         }, () => {
           this.serviceCampos.mudarAviso(4);
           this.opensnack.openSnackBarCampos(AvisocamposComponent, 2000);
