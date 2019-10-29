@@ -218,14 +218,26 @@
   <app-consulta></app-consulta>
 </div>
 
+<div class="spinner-border text-info spinner" role="status" *ngIf=buscandodoacao>
+  <span class="sr-only">Loading...</span>
+</div>
+
 <div id='doacao' *ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2) && exibicao === 3 && listenpreenchimento'
   class="alinhamentoItens">
   <app-doacao></app-doacao>
 </div>
 
+<div class="spinner-border text-info spinner" role="status" *ngIf=buscandoentrega>
+  <span class="sr-only">Loading...</span>
+</div>
+
 <div id='entrega' *ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2) && exibicao === 4 && listenpreenchimento'
   class="alinhamentoItens">
   <app-entrega></app-entrega>
+</div>
+
+<div class="spinner-border text-info spinner" role="status" *ngIf=buscandorecurso>
+  <span class="sr-only">Loading...</span>
 </div>
 
 <div id='recurso' *ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2) && exibicao === 6 && listenpreenchimento'

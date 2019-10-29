@@ -39,6 +39,9 @@ export class DadosComponent implements OnInit, OnDestroy {
   listenpreenchimento = false;
   listenprocesso = false;
   carregado = false;
+  buscandoentrega = false;
+  buscandorecurso = false;
+  buscandodoacao = false;
   processoencontrado = false;
   matriculaencontrada = false;
   opcoes = [
@@ -74,7 +77,6 @@ export class DadosComponent implements OnInit, OnDestroy {
 
   ) { }
   //#endregion
-  @ViewChild('nomefocus', { static: true }) nomefocus: ElementRef;
 
   ngOnInit() {
     this.cadastro = new Cadastro();
@@ -130,10 +132,19 @@ export class DadosComponent implements OnInit, OnDestroy {
     ) {
       this.verificarProcessoEntrega(this.cadastro.processo);
     }
+
     if (
       this.cadastro.motivo === 'Doação'
     ) {
       this.buscarInstituicaoDoacao();
+    }
+
+    if (this.cadastro.motivo === 'Entrega') {
+      this.buscarAtendimento();
+    }
+
+    if (this.cadastro.motivo === 'Recurso') {
+      this.buscarAtendimento();
     }
 
     if (this.cadastro.motivo !== 'Descarte' && this.cadastro.motivo !== 'Doação') {
@@ -156,8 +167,6 @@ export class DadosComponent implements OnInit, OnDestroy {
     });
   }
 
-
-
   onAutorizado(value: boolean) {
 
     if (value === true) {
@@ -166,7 +175,6 @@ export class DadosComponent implements OnInit, OnDestroy {
       this.onAutorizadotipo = 2;
     }
   }
-
 
   onCPF(cpf) {
     const res = isCpf(cpf);
@@ -286,7 +294,7 @@ export class DadosComponent implements OnInit, OnDestroy {
 
   verificarProcessoEntrega(processo: string) {
     this.carregado = true;
-    this.salvaratendimento.buscarAtendimento(processo)
+    this.salvardoacaoservice.buscarInstituicao(processo)
       .subscribe(data => {
         console.log(data.body);
         if (data.body === null) {
@@ -310,6 +318,7 @@ export class DadosComponent implements OnInit, OnDestroy {
   }
 
   buscarInstituicaoDoacao() {
+    this.buscandodoacao = true;
     this.salvardoacaoservice.buscarInstituicao(this.cadastro.processo).subscribe(data => {
       if (data.body.length > 0) {
         this.instituicao = data.body[0];
@@ -318,10 +327,46 @@ export class DadosComponent implements OnInit, OnDestroy {
         this.listenprocesso = false;
         this.listenpreenchimento = true;
         this.salvardoacaoservice.alterarInstituicao(this.instituicao);
+        this.buscandodoacao = false;
+      } else {
+        this.buscandodoacao = false;
       }
     }, error => {
       this.avisocamposService.mudarAviso(4);
       this.opensnackbarService.openSnackBarCampos(AvisocamposComponent, 2000);
+      this.buscandodoacao = false;
     })
   }
+
+  buscarAtendimento() {
+    if(this.cadastro.motivo === 'Entrega') {
+      this.buscandoentrega = true;
+    } else if (this.cadastro.motivo === 'Recurso') {
+      this.buscandorecurso = true;
+    }
+
+    this.salvaratendimento.buscarAtendimento(this.cadastro.processo).subscribe(data => {
+      if (data.body === null) {
+        this.avisocamposService.mudarAviso(9);
+        this.opensnackbarService.openSnackBarCampos(AvisocamposComponent, 2000);
+        this.listenprocesso = false;
+        this.buscandoentrega = false;
+        this.buscandorecurso = false;
+      } else {
+        this.abertura = data.body;
+        this.aberturaservice.atualizarAbertura(this.abertura);
+        this.buscandoentrega = false;
+        this.buscandorecurso = false;
+        this.listenprocesso = false;
+        this.listenpreenchimento = true;
+      }
+    }, error => {
+      this.avisocamposService.mudarAviso(4);
+      this.opensnackbarService.openSnackBarCampos(AvisocamposComponent, 2000);
+      this.buscandoentrega = false;
+      this.buscandorecurso = false;
+    })
+  }
+
+
 }

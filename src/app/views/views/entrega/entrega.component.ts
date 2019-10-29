@@ -14,7 +14,6 @@ export class EntregaComponent implements OnInit {
 
   constructor(
     public abertura: Abertura, // objeto de abertura vinda da tela inicial
-    public aberturaremota: Abertura, // objeto abertura vindo da planilha googlesheets
     private aberturaservice: AberturaService,
     private salvaratendimento: SalvaratendimentoService,
     private avisocamposService: AvisocamposService,
@@ -32,7 +31,4 @@ export class EntregaComponent implements OnInit {
   onImprimir() {
     console.log(this.abertura);
   }
-
-
-
 }
