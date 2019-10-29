@@ -2,7 +2,7 @@ import { Instituicao } from './../../models/instituicao/instituicao';
 import { HttpClient, HttpHeaders, HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { GerardataService } from '../gerardata/gerardata.service';
-import { Observable, throwError } from 'rxjs';
+import { Observable, throwError, BehaviorSubject } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 const url = 'https://gcdapi.herokuapp.com/';
 const local = 'http://localhost:3000/';
@@ -14,8 +14,18 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class SalvardoacaoService {
+  public instituicaoAtual = new Instituicao();
+  public ouvirInstituicao = new BehaviorSubject(this.instituicaoAtual);
+  public correnteInstituicao = this.ouvirInstituicao.asObservable();
 
-  constructor(private http: HttpClient, private gd: GerardataService) { }
+  constructor(private http: HttpClient, private gd: GerardataService) { 
+    this.instituicaoAtual = new Instituicao();
+  }
+
+  alterarInstituicao(instituicao: Instituicao) {
+    this.ouvirInstituicao.next(instituicao);
+  }
+
 
   salvarInstituicao(instituicao: Instituicao): Observable<HttpResponse<Instituicao>> {
     return this.http.post<Instituicao>(url + 'gcd/instituicao/salvar', instituicao, { observe: 'response' })

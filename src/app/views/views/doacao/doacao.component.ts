@@ -9,7 +9,7 @@ import { LowerCasePipe, TitleCasePipe } from '@angular/common';
 import { AberturaService } from './../../services/abertura/abertura.service';
 import { Abertura } from './../../models/abertura/abertura';
 import { BuscalacreService } from './../../services/buscalacre/buscalacre.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { isCnpj } from 'validator-brazil';
 import { AvisocamposService } from '../../../services/avisocampos/avisocampos.service';
 import { OpensnackbarService } from '../../services/opensnackbar/opensnackbar.service';
@@ -23,6 +23,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./doacao.component.scss']
 })
 export class DoacaoComponent implements OnInit {
+
   cadastrarinstituicao: boolean;
   textoescolha: string;
   mask = true;
@@ -54,25 +55,30 @@ export class DoacaoComponent implements OnInit {
 
   ngOnInit() {
     this.instituicao = new Instituicao();
+    this.abertura = new Abertura();
+
     this.aberturaservice.correnteAbertura.subscribe(abertura => {
       this.abertura = abertura;
-    });
+    })
 
-    // assim que a view passar a ser apresentada, ativo uma view
-    // para buscar a instituição cujo processo for descrito no campo
-    // número do processo
-    this.salvardoacaoservice.buscarInstituicao(this.abertura.processo.toString()).subscribe(instituicao => {
-      if (instituicao.body.length > 0) {
-        this.instituicao = instituicao.body[0];
+    this.salvardoacaoservice.correnteInstituicao.subscribe(instituicao => {
+      // Nesse ponto trago os valores iniciais da abertura de processo 
+      // e faço uma consulta para trazer os valores dessa instiuição caso haja
+
+      if (typeof instituicao.processo !== 'undefined') {
+        this.instituicao = instituicao;
         this.textoescolha = 'Imprimir';
         this.cadastrarinstituicao = false;
       } else {
         this.textoescolha = 'Cadastrar';
         this.cadastrarinstituicao = true;
+        this.instituicao.matricula = 'o';
+        console.log(this.instituicao);
       }
-
       this.instituicao.codigo = '';
-    });
+    })
+
+       
   }
 
   onRazaoSocial() {
@@ -124,6 +130,14 @@ export class DoacaoComponent implements OnInit {
 
   onCodigo() {
     this.imprimir = true;
+    this.buscarLacre.arrayAtual.subscribe((arr) => {
+      this.instituicao.lacres = [];
+      this.buscarLacre.filtrarPorCodigp(arr, this.instituicao.codigo).forEach(t => {
+        this.instituicao.lacres.push(t);
+      });
+    })
+
+    
   }
 
   onCodigoFocus() {
@@ -132,27 +146,11 @@ export class DoacaoComponent implements OnInit {
   }
 
   onImprimir() {
+    this.disabled = true;
     this.instituicao.codigo = this.lowercasepipe.transform(this.instituicao.codigo);
-    this.instituicao.lacres = [];
-    this.buscarLacre.arrayAtual.subscribe((arr) => {
-      this.buscarLacre.filtrarPorCodigp(arr, this.instituicao.codigo).forEach(t => {
-        this.instituicao.lacres.push(t);
-      });
-
-      if (this.instituicao.lacres.length < 1) {
-        this.servicecampos.mudarAviso(8);
-        this.opensnack.openSnackBarCampos(AvisocamposComponent, 2000);
-      } else {
-        // nesse ponto caso haja lacres marcados com o código informado
-        // a instituição terá seu campo codigo atualizado com o valor do código
-        // e serão extraídos os lacres marcados com esse mesmo código
-        this.salvardoacaoservice.atualizarInstituicao(this.instituicao.codigo, this.instituicao.id).subscribe(data => {
-          this.pdfservice.downloadPDFDoacao(this.instituicao);
-          this.pdfservice.pdfavisocorrente.subscribe(() => {
-            this.refresh();
-          });
-        });
-      }
+    this.salvardoacaoservice.atualizarInstituicao(this.instituicao.codigo, this.instituicao.id).subscribe(data => {
+      this.pdfservice.downloadPDFDoacao(this.instituicao);
+      this.refresh();
     });
   }
 
@@ -178,6 +176,9 @@ export class DoacaoComponent implements OnInit {
 
   onSubmit() {
     if (this.testaCampos()) {
+      if(typeof this.instituicao.matricula === 'undefined') {
+        this.instituicao.matricula = 'o';
+      }
       this.disabled = true;
       this.instituicao.cep = this.formatacoes.formataCEP(this.instituicao.cep);
       this.salvardoacaoservice.salvarInstituicao(this.instituicao).subscribe(() => {
@@ -186,7 +187,7 @@ export class DoacaoComponent implements OnInit {
         this.servicecampos.mudarAviso(3);
         this.opensnack.openSnackBarCampos(AvisocamposComponent, 2000);
         this.refresh();
-      }, () => {
+      }, error => {
         this.disabled = false;
         this.servicecampos.mudarAviso(4);
         this.opensnack.openSnackBarCampos(AvisocamposComponent, 2000);
@@ -197,6 +198,7 @@ export class DoacaoComponent implements OnInit {
   refresh(): void {
     this.router.navigateByUrl('/doacao', { skipLocationChange: true }).then(() => {
       this.router.navigate(['dados']);
+      this.instituicao = new Instituicao();
     });
   }
 }

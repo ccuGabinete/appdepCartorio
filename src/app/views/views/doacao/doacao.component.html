@@ -18,11 +18,19 @@
           </mat-form-field>
         </div>
 
+        <div class="spinner-border text-info spinner" role="status" *ngIf=disabled>
+          <span class="sr-only">Loading...</span>
+        </div>
+
         <div *ngIf='imprimir'>
           <div class="alinhamentoButton unicorn-dark-theme">
-            <button type='button' mat-button color="primary" (click)='onImprimir()'>Gerar declaraçao</button>
+            <button type='button' mat-button color="primary" (click)='onImprimir()' [disabled]=disabled>
+              Gerar declaraçao
+            </button>
           </div>
         </div>
+
+
       </div>
 
       <div *ngIf='cadastrarinstituicao'>
@@ -55,7 +63,7 @@
         <div class="unicorn-dark-theme">
           <mat-form-field>
             <input matInput type="text" placeholder="Razão Social" name="razaosocial" id="razaosocial"
-              [(ngModel)]='instituicao.razaosocial' [required]=true (change)='onRazaoSocial()' [disabled]='disabled'>
+              [(ngModel)]='instituicao.razaosocial' [required]=true (change)='onRazaoSocial()'>
           </mat-form-field>
         </div>
       </div>
@@ -114,8 +122,13 @@
         </mat-form-field>
       </div>
 
+      <div class="spinner-border text-info spinner" role="status" *ngIf=disabled>
+        <span class="sr-only">Loading...</span>
+      </div>
+
       <div class="alinhamentoButton unicorn-dark-theme" #submitButton2>
-        <button type='submit' mat-button color="primary" (click)='onSubmit()'>Gerar declaraçao</button>
+        <button type='submit' mat-button color="primary" (click)='onSubmit()' [disabled]=disabled>Gerar
+          declaraçao</button>
       </div>
 
     </mat-expansion-panel>

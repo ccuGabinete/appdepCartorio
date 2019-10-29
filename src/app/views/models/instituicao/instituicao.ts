@@ -17,4 +17,5 @@ export class Instituicao {
   processo: string;
   responsavel: string;
   razaosocial: string;
+  matricula: string;
 }

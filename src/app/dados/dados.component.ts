@@ -7,13 +7,15 @@ import { AberturaService } from './../views/services/abertura/abertura.service';
 import { Subscription } from 'rxjs';
 import { BuscacepService } from './../services/buscacep/buscacep.service';
 import { InscricaomunicipalService } from '../services/inscricaomunicipal/InscricaomunicipalService';
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { LogadoService } from '../services/logado/logado.service';
 import { Router } from '@angular/router';
 import { Usuario } from '../models/usuario/usuario';
 import { Cadastro } from '../models/cadastro/cadastro';
 import { Abertura } from '../views/models/abertura/abertura';
 import { isCpf } from 'validator-brazil';
+import { SalvardoacaoService } from '../views/services/salvardoacao/salvardoacao.service';
+import { Instituicao } from '../views/models/instituicao/instituicao';
 
 
 
@@ -55,9 +57,10 @@ export class DadosComponent implements OnInit, OnDestroy {
 
   //#region construtor
   constructor(
-    private router: Router,
+    public instituicao: Instituicao,
     public cadastro: Cadastro,
     public inscmunservice: InscricaomunicipalService,
+    private router: Router,
     private serviceCampos: AvisocamposService,
     private logado: LogadoService,
     public buscacepService: BuscacepService,
@@ -66,40 +69,22 @@ export class DadosComponent implements OnInit, OnDestroy {
     private buscarLacre: BuscalacreService,
     private avisocamposService: AvisocamposService,
     private salvaratendimento: SalvaratendimentoService,
+    private salvardoacaoservice: SalvardoacaoService,
     private opensnackbarService: OpensnackbarService,
 
   ) { }
   //#endregion
-  @ViewChild('submitButton', { static: true }) submitButton;
+  @ViewChild('nomefocus', { static: true }) nomefocus: ElementRef;
+
   ngOnInit() {
     this.cadastro = new Cadastro();
     this.abertura = new Abertura();
+    this.instituicao = new Instituicao();
 
     this.logado.currentMessage.subscribe(user => {
       this.usuario = user.nome;
       (user.link) ? this.link = user.link.replace('open', 'uc') : this.link = '';
       this.cadastro.agenterespcadastro = user.nome;
-    });
-  }
-
-  onProcesso() {
-    if (this.cadastro.motivo === 'Entrega') {
-      this.verificarProcessoEntrega(this.cadastro.processo);
-    }
-  }
-
-  onfocusProcesso() {
-    this.cadastro.processo = '';
-    this.listenprocesso = false;
-  }
-
-  // função para carregar o array de lacres
-  // para disponibilizar esse array com atecedência
-  // dado o possível iato no carregamento dos dados
-  carregaLacres() {
-    this.buscarLacre.buscarLacre().subscribe(arr => {
-      const resp = this.buscarLacre.converteParaArrayDeLacres(arr.body);
-      this.buscarLacre.atualizarArrayLacres(resp);
     });
   }
 
@@ -138,6 +123,40 @@ export class DadosComponent implements OnInit, OnDestroy {
       }
     }
   }
+
+  onProcesso() {
+    if (
+      this.cadastro.motivo === 'Descarte'
+    ) {
+      this.verificarProcessoEntrega(this.cadastro.processo);
+    }
+    if (
+      this.cadastro.motivo === 'Doação'
+    ) {
+      this.buscarInstituicaoDoacao();
+    }
+
+    if (this.cadastro.motivo !== 'Descarte' && this.cadastro.motivo !== 'Doação') {
+      this.listenprocesso = true;
+    }
+  }
+
+  onfocusProcesso() {
+    this.cadastro.processo = '';
+    this.listenprocesso = false;
+  }
+
+  // função para carregar o array de lacres
+  // para disponibilizar esse array com atecedência
+  // dado o possível iato no carregamento dos dados
+  carregaLacres() {
+    this.buscarLacre.buscarLacre().subscribe(arr => {
+      const resp = this.buscarLacre.converteParaArrayDeLacres(arr.body);
+      this.buscarLacre.atualizarArrayLacres(resp);
+    });
+  }
+
+
 
   onAutorizado(value: boolean) {
 
@@ -191,15 +210,14 @@ export class DadosComponent implements OnInit, OnDestroy {
 
   }
 
-  changeEvent() {
-    this.submitButton.focus();
-  }
-
   onFocusMatricula() {
-    this.cadastro.matricula = '';
-    this.cadastro.nome = '';
-    this.processoencontrado = false;
-    this.listenpreenchimento = false;
+    if (typeof this.instituicao.matricula !== 'undefined' && this.instituicao.matricula.length === 1) {
+      this.cadastro.matricula = '';
+      this.cadastro.nome = '';
+      this.processoencontrado = false;
+      this.listenpreenchimento = false;
+    }
+
   }
 
   onSexo(value) {
@@ -252,18 +270,30 @@ export class DadosComponent implements OnInit, OnDestroy {
 
 
   }
+
   ngOnDestroy(): void {
     this.serviceCampos.mudarAviso(1);
+    this.cadastro = new Cadastro();
+    this.abertura = new Abertura();
+    this.onAutorizadotipo = 0;
+    this.exibicao = 0;
+    this.listenpreenchimento = false;
+    this.listenprocesso = false;
+    this.carregado = false;
+    this.processoencontrado = false;
+    this.matriculaencontrada = false;
   }
 
   verificarProcessoEntrega(processo: string) {
     this.carregado = true;
     this.salvaratendimento.buscarAtendimento(processo)
       .subscribe(data => {
+        console.log(data.body);
         if (data.body === null) {
           this.avisocamposService.mudarAviso(9);
           this.opensnackbarService.openSnackBarCampos(AvisocamposComponent, 2000);
           this.carregado = false;
+          this.listenprocesso = false;
         } else {
           this.abertura = data.body;
           this.aberturaservice.atualizarAbertura(this.abertura);
@@ -277,5 +307,21 @@ export class DadosComponent implements OnInit, OnDestroy {
         this.carregado = false;
       }
       );
+  }
+
+  buscarInstituicaoDoacao() {
+    this.salvardoacaoservice.buscarInstituicao(this.cadastro.processo).subscribe(data => {
+      if (data.body.length > 0) {
+        this.instituicao = data.body[0];
+        // aqui tento passar direto para a impressao
+        // caso a instituição já resteja cadastrada
+        this.listenprocesso = false;
+        this.listenpreenchimento = true;
+        this.salvardoacaoservice.alterarInstituicao(this.instituicao);
+      }
+    }, error => {
+      this.avisocamposService.mudarAviso(4);
+      this.opensnackbarService.openSnackBarCampos(AvisocamposComponent, 2000);
+    })
   }
 }

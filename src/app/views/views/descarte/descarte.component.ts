@@ -57,7 +57,6 @@ export class DescarteComponent implements OnInit {
       // instiução para compor a tabela de instiuções ainda que
       // o objetivo seja diferente, possui as mesmas características
       this.salvardoacaoservice.salvarInstituicao(this.instituicao).subscribe(() => {
-        console.log(this.instituicao);
       });
     });
   }

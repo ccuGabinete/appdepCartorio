@@ -68,7 +68,7 @@
 
     <div class="unicorn-dark-theme" *ngIf='onAutorizadotipo === 1 || onAutorizadotipo === 2'>
       <mat-form-field>
-        <input style='font-size: 10pt' matInput type="text" placeholder="Processo" name="numeroprocesso"
+        <input matInput type="text" placeholder="Processo" name="numeroprocesso"
           id="numeroprocesso" [(ngModel)]='cadastro.processo' mask='0000/000.000/0000' (focus)='onfocusProcesso()'
           (change)='onProcesso()'>
       </mat-form-field>
@@ -95,7 +95,7 @@
     <div class="unicorn-dark-theme">
       <mat-form-field>
         <input matInput type="text" placeholder="Inscriçao Municipal" name="inscricaomunicipal" id="inscricaomunicipal"
-          (change)="buscaNotificado(cadastro.matricula)" (focus)='onFocusMatricula()' [(ngModel)]='cadastro.matricula'
+          (blur)="buscaNotificado(cadastro.matricula)" (focus)='onFocusMatricula()' [(ngModel)]='cadastro.matricula'
           maxlength="8">
       </mat-form-field>
     </div>

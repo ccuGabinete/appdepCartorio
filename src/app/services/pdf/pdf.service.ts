@@ -418,7 +418,6 @@ export class PdfService {
     });
 
     doc.save('Recibo de doação nº' + '');
-    this.mudarPdfAviso('ok');
   }
 
   downloadPDFDescarte(instituicao: Instituicao) {
