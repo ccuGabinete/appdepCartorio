@@ -8,7 +8,7 @@ const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
 };
 
-const apiUrl = 'https://ccuapi.herokuapp.com/acesso/validar';
+const apiUrl = 'https://gcdapi.herokuapp.com/acesso/validar';
 
 
 

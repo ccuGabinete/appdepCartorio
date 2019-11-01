@@ -1,3 +1,5 @@
+import { Router } from '@angular/router';
+import { PdfService } from './../../../services/pdf/pdf.service';
 import { Component, OnInit } from '@angular/core';
 import { Abertura } from '../../models/abertura/abertura';
 import { AberturaService } from '../../services/abertura/abertura.service';
@@ -14,21 +16,40 @@ export class RecursoComponent implements OnInit {
 
   constructor(
     public abertura: Abertura, // objeto de abertura vinda da tela inicial
+    private aberturaatual: Abertura,
     private aberturaservice: AberturaService,
-    private salvaratendimento: SalvaratendimentoService,
+    private salvaratendimentoservice: SalvaratendimentoService,
     private avisocamposService: AvisocamposService,
-    private opensnackbarService: OpensnackbarService
+    private opensnackbarService: OpensnackbarService,
+    private pdfservide: PdfService,
+    private router: Router
   ) { }
 
   ngOnInit() {
     this.abertura = new Abertura();
     this.aberturaservice.correnteAbertura.subscribe(abertura => {
       this.abertura = abertura;
+      this.aberturaatual.agenterespcadastro = abertura.agenterespcadastro;
+      this.aberturaatual.autorizado = abertura.autorizado;
+      this.aberturaatual.processo = abertura.processo;
+      this.aberturaatual.nome = abertura.nome;
+      this.aberturaatual.identidade = abertura.identidade;
+      this.aberturaatual.motivo = abertura.motivo;
+      this.aberturaatual.dataabertura = abertura.dataabertura;
     });
   }
 
   onImprimir() {
-    console.log(this.abertura);
+    this.pdfservide.downloadPDFRecurso(this.abertura);
+    this.salvaratendimentoservice.salvarAtendimento(this.aberturaatual).subscribe(() => {
+      this.refresh();
+    });
+  }
+
+  refresh(): void {
+    this.router.navigateByUrl('/recurso', { skipLocationChange: true }).then(() => {
+      this.router.navigate(['dados']);
+    });
   }
 
 }

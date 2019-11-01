@@ -214,12 +214,14 @@ export class AberturaComponent implements OnInit, OnDestroy {
   listalacres: Array<Lacre> = [];
   listaAutos: Array<Auto> = [];
   listaTRM = [];
+  listaMetro = [];
   objlacre: string;
   comprobatorio = '';
   docs = [
     'Auto',
     'TRM',
     'Lacre',
+    'Metrô',
     'Nenhum'
   ];
 
@@ -408,6 +410,16 @@ export class AberturaComponent implements OnInit, OnDestroy {
     this.abertura.lacre = '';
   }
 
+  onMetro(val: string) {
+    this.abertura.metro = this.formata.colocaZeros(this.abertura.metro);
+    this.listaMetro.push(this.abertura.metro);
+    this.abertura.metro = '';
+  }
+
+  onFocusMetro() {
+    this.abertura.metro = '';
+  }
+
   onFocusAuto() {
     this.abertura.autodeapreensao = '';
   }
@@ -444,10 +456,16 @@ export class AberturaComponent implements OnInit, OnDestroy {
     this.abertura.autodeapreensao = '';
   }
 
+  onDeletarMetro(metro: string) {
+    const index = this.listaMetro.indexOf(metro);
+    this.listaMetro.splice(index, 1);
+  }
+
   onComprobatorio() {
     this.listaAutos = [];
     this.listaTRM = [];
     this.listalacres = [];
+    this.listaMetro = [];
     this.objlacre = '';
   }
 
@@ -455,6 +473,7 @@ export class AberturaComponent implements OnInit, OnDestroy {
   populaListas() {
     this.abertura.listalacres = '';
     this.abertura.listaautos = '';
+    this.abertura.listaMetro = this.listaMetro.toString();
     this.abertura.listatrms = this.listaTRM.toString();
 
     this.listalacres.forEach((lacre, pos, array) => {
@@ -532,6 +551,7 @@ export class AberturaComponent implements OnInit, OnDestroy {
   // serem usados pelo servico pdf.service
   populaitensComporbatorios() {
     this.abertura.listatrms = this.listaTRM.toString();
+    this.abertura.listaMetro = this.listaMetro.toString();
     this.abertura.listaautos = '';
     this.abertura.listalacres = '';
     this.listaAutos.forEach((t, p, a) => {

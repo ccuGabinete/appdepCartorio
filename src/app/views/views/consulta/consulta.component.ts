@@ -31,7 +31,13 @@ export class ConsultaComponent implements OnInit {
   ngOnInit() {
     this.abertura = new Abertura();
     this.aberturaservice.correnteAbertura.subscribe(abertura => {
-      this.abertura = abertura;
+      this.abertura.agenterespcadastro = abertura.agenterespcadastro;
+      this.abertura.autorizado = abertura.autorizado;
+      this.abertura.processo = abertura.processo;
+      this.abertura.nome = abertura.nome;
+      this.abertura.identidade = abertura.identidade;
+      this.abertura.motivo = abertura.motivo;
+      this.abertura.dataabertura = abertura.dataabertura;
       this._clipboardService.copyFromContent(this.abertura.processo.toString());
       this.serviceCampos.mudarAviso(7);
       this.opensnack.openSnackBarCampos(AvisocamposComponent, 4000);
@@ -54,6 +60,7 @@ export class ConsultaComponent implements OnInit {
       this.disabled = false;
       this.refresh();
     }, error => {
+      console.log(this.abertura);
       this.serviceCampos.mudarAviso(4);
       this.opensnack.openSnackBarCampos(AvisocamposComponent, 2500);
     });

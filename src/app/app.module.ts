@@ -64,6 +64,7 @@ import { BuscarautoService } from './views/services/buscarauto/buscarauto.servic
 import { SalvarlacreService } from './views/services/salvarlacre/salvarlacre.service';
 import { ClipboardModule } from 'ngx-clipboard';
 import { DescarteComponent } from './views/views/descarte/descarte.component';
+import { DespachosComponent } from './views/views/despachos/despachos.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -84,7 +85,8 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
     DoacaoComponent,
     EntregaComponent,
     RecursoComponent,
-    DescarteComponent
+    DescarteComponent,
+    DespachosComponent
   ],
   imports: [
     ClipboardModule,

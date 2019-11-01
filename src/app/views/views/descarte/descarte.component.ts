@@ -1,3 +1,4 @@
+import { SalvaratendimentoService } from './../../services/salvaratendimento/salvaratendimento.service';
 import { Router } from '@angular/router';
 import { PdfService } from './../../../services/pdf/pdf.service';
 import { BuscalacreService } from './../../services/buscalacre/buscalacre.service';
@@ -32,13 +33,21 @@ export class DescarteComponent implements OnInit {
     private opensnack: OpensnackbarService,
     private buscarLacre: BuscalacreService,
     private pdfservice: PdfService,
-    private router: Router
+    private router: Router,
+    private salvaratendimentoservice: SalvaratendimentoService
   ) { }
 
   ngOnInit() {
-
+    this.abertura = new Abertura();
     this.aberturaservice.correnteAbertura.subscribe(abertura => {
-      this.abertura = abertura;
+      this.abertura.agenterespcadastro = abertura.agenterespcadastro;
+      this.abertura.autorizado = abertura.autorizado;
+      this.abertura.processo = abertura.processo;
+      this.abertura.nome = abertura.nome;
+      this.abertura.identidade = abertura.identidade;
+      this.abertura.motivo = abertura.motivo;
+      this.abertura.dataabertura = abertura.dataabertura;
+
       this.instituicao = new Instituicao();
       this.instituicao.razaosocial = this.title.transform('COMPANHIA MUNICIPAL DE LIMPEZA URBANA') + ' - COMLURB';
       this.instituicao.numero = '358';
@@ -48,9 +57,9 @@ export class DescarteComponent implements OnInit {
       this.instituicao.cep = '20511900';
       this.instituicao.cnpj = '42124693000174';
       this.instituicao.endereco = 'Rua Major Ávila';
-      this.instituicao.responsavel = this.title.transform(this.abertura.nome);
-      this.instituicao.cpf = this.abertura.cpf;
-      this.instituicao.processo = this.abertura.processo.toString();
+      this.instituicao.responsavel = this.title.transform(abertura.nome);
+      this.instituicao.cpf = abertura.cpf;
+      this.instituicao.processo = abertura.processo.toString();
       this.instituicao.codigo = '0';
 
       // assim que a view subir, executo o salvamento desta
@@ -88,6 +97,12 @@ export class DescarteComponent implements OnInit {
         this.salvardoacaoservice.buscarInstituicao(this.instituicao.processo).subscribe(data => {
           // será necessário buscar a linha {id} do processo recem salvao na planilha
           this.salvardoacaoservice.atualizarInstituicao(this.instituicao.codigo, data.body[0].id).subscribe(data => {
+            this.salvaratendimentoservice.salvarAtendimento(this.abertura).subscribe(() => {
+            }, error => {
+              this.servicecampos.mudarAviso(4);
+              this.opensnack.openSnackBarCampos(AvisocamposComponent, 2000);
+            });
+
             this.pdfservice.downloadPDFDescarte(this.instituicao);
             this.pdfservice.pdfavisocorrente.subscribe(() => {
               this.refresh();

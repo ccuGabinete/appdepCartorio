@@ -1,3 +1,4 @@
+import { EntregaComponent } from './views/views/entrega/entrega.component';
 import { DescarteComponent } from './views/views/descarte/descarte.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
@@ -6,6 +7,8 @@ import { HomeComponent } from './home/home.component';
 import { ConsultaComponent } from './views/views/consulta/consulta.component';
 import { AberturaComponent } from './views/views/abertura/abertura.component';
 import { DoacaoComponent } from './views/views/doacao/doacao.component';
+import { RecursoComponent } from './views/views/recurso/recurso.component';
+import { DespachosComponent } from './views/views/despachos/despachos.component';
 
 const routes: Routes = [
   {
@@ -31,6 +34,18 @@ const routes: Routes = [
   {
     path: 'descarte',
     component: DescarteComponent
+  },
+  {
+    path: 'entrega',
+    component: EntregaComponent
+  },
+  {
+    path: 'recurso',
+    component: RecursoComponent
+  },
+  {
+    path: 'despachos',
+    component: DespachosComponent
   }
 ];
 

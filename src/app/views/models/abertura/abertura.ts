@@ -4,7 +4,7 @@ export class Abertura {
   autorizado: boolean;
   bairro: string;
   cep: string;
-  codigo: string; // código para doação ou descarte,
+  codigo: string; //  código para doação ou descarte,
   complemento: string;
   cpf: string;
   dataabertura: string;
@@ -19,11 +19,13 @@ export class Abertura {
   itensdiscriminados: string;
   lacre: string;
   listaautos: string;
+  listaMetro: string;
   listalacres: string;
   listatrms: string;
   localapreensao: string;
   localequipamento: string;
   matricula: string;
+  metro: string;
   motivo: string;
   municipio: string;
   nacionalidade: string;

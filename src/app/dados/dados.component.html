@@ -2,10 +2,7 @@
 <div class="unicorn-dark-theme">
   <mat-toolbar color="primary">
     <mat-toolbar-row>
-      <span style="font-size: 1.1em; color:rgb(224, 231, 255)"><span
-          style="color:darkblue; font-size: 1em;">G</span>erência de <span
-          style="color:darkblue; font-size: 1em;">C</span>ontrole e <span
-          style="color:darkblue; font-size: 1em;">D</span>epósito</span>
+      <span style="font-size: 1.1em; color:darkblue;">Depósito Público Municipal</span>
       <mat-icon matTooltip="logout" (click)="onLogout()"> directions_run</mat-icon>
     </mat-toolbar-row>
   </mat-toolbar>
@@ -29,7 +26,7 @@
 
 <!--#region triagem  -->
 
-<div class="unicorn-dark-theme" *ngIf='cadastro.motivo === undefined || cadastro.motivo.length === 0'>
+<div class="unicorn-dark-theme" *ngIf=exibirsexo>
   <mat-card>
     <mat-card-content>
       <h5 class="example-h2">Sexo</h5>
@@ -55,7 +52,7 @@
     </mat-form-field>
   </div>
 
-  <div *ngIf='cadastro.motivo !== undefined && cadastro.motivo.length > 1' class="unicorn-dark-theme">
+  <div *ngIf=listenautorizado class="unicorn-dark-theme">
     <mat-form-field>
       <mat-label>Autorizado?</mat-label>
       <mat-select color="primary" [(ngModel)]='cadastro.listenautorizado'
@@ -65,18 +62,16 @@
         </mat-option>
       </mat-select>
     </mat-form-field>
+  </div>
 
-    <div class="unicorn-dark-theme" *ngIf='onAutorizadotipo === 1 || onAutorizadotipo === 2'>
-      <mat-form-field>
-        <input matInput type="text" placeholder="Processo" name="numeroprocesso"
-          id="numeroprocesso" [(ngModel)]='cadastro.processo' mask='0000/000.000/0000' (focus)='onfocusProcesso()'
-          (change)='onProcesso()'>
-      </mat-form-field>
-    </div>
-    <div class="spinner-border text-info spinner" role="status" *ngIf=carregado>
-      <span class="sr-only">Loading...</span>
-    </div>
-
+  <div class="unicorn-dark-theme" *ngIf='onAutorizadotipo === 1 || onAutorizadotipo === 2 || onAutorizadotipo === 3'>
+    <mat-form-field>
+      <input matInput type="text" placeholder="Processo" name="numeroprocesso" id="numeroprocesso"
+        [(ngModel)]='cadastro.processo' mask='0000/000.000/0000' (focus)='onfocusProcesso()' (change)='onProcesso()'>
+    </mat-form-field>
+  </div>
+  <div class="spinner-border text-info spinner" role="status" *ngIf=carregado>
+    <span class="sr-only">Loading...</span>
   </div>
 
 
@@ -200,8 +195,8 @@
 
   <div class="unicorn-dark-theme">
     <mat-form-field>
-      <input matInput type="text" placeholder="CPF" name="cpf" id="cpf"  (focus)='onFocusCPF()' (change)='onCPF(cadastro.cpf)'
-        [(ngModel)]="cadastro.cpf" maxlength="11">
+      <input matInput type="text" placeholder="CPF" name="cpf" id="cpf" (focus)='onFocusCPF()'
+        (change)='onCPF(cadastro.cpf)' [(ngModel)]="cadastro.cpf" maxlength="11">
     </mat-form-field>
   </div>
 </div>
@@ -213,7 +208,11 @@
   <app-abertura></app-abertura>
 </div>
 
-<div id='consulta' *ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2) && exibicao === 2 && listenpreenchimento'
+<div class="spinner-border text-info spinner" role="status" *ngIf=buscandoconsulta>
+  <span class="sr-only">Loading...</span>
+</div>
+
+<div id='consulta' *ngIf='(onAutorizadotipo === 3) && exibicao === 2 && listenpreenchimento'
   class="alinhamentoItens">
   <app-consulta></app-consulta>
 </div>
@@ -222,7 +221,7 @@
   <span class="sr-only">Loading...</span>
 </div>
 
-<div id='doacao' *ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2) && exibicao === 3 && listenpreenchimento'
+<div id='doacao' *ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2 || onAutorizadotipo === 3) && exibicao === 3 && listenpreenchimento'
   class="alinhamentoItens">
   <app-doacao></app-doacao>
 </div>
@@ -231,7 +230,7 @@
   <span class="sr-only">Loading...</span>
 </div>
 
-<div id='entrega' *ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2) && exibicao === 4 && listenpreenchimento'
+<div id='entrega' *ngIf='onAutorizadotipo === 3 && exibicao === 4 && listenpreenchimento'
   class="alinhamentoItens">
   <app-entrega></app-entrega>
 </div>
@@ -240,14 +239,27 @@
   <span class="sr-only">Loading...</span>
 </div>
 
-<div id='recurso' *ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2) && exibicao === 6 && listenpreenchimento'
+<div id='recurso' *ngIf='onAutorizadotipo === 3 && exibicao === 6 && listenpreenchimento'
   class="alinhamentoItens">
   <app-recurso></app-recurso>
 </div>
 
-<div id='descarte' *ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2) && exibicao === 7 && listenpreenchimento'
+<div class="spinner-border text-info spinner" role="status" *ngIf=buscandodescarte>
+  <span class="sr-only">Loading...</span>
+</div>
+
+<div id='descarte' *ngIf='onAutorizadotipo === 3 && exibicao === 7 && listenpreenchimento'
   class="alinhamentoItens">
   <app-descarte></app-descarte>
+</div>
+
+<div class="spinner-border text-info spinner" role="status" *ngIf=buscandodespacho>
+  <span class="sr-only">Loading...</span>
+</div>
+
+<div id='desapchos' *ngIf='onAutorizadotipo === 3 && exibicao === 8 && listenpreenchimento'
+  class="alinhamentoItens">
+  <app-despachos></app-despachos>
 </div>
 
 <!--#endregion -->

@@ -177,6 +177,19 @@
           </ul>
         </div>
 
+        <div class="unicorn-dark-theme" *ngIf="comprobatorio === 'Metrô'">
+          <mat-form-field>
+            <input matInput type="text" placeholder="Metrô" name="metro" id="metro" [(ngModel)]='abertura.metro' maxlength='8'
+              (change)='onMetro(abertura.metro)' (focus)='onFocusMetro()'>
+          </mat-form-field>
+
+          <ul *ngIf='listaMetro.length > 0' matTooltip="clique para excluir">
+            <div *ngFor='let l of listaMetro'>
+              <li (click)='onDeletarMetro(l)' style="color: #CAE1FF">{{l}}</li>
+            </div>
+          </ul>
+        </div>
+
         <div class="unicorn-dark-theme">
           <mat-form-field>
             <input matInput type="text" placeholder="Itens discriminados" name="itensdiscriminados"

@@ -28,6 +28,9 @@ export class SalvardoacaoService {
 
 
   salvarInstituicao(instituicao: Instituicao): Observable<HttpResponse<Instituicao>> {
+    if(typeof instituicao.matricula === 'undefined'){
+      instituicao.matricula = 'o';
+    }
     return this.http.post<Instituicao>(url + 'gcd/instituicao/salvar', instituicao, { observe: 'response' })
       .pipe(
         catchError(this.handleError));

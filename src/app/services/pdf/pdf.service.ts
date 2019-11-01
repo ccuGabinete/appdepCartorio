@@ -4,8 +4,7 @@ import { Abertura } from './../../views/models/abertura/abertura';
 import { Injectable } from '@angular/core';
 import * as jsPDF from 'jspdf';
 import { body } from '../../services/imagens';
-import * as moment from 'moment-timezone';
-import { TitleCasePipe, LowerCasePipe } from '@angular/common';
+import { TitleCasePipe, LowerCasePipe, UpperCasePipe } from '@angular/common';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
@@ -18,6 +17,8 @@ export class PdfService {
   imageDoacao = body.bodydoacao;
   imageDescarte = body.bodydescarte;
   imageanexodoacao = body.anexodoacao;
+  imageEntrega = body.bodyentrega;
+  imageRecurso = body.bodyrecurso;
   public buscarPdfaAviso = new BehaviorSubject(this.pdfaviso);
   pdfavisocorrente = this.buscarPdfaAviso.asObservable();
 
@@ -28,11 +29,13 @@ export class PdfService {
   constructor(
     private titlecasePipe: TitleCasePipe,
     private lowercasePipe: LowerCasePipe,
-    private formatacao: FormatacoesService
+    private formatacao: FormatacoesService,
+    private uppercasepipe: UpperCasePipe
   ) { }
 
   downloadPDF(abertura: Abertura) {
     //#region variaveis
+    const processo = abertura.processo;
     const dataexpedicao = abertura.dataexpedicao.toString();
     abertura.dataabertura = this.formatacao.getDataExtenso(this.formatacao.gerarData());
     const datacarimbo = this.formatacao.formataDataCarimbo(this.formatacao.gerarData());
@@ -217,12 +220,11 @@ export class PdfService {
     doc.setFontSize(12);
     doc.setFont('times', 'normal');
     doc.setProperties({
-      title: 'Auto de Infração nº' + 'notificado.infracao',
-      subject: 'Notificação do(a) Sr(a)' + 'notificado.nome',
-      author: 'notificado.agenterespcadastro',
+      title: 'Folha de abertura do processo nº ' + abertura.processo,
+      subject: 'Requerente; ' + abertura.nome,
+      author: abertura.agenterespcadastro,
       keywords: ' ',
       creator: 'Coordenadoria de Controle Urbano'
-
     });
 
     //#region coordenadas
@@ -259,7 +261,7 @@ export class PdfService {
     doc.addImage(this.imageData, 'PNG', coord.imageBody.x, coord.imageBody.y, coord.imageBody.w, coord.imageBody.h);
     doc.addPage();
     doc.addImage(this.imageDespacho, 'PNG', coord.imageBody.x, coord.imageBody.y, coord.imageBody.w, coord.imageBody.h);
-    doc.save('Abertura de Processo nº ' + abertura.processo);
+    doc.save('Abertura de Processo nº ' + processo);
     this.mudarPdfAviso('ok');
   }
 
@@ -277,6 +279,7 @@ export class PdfService {
     endereco += ' CEP: ' + instituicao.cep;
     const data = this.formatacao.getDataExtenso(this.formatacao.gerarData());
     instituicao.cnpj = this.formatacao.formataCNPJ(instituicao.cnpj);
+    const processo = instituicao.processo;
     instituicao.processo = this.formatacao.fomataProcesso(instituicao.processo);
     //#endregion
 
@@ -360,9 +363,9 @@ export class PdfService {
     doc.setFontSize(12);
     doc.setFont('times', 'normal');
     doc.setProperties({
-      title: 'Auto de Infração nº' + 'notificado.infracao',
-      subject: 'Notificação do(a) Sr(a)' + 'notificado.nome',
-      author: 'notificado.agenterespcadastro',
+      title: 'Recibo de doação nº ' + instituicao.processo,
+      subject: 'Responsável pela instiuição: ' + instituicao.responsavel,
+      author: instituicao.razaosocial,
       keywords: ' ',
       creator: 'Coordenadoria de Controle Urbano'
 
@@ -416,7 +419,7 @@ export class PdfService {
 
     });
 
-    doc.save('Recibo de doação processo nº ' + instituicao.processo);
+    doc.save('Recibo de doação do processo nº ' + processo);
   }
 
   downloadPDFDescarte(instituicao: Instituicao) {
@@ -516,9 +519,9 @@ export class PdfService {
     doc.setFontSize(12);
     doc.setFont('times', 'normal');
     doc.setProperties({
-      title: 'Auto de Infração nº' + 'notificado.infracao',
-      subject: 'Notificação do(a) Sr(a)' + 'notificado.nome',
-      author: 'notificado.agenterespcadastro',
+      title: 'Recibo de descarte nº ' + instituicao.processo,
+      subject: 'Responsável pelo recebimento: ' + instituicao.responsavel,
+      author: instituicao.razaosocial,
       keywords: ' ',
       creator: 'Coordenadoria de Controle Urbano'
 
@@ -581,4 +584,260 @@ export class PdfService {
     doc.text(instituicao.codigo, 30, 59);
     doc.text('folha de anexo nº: ' + pos, 165, 280);
   }
+
+  downloadPDFEntrega(abertura: Abertura) {
+    //#region variaveis
+    const dataexpedicao = abertura.dataexpedicao.toString();
+    const assinatura = this.uppercasepipe.transform(abertura.nome);
+    const processo = this.formatacao.fomataProcesso(abertura.processo.toString());
+    abertura.telcelular = this.formatacao.formataCel(abertura.telcelular);
+    abertura.telresidencial = this.formatacao.formataRes(abertura.telresidencial);
+    abertura.nome = this.titlecasePipe.transform(abertura.nome);
+    abertura.cep = this.formatacao.formataCEP(abertura.cep);
+    abertura.email = this.lowercasePipe.transform(abertura.email);
+    abertura.itensdiscriminados = this.lowercasePipe.transform(abertura.itensdiscriminados);
+    //#endregion
+
+    const coord = {
+
+      text01: {
+        texto: abertura.nome,
+        x: 62,
+        y: 50.5
+      },
+
+      text02: {
+        texto: abertura.cpf,
+        x: 65.5,
+        y: 57
+      },
+
+      text03: {
+        texto: abertura.identidade,
+        x: 124,
+        y: 57
+      },
+
+      text04: {
+        texto: abertura.expedicao,
+        x: 62.17,
+        y: 63.5
+      },
+
+      text05: {
+        texto: dataexpedicao,
+        x: 92.3,
+        y: 63.5
+      },
+
+      text06: {
+        texto: abertura.nacionalidade,
+        x: 155,
+        y: 63.5
+      },
+
+      text07: {
+        texto: abertura.estadocivil,
+        x: 49,
+        y: 70.5
+      },
+
+      text08: {
+        texto: abertura.endereco,
+        x: 112.5,
+        y: 70.5
+      },
+
+      text09: {
+        texto: abertura.numero,
+        x: 34,
+        y: 77
+      },
+
+      text10: {
+        texto: abertura.complemento,
+        x: 78,
+        y: 77
+      },
+
+      text11: {
+        texto: abertura.bairro,
+        x: 126,
+        y: 77
+      },
+
+      text12: {
+        texto: abertura.municipio,
+        x: 45.85,
+        y: 83
+      },
+
+      text13: {
+        texto: abertura.cep,
+        x: 121,
+        y: 83
+      },
+
+      text14: {
+        texto: abertura.telresidencial,
+        x: 166.5,
+        y: 83
+      },
+
+      text15: {
+        texto: abertura.telcelular,
+        x: 53,
+        y: 90
+      },
+
+      text16: {
+        texto: abertura.email,
+        x: 106,
+        y: 90
+      },
+
+      text17: {
+        texto: abertura.processo,
+        x: 160.25,
+        y: 10.5
+      },
+
+      text18: {
+        texto: processo,
+        x: 127.5,
+        y: 97
+      },
+
+      text19: {
+        texto: abertura.dataabertura,
+        x: 171,
+        y: 97
+      },
+
+      text20: {
+        texto: abertura.dataabertura,
+        x: 152.5,
+        y: 18.9
+      },
+
+      text21: {
+        texto: assinatura,
+        x: 71,
+        y: 128
+      },
+
+      imageBody: {
+        x: 27,
+        y: 5,
+        w: 180.121,
+        h: 231.21
+      },
+
+      imageDespacho: {
+        x: 24.61,
+        y: 5,
+        w: 180.067,
+        h: 277.195
+      }
+    };
+
+    const doc = new jsPDF({
+      orientaion: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    doc.setFontSize(12);
+    doc.setFont('times', 'normal');
+    doc.setProperties({
+      title: 'Recibo de entrega do processo nº ' + abertura.processo,
+      subject: 'Requerente: ' + abertura.nome,
+      author: abertura.agenterespcadastro,
+      keywords: ' ',
+      creator: 'Coordenadoria de Controle Urbano'
+
+    });
+
+    //#region coordenadas
+    doc.text(coord.text01.texto, coord.text01.x, coord.text01.y);
+    doc.text(coord.text02.texto, coord.text02.x, coord.text02.y);
+    doc.text(coord.text03.texto, coord.text03.x, coord.text03.y);
+    doc.text(coord.text04.texto, coord.text04.x, coord.text04.y);
+    doc.text(coord.text05.texto, coord.text05.x, coord.text05.y);
+    doc.text(coord.text06.texto, coord.text06.x, coord.text06.y);
+    doc.text(coord.text07.texto, coord.text07.x, coord.text07.y);
+    doc.text(coord.text08.texto, coord.text08.x, coord.text08.y);
+    doc.text(coord.text09.texto, coord.text09.x, coord.text09.y);
+    doc.text(coord.text10.texto, coord.text10.x, coord.text10.y);
+    doc.text(coord.text11.texto, coord.text11.x, coord.text11.y);
+    doc.text(coord.text12.texto, coord.text12.x, coord.text12.y);
+    doc.text(coord.text13.texto, coord.text13.x, coord.text13.y);
+    doc.text(coord.text14.texto, coord.text14.x, coord.text14.y);
+    doc.text(coord.text15.texto, coord.text15.x, coord.text15.y);
+    doc.text(coord.text16.texto, coord.text16.x, coord.text16.y);
+    doc.text(coord.text18.texto, coord.text18.x, coord.text18.y);
+    doc.text(coord.text19.texto, coord.text19.x, coord.text19.y);
+    doc.text(coord.text20.texto, coord.text20.x, coord.text20.y);
+    doc.text(coord.text21.texto, coord.text21.x, coord.text21.y);
+    doc.setFontSize(15);
+    doc.setFontStyle('bold');
+    doc.text(coord.text17.texto, coord.text17.x, coord.text17.y);
+    //#endregion
+    doc.addImage(this.imageEntrega, 'PNG', coord.imageBody.x, coord.imageBody.y, coord.imageBody.w, coord.imageBody.h);
+    doc.save('Recibo de entrega do processo nº ' + abertura.processo);
+  }
+
+  downloadPDFRecurso(abertura: Abertura) {
+    const processo = this.formatacao.fomataProcesso(abertura.processo.toString());
+
+    const coord = {
+
+      text17: {
+        texto: abertura.dataabertura,
+        x: 152.5,
+        y: 21
+      },
+
+      text18: {
+        texto: processo,
+        x: 160.25,
+        y: 11
+      },
+
+      imageBody: {
+        x: 24.61,
+        y: 5,
+        w: 179.936,
+        h: 111.929
+      }
+    };
+
+    const doc = new jsPDF({
+      orientaion: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    doc.setFontSize(12);
+    doc.setFont('times', 'normal');
+    doc.setProperties({
+      title: 'Despacho de recurso do processo nº' + processo,
+      subject: 'Recurso do Sr(a): ' + abertura.nome,
+      author: 'notificado.agenterespcadastro',
+      keywords: '',
+      creator: 'Coordenadoria de Controle Urbano'
+
+    });
+
+
+    doc.text(coord.text17.texto, coord.text17.x, coord.text17.y);
+    doc.setFontSize(15);
+    doc.setFontStyle('bold');
+    doc.text(coord.text18.texto, coord.text18.x, coord.text18.y);
+
+    doc.addImage(this.imageRecurso, 'PNG', coord.imageBody.x, coord.imageBody.y, coord.imageBody.w, coord.imageBody.h);
+    doc.save('Recibo de recurso do processo nº ' + abertura.processo);
+  }
+
+
 }

@@ -38,25 +38,28 @@ export class DadosComponent implements OnInit, OnDestroy {
   exibicao = 0;
   listenpreenchimento = false;
   listenprocesso = false;
+  listenautorizado = false;
   carregado = false;
   buscandoentrega = false;
   buscandorecurso = false;
+  buscandoconsulta = false;
   buscandodoacao = false;
+  buscandodescarte = false;
+  buscandodespacho = false;
   processoencontrado = false;
   matriculaencontrada = false;
+  exibirsexo = true;
   opcoes = [
     'Abertura',
     'Consulta',
     'Recurso',
     'Entrega',
     'Doação',
-    'Descarte'
+    'Descarte',
+    'Despacho'
   ].sort();
   testeAutorizado: string;
-
-
-
-  //#endregion
+  //#endregion variaveis
 
   //#region construtor
   constructor(
@@ -91,6 +94,9 @@ export class DadosComponent implements OnInit, OnDestroy {
   }
 
   onMotivo() {
+
+    this.listenautorizado = true;
+
     switch (this.cadastro.motivo) {
       case 'Abertura': {
         this.exibicao = 1;
@@ -99,24 +105,40 @@ export class DadosComponent implements OnInit, OnDestroy {
       }
       case 'Consulta': {
         this.exibicao = 2;
+        this.listenautorizado = false;
+        this.onAutorizadotipo = 3;
         break;
       }
       case 'Descarte': {
         this.carregaLacres();
         this.exibicao = 7;
+        this.listenautorizado = false;
+        this.onAutorizadotipo = 3;
         break;
       }
       case 'Doação': {
         this.carregaLacres();
         this.exibicao = 3;
+        this.listenautorizado = true;
         break;
       }
       case 'Entrega': {
         this.exibicao = 4;
+        this.listenautorizado = false;
+        this.onAutorizadotipo = 3;
         break;
       }
       case 'Recurso': {
         this.exibicao = 6;
+        this.listenautorizado = false;
+        this.onAutorizadotipo = 3;
+        break;
+      }
+      case 'Despacho': {
+        this.exibicao = 8;
+        this.listenautorizado = false;
+        this.onAutorizadotipo = 3;
+        console.log('ok');
         break;
       }
       default: {
@@ -124,19 +146,30 @@ export class DadosComponent implements OnInit, OnDestroy {
         break;
       }
     }
+
+    this.cadastro.processo = '';
+    this.exibirsexo = false;
   }
 
+
   onProcesso() {
-    if (
-      this.cadastro.motivo === 'Descarte'
-    ) {
-      this.verificarProcessoEntrega(this.cadastro.processo);
-    }
+    // if (
+    //   this.cadastro.motivo === 'Descarte'
+    // ) {
+    //   this.verificarProcessoEntrega(this.cadastro.processo);
+    // }
 
     if (
       this.cadastro.motivo === 'Doação'
     ) {
       this.buscarInstituicaoDoacao();
+      this.buscarAtendimento();
+    }
+
+    if (
+      this.cadastro.motivo === 'Descarte'
+    ) {
+      this.buscarAtendimento();
     }
 
     if (this.cadastro.motivo === 'Entrega') {
@@ -147,8 +180,17 @@ export class DadosComponent implements OnInit, OnDestroy {
       this.buscarAtendimento();
     }
 
-    if (this.cadastro.motivo !== 'Descarte' && this.cadastro.motivo !== 'Doação') {
+    if (this.cadastro.motivo !== 'Doação') {
       this.listenprocesso = true;
+    }
+
+    if (this.cadastro.motivo === 'Consulta') {
+      this.buscarAtendimento();
+    }
+
+    if (this.cadastro.motivo === 'Despacho') {
+      console.log('ok despacho');
+      this.buscarAtendimento();
     }
   }
 
@@ -307,6 +349,7 @@ export class DadosComponent implements OnInit, OnDestroy {
           this.aberturaservice.atualizarAbertura(this.abertura);
           this.listenprocesso = true;
           this.carregado = false;
+          this.listenpreenchimento = true;
         }
       }, erro => {
         this.listenprocesso = false;
@@ -330,42 +373,81 @@ export class DadosComponent implements OnInit, OnDestroy {
         this.buscandodoacao = false;
       } else {
         this.buscandodoacao = false;
+        this.listenprocesso = true;
+        // this.listenpreenchimento = true;
       }
     }, error => {
       this.avisocamposService.mudarAviso(4);
       this.opensnackbarService.openSnackBarCampos(AvisocamposComponent, 2000);
       this.buscandodoacao = false;
-    })
+    });
   }
 
   buscarAtendimento() {
-    if(this.cadastro.motivo === 'Entrega') {
-      this.buscandoentrega = true;
-    } else if (this.cadastro.motivo === 'Recurso') {
-      this.buscandorecurso = true;
-    }
-
+    console.log('ok buscar');
+    this.ativaLoading();
     this.salvaratendimento.buscarAtendimento(this.cadastro.processo).subscribe(data => {
       if (data.body === null) {
         this.avisocamposService.mudarAviso(9);
         this.opensnackbarService.openSnackBarCampos(AvisocamposComponent, 2000);
-        this.listenprocesso = false;
-        this.buscandoentrega = false;
-        this.buscandorecurso = false;
+        this.zeraLoading();
       } else {
         this.abertura = data.body;
+        this.abertura.motivo = this.cadastro.motivo;
         this.aberturaservice.atualizarAbertura(this.abertura);
-        this.buscandoentrega = false;
-        this.buscandorecurso = false;
-        this.listenprocesso = false;
+        this.zeraLoading();
         this.listenpreenchimento = true;
       }
     }, error => {
       this.avisocamposService.mudarAviso(4);
       this.opensnackbarService.openSnackBarCampos(AvisocamposComponent, 2000);
-      this.buscandoentrega = false;
-      this.buscandorecurso = false;
-    })
+      this.zeraLoading();
+    });
+  }
+
+  zeraLoading() {
+    this.buscandoentrega = false;
+    this.buscandorecurso = false;
+    this.buscandoconsulta = false;
+    this.buscandodoacao = false;
+    this.buscandodescarte = false;
+    this.buscandodespacho = false;
+    this.listenprocesso = false;
+  }
+
+  ativaLoading() {
+
+    switch (this.cadastro.motivo) {
+      case 'Consulta': {
+        this.buscandoconsulta = true;
+        break;
+      }
+      case 'Descarte': {
+        this.buscandodescarte = true;
+        break;
+      }
+      case 'Doação': {
+       this.buscandodoacao = true;
+        break;
+      }
+      case 'Entrega': {
+        this.buscandoentrega = true;
+        break;
+      }
+      case 'Recurso': {
+        this.buscandorecurso = true;
+        break;
+      }
+      case 'Despachos': {
+        this.buscandodespacho = true;
+        console.log(this.buscandodespacho);
+        break;
+      }
+      default: {
+        this.exibicao = 0;
+        break;
+      }
+    }
   }
 
 

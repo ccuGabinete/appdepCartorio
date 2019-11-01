@@ -1,3 +1,4 @@
+import { SalvaratendimentoService } from './../../services/salvaratendimento/salvaratendimento.service';
 import { PdfService } from './../../../services/pdf/pdf.service';
 import { FormatacoesService } from './../../services/formatacoes/formatacoes.service';
 import { GerardataService } from './../../services/gerardata/gerardata.service';
@@ -38,6 +39,7 @@ export class DoacaoComponent implements OnInit {
 
   constructor(
     public abertura: Abertura,
+    private aberturaatual: Abertura,
     public instituicao: Instituicao,
     private buscarLacre: BuscalacreService,
     private aberturaservice: AberturaService,
@@ -45,26 +47,34 @@ export class DoacaoComponent implements OnInit {
     private buscacepservice: BuscacepService,
     private titlecasepipe: TitleCasePipe,
     private salvardoacaoservice: SalvardoacaoService,
-    private servicecampos: AvisocamposService,
-    private opensnack: OpensnackbarService,
+    private avisocamposService: AvisocamposService,
+    private opensnackbarService: OpensnackbarService,
     private router: Router,
     private gerardataservice: GerardataService,
     private formatacoes: FormatacoesService,
-    private pdfservice: PdfService
+    private pdfservice: PdfService,
+    private salvaratendimentoservice: SalvaratendimentoService
   ) { }
 
   ngOnInit() {
     this.instituicao = new Instituicao();
     this.abertura = new Abertura();
+    this.aberturaatual = new Abertura();
 
     this.aberturaservice.correnteAbertura.subscribe(abertura => {
       this.abertura = abertura;
-    })
+      this.aberturaatual.agenterespcadastro = abertura.agenterespcadastro;
+      this.aberturaatual.autorizado = abertura.autorizado;
+      this.aberturaatual.processo = abertura.processo;
+      this.aberturaatual.nome = abertura.nome;
+      this.aberturaatual.identidade = abertura.identidade;
+      this.aberturaatual.motivo = abertura.motivo;
+      this.aberturaatual.dataabertura = abertura.dataabertura;
+    });
 
     this.salvardoacaoservice.correnteInstituicao.subscribe(instituicao => {
-      // Nesse ponto trago os valores iniciais da abertura de processo 
+      // Nesse ponto trago os valores iniciais da abertura de processo
       // e faço uma consulta para trazer os valores dessa instiuição caso haja
-
       if (typeof instituicao.processo !== 'undefined') {
         this.instituicao = instituicao;
         this.textoescolha = 'Imprimir';
@@ -73,12 +83,15 @@ export class DoacaoComponent implements OnInit {
         this.textoescolha = 'Cadastrar';
         this.cadastrarinstituicao = true;
         this.instituicao.matricula = 'o';
-        console.log(this.instituicao);
       }
       this.instituicao.codigo = '';
-    })
 
-       
+    }, error => {
+      this.avisocamposService.mudarAviso(4);
+      this.opensnackbarService.openSnackBarCampos(AvisocamposComponent, 4000);
+    });
+
+
   }
 
   onRazaoSocial() {
@@ -135,9 +148,7 @@ export class DoacaoComponent implements OnInit {
       this.buscarLacre.filtrarPorCodigp(arr, this.instituicao.codigo).forEach(t => {
         this.instituicao.lacres.push(t);
       });
-    })
-
-    
+    });
   }
 
   onCodigoFocus() {
@@ -150,7 +161,12 @@ export class DoacaoComponent implements OnInit {
     this.instituicao.codigo = this.lowercasepipe.transform(this.instituicao.codigo);
     this.salvardoacaoservice.atualizarInstituicao(this.instituicao.codigo, this.instituicao.id).subscribe(data => {
       this.pdfservice.downloadPDFDoacao(this.instituicao);
-      this.refresh();
+      this.salvaratendimentoservice.salvarAtendimento(this.aberturaatual).subscribe(() => {
+        this.refresh();
+      }, error => {
+        this.avisocamposService.mudarAviso(4);
+        this.opensnackbarService.openSnackBarCampos(AvisocamposComponent, 4000);
+      });
     });
   }
 
@@ -163,8 +179,8 @@ export class DoacaoComponent implements OnInit {
       typeof this.instituicao.cep === 'undefined' ||
       typeof this.instituicao.numero === 'undefined'
     ) {
-      this.servicecampos.mudarAviso(2);
-      this.opensnack.openSnackBarCampos(AvisocamposComponent, 2000);
+      this.avisocamposService.mudarAviso(2);
+      this.opensnackbarService.openSnackBarCampos(AvisocamposComponent, 2000);
       return false;
     } else {
       if (typeof this.instituicao.complemento === 'undefined' || this.instituicao.complemento === '') {
@@ -176,7 +192,7 @@ export class DoacaoComponent implements OnInit {
 
   onSubmit() {
     if (this.testaCampos()) {
-      if(typeof this.instituicao.matricula === 'undefined') {
+      if (typeof this.instituicao.matricula === 'undefined') {
         this.instituicao.matricula = 'o';
       }
       this.disabled = true;
@@ -184,13 +200,11 @@ export class DoacaoComponent implements OnInit {
       this.salvardoacaoservice.salvarInstituicao(this.instituicao).subscribe(() => {
         this.instituicao = new Instituicao();
         this.disabled = false;
-        this.servicecampos.mudarAviso(3);
-        this.opensnack.openSnackBarCampos(AvisocamposComponent, 2000);
         this.refresh();
       }, error => {
         this.disabled = false;
-        this.servicecampos.mudarAviso(4);
-        this.opensnack.openSnackBarCampos(AvisocamposComponent, 2000);
+        this.avisocamposService.mudarAviso(4);
+        this.opensnackbarService.openSnackBarCampos(AvisocamposComponent, 2000);
       });
     }
   }
@@ -198,7 +212,6 @@ export class DoacaoComponent implements OnInit {
   refresh(): void {
     this.router.navigateByUrl('/doacao', { skipLocationChange: true }).then(() => {
       this.router.navigate(['dados']);
-      this.instituicao = new Instituicao();
     });
   }
 }
