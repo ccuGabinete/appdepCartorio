@@ -27,6 +27,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { AppRoutingModule } from './app-routing.module';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { NgxMaskModule, IConfig } from 'ngx-mask';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 // NG Translate
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
@@ -102,6 +103,7 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
     BrowserAnimationsModule,
     MatCardModule,
     MatSlideToggleModule,
+    MatCheckboxModule,
     MatRadioModule,
     MatInputModule,
     MatSelectModule,

@@ -16,6 +16,7 @@ import { Abertura } from '../views/models/abertura/abertura';
 import { isCpf } from 'validator-brazil';
 import { SalvardoacaoService } from '../views/services/salvardoacao/salvardoacao.service';
 import { Instituicao } from '../views/models/instituicao/instituicao';
+import { GeracodigoService } from '../views/services/geracodigo/geracodigo.service';
 
 
 
@@ -77,6 +78,7 @@ export class DadosComponent implements OnInit, OnDestroy {
     private salvaratendimento: SalvaratendimentoService,
     private salvardoacaoservice: SalvardoacaoService,
     private opensnackbarService: OpensnackbarService,
+    private gerarcodigo: GeracodigoService
 
   ) { }
   //#endregion
@@ -90,6 +92,14 @@ export class DadosComponent implements OnInit, OnDestroy {
       this.usuario = user.nome;
       (user.link) ? this.link = user.link.replace('open', 'uc') : this.link = '';
       this.cadastro.agenterespcadastro = user.nome;
+    });
+  }
+
+  onEmail() {
+    this.gerarcodigo.enviarCodigo().subscribe(data => {
+      console.log(data);
+    }, error => {
+      console.log(error);
     });
   }
 
@@ -138,7 +148,6 @@ export class DadosComponent implements OnInit, OnDestroy {
         this.exibicao = 8;
         this.listenautorizado = false;
         this.onAutorizadotipo = 3;
-        console.log('ok');
         break;
       }
       default: {
@@ -159,39 +168,47 @@ export class DadosComponent implements OnInit, OnDestroy {
     //   this.verificarProcessoEntrega(this.cadastro.processo);
     // }
 
-    if (
-      this.cadastro.motivo === 'Doação'
-    ) {
-      this.buscarInstituicaoDoacao();
-      this.buscarAtendimento();
-    }
-
-    if (
-      this.cadastro.motivo === 'Descarte'
-    ) {
-      this.buscarAtendimento();
-    }
-
-    if (this.cadastro.motivo === 'Entrega') {
-      this.buscarAtendimento();
-    }
-
-    if (this.cadastro.motivo === 'Recurso') {
-      this.buscarAtendimento();
+    switch (this.cadastro.motivo) {
+      case 'Abertura': {
+        this.exibicao = 1;
+        this.carregaLacres();
+        break;
+      }
+      case 'Consulta': {
+        this.buscarAtendimento();
+        break;
+      }
+      case 'Descarte': {
+        this.buscarAtendimento();
+        break;
+      }
+      case 'Doação': {
+        this.buscarInstituicaoDoacao();
+        this.buscarAtendimento();
+        break;
+      }
+      case 'Entrega': {
+        this.buscarAtendimento();
+        break;
+      }
+      case 'Recurso': {
+        this.buscarAtendimento();
+        break;
+      }
+      case 'Despacho': {
+        this.buscarAtendimento();
+        break;
+      }
+      default: {
+        this.exibicao = 0;
+        break;
+      }
     }
 
     if (this.cadastro.motivo !== 'Doação') {
       this.listenprocesso = true;
     }
-
-    if (this.cadastro.motivo === 'Consulta') {
-      this.buscarAtendimento();
-    }
-
-    if (this.cadastro.motivo === 'Despacho') {
-      console.log('ok despacho');
-      this.buscarAtendimento();
-    }
+ 
   }
 
   onfocusProcesso() {
@@ -338,7 +355,6 @@ export class DadosComponent implements OnInit, OnDestroy {
     this.carregado = true;
     this.salvardoacaoservice.buscarInstituicao(processo)
       .subscribe(data => {
-        console.log(data.body);
         if (data.body === null) {
           this.avisocamposService.mudarAviso(9);
           this.opensnackbarService.openSnackBarCampos(AvisocamposComponent, 2000);
@@ -384,7 +400,6 @@ export class DadosComponent implements OnInit, OnDestroy {
   }
 
   buscarAtendimento() {
-    console.log('ok buscar');
     this.ativaLoading();
     this.salvaratendimento.buscarAtendimento(this.cadastro.processo).subscribe(data => {
       if (data.body === null) {
@@ -438,9 +453,8 @@ export class DadosComponent implements OnInit, OnDestroy {
         this.buscandorecurso = true;
         break;
       }
-      case 'Despachos': {
+      case 'Despacho': {
         this.buscandodespacho = true;
-        console.log(this.buscandodespacho);
         break;
       }
       default: {

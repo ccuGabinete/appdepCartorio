@@ -14,6 +14,7 @@ import { AvisocamposComponent } from '../../../avisocampos/avisocampos.component
   styleUrls: ['./entrega.component.scss']
 })
 export class EntregaComponent implements OnInit {
+disabled = false;
 
   constructor(
     public abertura: Abertura, // objeto de abertura vinda da tela inicial
@@ -43,8 +44,10 @@ export class EntregaComponent implements OnInit {
   }
 
   onImprimir() {
+    this.disabled = true;
     this.pdfservice.downloadPDFEntrega(this.abertura);
     this.salvaratendimento.salvarAtendimento(this.aberturaatual).subscribe(() => {
+      this.disabled = false;
       this.refresh();
     }, error => {
       this.avisocamposService.mudarAviso(4);

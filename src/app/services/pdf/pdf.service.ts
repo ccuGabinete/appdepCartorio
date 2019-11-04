@@ -19,6 +19,10 @@ export class PdfService {
   imageanexodoacao = body.anexodoacao;
   imageEntrega = body.bodyentrega;
   imageRecurso = body.bodyrecurso;
+  imagedeferimento = body.deferimento;
+  imageindeferimento = body.indeferimento;
+  imageexigencia = body.exigencia;
+  imageexigenciacartoraria = body.exigenciacartoraria;
   public buscarPdfaAviso = new BehaviorSubject(this.pdfaviso);
   pdfavisocorrente = this.buscarPdfaAviso.asObservable();
 
@@ -839,5 +843,120 @@ export class PdfService {
     doc.save('Recibo de recurso do processo nº ' + abertura.processo);
   }
 
+  downloadPDDespacho(abertura: Abertura, tipo: string, exigencias?: Array<string>) {
+    const doc = new jsPDF({
+      orientaion: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
 
+    let imagem: string;
+    let largura: number;
+    let altura: number;
+    let eixoyprocesso: number;
+    let eixoydata: number;
+
+    switch(tipo){
+      case 'Deferimento': {
+        imagem = this.imagedeferimento;
+        largura = 180;
+        altura = 158.875;
+        eixoyprocesso = 12;
+        eixoydata = 23;
+        break;
+      }
+
+      case 'Indeferimento': {
+        imagem = this.imageindeferimento;
+        largura = 180;
+        altura = 150.912;
+        eixoyprocesso = 12;
+        eixoydata = 21;
+        break;
+      }
+
+      case 'Exigência': {
+        imagem = this.imageexigencia;
+        largura = 180;
+        altura = 197.056;
+        eixoyprocesso = 12;
+        eixoydata = 21;
+
+        this.formataExigencias(exigencias, doc, 130);
+
+        break;
+      }
+
+      case 'Cartorária': {
+        imagem = this.imageexigenciacartoraria;
+        largura = 180;
+        altura = 197.056;
+        eixoyprocesso = 12;
+        eixoydata = 21;
+
+        this.formataExigencias(exigencias, doc, 85);
+
+        break;
+      }
+
+      default: {
+        imagem = ''
+        break;
+      }
+    }
+
+    const processo = this.formatacao.fomataProcesso(abertura.processo.toString());
+
+    const coord = {
+
+      text17: {
+        texto: abertura.dataabertura,
+        x: 152.5,
+        y: eixoydata
+      },
+
+      text18: {
+        texto: processo,
+        x: 157.25,
+        y: eixoyprocesso
+      },
+
+      imageBody: {
+        x: 24.61,
+        y: 5,
+        w: largura,
+        h: altura
+      }
+    };
+
+    doc.setFontSize(12);
+    doc.setFont('times', 'normal');
+    doc.setProperties({
+      title: 'Despacho de ' + tipo +  ' do processo nº ' + processo,
+      subject: 'Sr(a): ' + abertura.nome,
+      author: abertura.agenterespcadastro,
+      keywords: '',
+      creator: 'Coordenadoria de Controle Urbano'
+
+    });
+
+
+    doc.text(coord.text17.texto, coord.text17.x, coord.text17.y);
+    doc.setFontSize(15);
+    doc.setFontStyle('bold');
+    doc.text(coord.text18.texto, coord.text18.x, coord.text18.y);
+
+    doc.addImage(imagem, 'PNG', coord.imageBody.x, coord.imageBody.y, coord.imageBody.w, coord.imageBody.h);
+    doc.save('Recibo de ' +  tipo + ' do processo nº ' + abertura.processo);
+  }
+
+formataExigencias(exigencias: Array<string>, doc: jsPDF, eixoY: number) {
+    let auxY = 0;
+    doc.setFontSize(12);
+    exigencias.forEach(texto => {
+      doc.text('=> ' + texto, 50, eixoY + auxY);
+      auxY += 10;
+    })
+  }
+  
 }

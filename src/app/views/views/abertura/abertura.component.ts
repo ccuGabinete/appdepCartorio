@@ -224,6 +224,7 @@ export class AberturaComponent implements OnInit, OnDestroy {
     'Metrô',
     'Nenhum'
   ];
+  disabled = false;
 
   //#endregion
 
@@ -502,6 +503,7 @@ export class AberturaComponent implements OnInit, OnDestroy {
   onSubmit() {
     if (this.testaCampo(this.abertura)) {
       this.populaitensComporbatorios();
+      this.disabled = true;
 
       this.abertura.dataexpedicao = this.gerardata.gerarMomentData(this.abertura.dataexpedicao);
       this.abertura.dataapreensao = this.gerardata.gerarMomentData(this.abertura.dataapreensao);
@@ -514,11 +516,13 @@ export class AberturaComponent implements OnInit, OnDestroy {
         this.pdfservice.downloadPDF(this.abertura);
         this.pdfservice.pdfavisocorrente.subscribe(() => {
           setTimeout(() => {
+            this.disabled = false;
             this.refresh();
           }, 4000);
         });
       },
         () => {
+          this.disabled = false;
           this.serviceCampos.mudarAviso(4);
           this.opensnack.openSnackBarCampos(AvisocamposComponent, 2000);
         });

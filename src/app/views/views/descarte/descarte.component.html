@@ -16,7 +16,7 @@
 
       <div *ngIf='imprimir'>
         <div class="alinhamentoButton unicorn-dark-theme">
-          <button type='button' mat-button color="primary" (click)='onImprimir()'>Gerar declaraçao</button>
+          <button type='button' mat-button color="primary" (click)='onImprimir()' [disabled]='disabled'>Gerar declaraçao</button>
         </div>
       </div>
     </mat-expansion-panel>

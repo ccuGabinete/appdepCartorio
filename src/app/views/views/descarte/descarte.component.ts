@@ -21,6 +21,7 @@ import { AvisocamposComponent } from '../../../avisocampos/avisocampos.component
 export class DescarteComponent implements OnInit {
   imprimir = false;
   cadastrarinstituicao: boolean;
+  disabled = false;
 
   constructor(
     public instituicao: Instituicao,
@@ -30,11 +31,12 @@ export class DescarteComponent implements OnInit {
     private aberturaservice: AberturaService,
     private servicecampos: AvisocamposService,
     private lowercasepipe: LowerCasePipe,
-    private opensnack: OpensnackbarService,
+    private opensnackservice: OpensnackbarService,
     private buscarLacre: BuscalacreService,
     private pdfservice: PdfService,
     private router: Router,
-    private salvaratendimentoservice: SalvaratendimentoService
+    private salvaratendimentoservice: SalvaratendimentoService,
+    private avisocamposservice: AvisocamposService
   ) { }
 
   ngOnInit() {
@@ -80,6 +82,7 @@ export class DescarteComponent implements OnInit {
   }
 
   onImprimir() {
+    this.disabled = true;
     this.instituicao.codigo = this.lowercasepipe.transform(this.instituicao.codigo);
     this.instituicao.lacres = [];
     this.buscarLacre.arrayAtual.subscribe((arr) => {
@@ -89,7 +92,7 @@ export class DescarteComponent implements OnInit {
 
       if (this.instituicao.lacres.length < 1) {
         this.servicecampos.mudarAviso(8);
-        this.opensnack.openSnackBarCampos(AvisocamposComponent, 2000);
+        this.opensnackservice.openSnackBarCampos(AvisocamposComponent, 2000);
       } else {
         // nesse ponto caso haja lacres marcados com o código informado
         // a instituição terá seu campo codigo atualizado com o valor do código
@@ -100,16 +103,20 @@ export class DescarteComponent implements OnInit {
             this.salvaratendimentoservice.salvarAtendimento(this.abertura).subscribe(() => {
             }, error => {
               this.servicecampos.mudarAviso(4);
-              this.opensnack.openSnackBarCampos(AvisocamposComponent, 2000);
+              this.opensnackservice.openSnackBarCampos(AvisocamposComponent, 2000);
             });
 
             this.pdfservice.downloadPDFDescarte(this.instituicao);
             this.pdfservice.pdfavisocorrente.subscribe(() => {
+              this.disabled = false;
               this.refresh();
             });
           });
         });
       }//  fim else
+    }, error => {
+      this.avisocamposservice.mudarAviso(4);
+      this.opensnackservice.openSnackBarCampos(AvisocamposComponent, 2000);
     });
   }
 

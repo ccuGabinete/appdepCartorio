@@ -14,6 +14,8 @@ import { OpensnackbarService } from '../../services/opensnackbar/opensnackbar.se
 })
 export class RecursoComponent implements OnInit {
 
+  disabled = false;
+  
   constructor(
     public abertura: Abertura, // objeto de abertura vinda da tela inicial
     private aberturaatual: Abertura,
@@ -40,8 +42,10 @@ export class RecursoComponent implements OnInit {
   }
 
   onImprimir() {
+    this.disabled = true;
     this.pdfservide.downloadPDFRecurso(this.abertura);
     this.salvaratendimentoservice.salvarAtendimento(this.aberturaatual).subscribe(() => {
+      this.disabled = false;
       this.refresh();
     });
   }
