@@ -29,7 +29,7 @@ import { GeracodigoService } from '../views/services/geracodigo/geracodigo.servi
 export class DadosComponent implements OnInit, OnDestroy {
 
   //#region variaveis
-  disabled = true;
+  disabled: boolean;
   subscription: Subscription;
   nome: string;
   usuario: string;
@@ -91,8 +91,15 @@ export class DadosComponent implements OnInit, OnDestroy {
 
     this.logado.currentMessage.subscribe(user => {
       this.usuario = user.nome;
+      console.log(user);
       (user.link) ? this.link = user.link.replace('open', 'uc') : this.link = '';
       this.cadastro.agenterespcadastro = user.nome;
+      if (user.setor === 'admin' || user.setor === 'gabinete') {
+        this.disabled = true;
+      } else {
+        console.log(user.setor);
+        this.disabled = false;
+      }
     });
   }
 

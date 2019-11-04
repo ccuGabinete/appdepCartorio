@@ -62,6 +62,7 @@ export class HomeComponent implements OnInit {
             if (res.body.isValid) {
               user.nome = res.body.nome;
               user.link = res.body.link;
+              user.setor = res.body.setor;
               this.logado.mudarUsuario(user);
               this.router.navigateByUrl('dados');
             } else {
