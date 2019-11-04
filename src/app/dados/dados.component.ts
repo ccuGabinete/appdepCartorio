@@ -29,6 +29,7 @@ import { GeracodigoService } from '../views/services/geracodigo/geracodigo.servi
 export class DadosComponent implements OnInit, OnDestroy {
 
   //#region variaveis
+  disabled = true;
   subscription: Subscription;
   nome: string;
   usuario: string;
@@ -96,10 +97,17 @@ export class DadosComponent implements OnInit, OnDestroy {
   }
 
   onEmail() {
+    this.disabled = false;
     this.gerarcodigo.enviarCodigo().subscribe(data => {
-      console.log(data);
+      this.abertura.codigo = data.body.codigo;
+      this.aberturaservice.atualizarAbertura(this.abertura);
+      this.serviceCampos.mudarAviso(11);
+      this.opensnackbarService.openSnackBarCampos(AvisocamposComponent, 4000);
+      this.disabled = true;
     }, error => {
-      console.log(error);
+      this.serviceCampos.mudarAviso(11);
+      this.opensnackbarService.openSnackBarCampos(AvisocamposComponent, 6000);
+      this.disabled = true;
     });
   }
 
@@ -208,7 +216,7 @@ export class DadosComponent implements OnInit, OnDestroy {
     if (this.cadastro.motivo !== 'Doação') {
       this.listenprocesso = true;
     }
- 
+
   }
 
   onfocusProcesso() {
@@ -442,7 +450,7 @@ export class DadosComponent implements OnInit, OnDestroy {
         break;
       }
       case 'Doação': {
-       this.buscandodoacao = true;
+        this.buscandodoacao = true;
         break;
       }
       case 'Entrega': {

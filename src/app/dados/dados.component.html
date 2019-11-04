@@ -3,7 +3,7 @@
   <mat-toolbar color="primary">
     <mat-toolbar-row>
       <span style="font-size: 1.1em; color:darkblue;">Depósito Público Municipal</span>
-      <mat-icon matTooltip="gerar código" aria-hidden="false" aria-label="Example heart icon" class="email" (click)=onEmail()>email</mat-icon>
+      <mat-icon matTooltip="gerar código" aria-hidden="false" aria-label="Example heart icon" class="email" (click)=onEmail() *ngIf=disabled>email</mat-icon>
       <mat-icon matTooltip="logout" (click)="onLogout()"> directions_run</mat-icon>
     </mat-toolbar-row>
   </mat-toolbar>
