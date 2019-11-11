@@ -235,6 +235,7 @@ export class DadosComponent implements OnInit, OnDestroy {
   // dado o possível iato no carregamento dos dados
   carregaLacres() {
     this.buscarLacre.buscarLacre().subscribe(arr => {
+      this.buscarLacre.atualizarArrayLacresOriginal(arr.body);
       const resp = this.buscarLacre.converteParaArrayDeLacres(arr.body);
       this.buscarLacre.atualizarArrayLacres(resp);
     });

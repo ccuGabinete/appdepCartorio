@@ -20,6 +20,10 @@ export class BuscalacreService {
   public buscarArray = new BehaviorSubject(this.arr);
   arrayAtual = this.buscarArray.asObservable();
 
+  public arrOriginal: Array<Lacre>;
+  public buscarArrayOriginal = new BehaviorSubject(this.arrOriginal);
+  arrayAtualOriginal = this.buscarArrayOriginal.asObservable();
+
 
   constructor(private http: HttpClient, private gd: GerardataService) {
     this.arr = [];
@@ -35,6 +39,11 @@ export class BuscalacreService {
   atualizarArrayLacres(arr: Array<Lacre>) {
     this.buscarArray.next(arr);
   }
+
+  atualizarArrayLacresOriginal(arr: Array<Lacre>) {
+    this.buscarArrayOriginal.next(arr);
+  }
+
 
   // converte o array resposta vinda do servidor em um um array de objetos tipo Lacre
   converteParaArrayDeLacres(linhas: any) {

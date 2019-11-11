@@ -1,3 +1,5 @@
+import { SalvarlacreService } from './../../services/salvarlacre/salvarlacre.service';
+import { FormatacoesService } from './../../services/formatacoes/formatacoes.service';
 import { BuscalacreService } from './../../services/buscalacre/buscalacre.service';
 import { Router } from '@angular/router';
 import { PdfService } from './../../../services/pdf/pdf.service';
@@ -8,6 +10,7 @@ import { SalvaratendimentoService } from './../../services/salvaratendimento/sal
 import { Abertura } from './../../models/abertura/abertura';
 import { Component, OnInit } from '@angular/core';
 import { AvisocamposComponent } from '../../../avisocampos/avisocampos.component';
+import { Lacre } from '../../models/lacre/lacre';
 const go = console.log;
 
 @Component({
@@ -17,6 +20,7 @@ const go = console.log;
 })
 export class EntregaComponent implements OnInit {
   disabled = false;
+  arrayOriginal: Lacre[];
 
   constructor(
     public abertura: Abertura, // objeto de abertura vinda da tela inicial
@@ -27,7 +31,9 @@ export class EntregaComponent implements OnInit {
     private opensnackbarService: OpensnackbarService,
     private pdfservice: PdfService,
     private router: Router,
-    private buscarlacre: BuscalacreService
+    private buscarlacre: BuscalacreService,
+    private formatacoes: FormatacoesService,
+    private salvarlacre: SalvarlacreService
 
   ) { }
 
@@ -44,6 +50,11 @@ export class EntregaComponent implements OnInit {
       this.aberturaatual.motivo = abertura.motivo;
       this.aberturaatual.dataabertura = abertura.dataabertura;
     });
+
+    this.buscarlacre.arrayAtualOriginal.subscribe(arr => {
+      go(arr);
+      this.arrayOriginal = arr;
+    });
   }
 
   onImprimir() {
@@ -59,8 +70,20 @@ export class EntregaComponent implements OnInit {
   }
 
   onChangeLacre() {
+    this.abertura.lacre = this.formatacoes.colocaZeros(this.abertura.lacre);
     this.buscarlacre.arrayAtual.subscribe(arr => {
       go(arr);
+      const lacrebuscado = arr.filter(t => t.numero === this.abertura.lacre);
+      go(lacrebuscado);
+      if (lacrebuscado.length > 0) {
+        const strbuscada = lacrebuscado[0];
+        go(strbuscada);
+        go(this.arrayOriginal);
+      } else {
+        this.avisocamposService.mudarAviso(12);
+        this.opensnackbarService.openSnackBarCampos(AvisocamposComponent, 2000);
+      }
+
     });
   }
 
