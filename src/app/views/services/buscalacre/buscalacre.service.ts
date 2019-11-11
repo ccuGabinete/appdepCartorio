@@ -7,9 +7,8 @@ import { map, catchError } from 'rxjs/operators';
 import { Lacre } from '../../models/lacre/lacre';
 const url = 'https://gcdapi.herokuapp.com/';
 const local = 'http://localhost:3000/';
-const httpOptions = {
-  headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-};
+const go = console.log;
+
 
 @Injectable({
   providedIn: 'root'
@@ -45,6 +44,7 @@ export class BuscalacreService {
     linhas.forEach((linha, ln) => {
       const arrlacre = linha.lacre.split(',');
       arrlacre.forEach((lc) => {
+
         const lacre = new Lacre();
         lacre.auto = linha.auto;
         lacre.data = this.gd.gerarData(true);
@@ -54,9 +54,28 @@ export class BuscalacreService {
         lacre.processo = linha.processo;
         lacre.trm = linha.trm;
         lacre.numero = lc.substring(0, 8);
+        lacre.status = lc.substring(9, 11);
         lacre.codigo = lc.substring(21, 25);
-        lacre.grupo = lc.substring(26, 28);
-        lacre.quantidade = lc.substring(29, 33);
+
+        if (lc.substring(21, 25) !== '') {
+          lacre.grupo = lc.substring(26, 28);
+        } else {
+          lacre.grupo = '00';
+        }
+
+        if (lacre.quantidade !== '') {
+          lacre.quantidade = lc.substring(29, 33);
+        } else {
+          lacre.quantidade = '0000';
+        }
+
+
+        if (lc.substring(34, 35) !== '') {
+          lacre.recebedor = lc.substring(34, 35);
+        } else {
+          lacre.recebedor = '0';
+        }
+
         arr.push(lacre);
       });
     });

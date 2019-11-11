@@ -3,7 +3,8 @@
   <mat-toolbar color="primary">
     <mat-toolbar-row>
       <span style="font-size: 1.1em; color:darkblue;">Depósito Público Municipal</span>
-      <mat-icon matTooltip="gerar código" aria-hidden="false" aria-label="Example heart icon" class="email" (click)=onEmail() *ngIf=disabled>email</mat-icon>
+      <mat-icon matTooltip="gerar código" aria-hidden="false" aria-label="Example heart icon" class="email"
+        (click)=onEmail() *ngIf=disabled>email</mat-icon>
       <mat-icon matTooltip="logout" (click)="onLogout()"> directions_run</mat-icon>
     </mat-toolbar-row>
   </mat-toolbar>
@@ -213,8 +214,7 @@
   <span class="sr-only">Loading...</span>
 </div>
 
-<div id='consulta' *ngIf='(onAutorizadotipo === 3) && exibicao === 2 && listenpreenchimento'
-  class="alinhamentoItens">
+<div id='consulta' *ngIf='(onAutorizadotipo === 3) && exibicao === 2 && listenpreenchimento' class="alinhamentoItens">
   <app-consulta></app-consulta>
 </div>
 
@@ -222,7 +222,8 @@
   <span class="sr-only">Loading...</span>
 </div>
 
-<div id='doacao' *ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2 || onAutorizadotipo === 3) && exibicao === 3 && listenpreenchimento'
+<div id='doacao'
+  *ngIf='(onAutorizadotipo === 1 || onAutorizadotipo === 2 || onAutorizadotipo === 3) && exibicao === 3 && listenpreenchimento'
   class="alinhamentoItens">
   <app-doacao></app-doacao>
 </div>
@@ -231,8 +232,7 @@
   <span class="sr-only">Loading...</span>
 </div>
 
-<div id='entrega' *ngIf='onAutorizadotipo === 3 && exibicao === 4 && listenpreenchimento'
-  class="alinhamentoItens">
+<div id='entrega' *ngIf='onAutorizadotipo === 3 && exibicao === 4 && listenpreenchimento' class="alinhamentoItens">
   <app-entrega></app-entrega>
 </div>
 
@@ -240,8 +240,7 @@
   <span class="sr-only">Loading...</span>
 </div>
 
-<div id='recurso' *ngIf='onAutorizadotipo === 3 && exibicao === 6 && listenpreenchimento'
-  class="alinhamentoItens">
+<div id='recurso' *ngIf='onAutorizadotipo === 3 && exibicao === 6 && listenpreenchimento' class="alinhamentoItens">
   <app-recurso></app-recurso>
 </div>
 
@@ -249,8 +248,7 @@
   <span class="sr-only">Loading...</span>
 </div>
 
-<div id='descarte' *ngIf='onAutorizadotipo === 3 && exibicao === 7 && listenpreenchimento'
-  class="alinhamentoItens">
+<div id='descarte' *ngIf='onAutorizadotipo === 3 && exibicao === 7 && listenpreenchimento' class="alinhamentoItens">
   <app-descarte></app-descarte>
 </div>
 
@@ -258,8 +256,7 @@
   <span class="sr-only">Loading...</span>
 </div>
 
-<div id='desapchos' *ngIf='onAutorizadotipo === 3 && exibicao === 8 && listenpreenchimento'
-  class="alinhamentoItens">
+<div id='desapchos' *ngIf='onAutorizadotipo === 3 && exibicao === 8 && listenpreenchimento' class="alinhamentoItens">
   <app-despachos></app-despachos>
 </div>
 

@@ -1,3 +1,4 @@
+import { BuscalacreService } from './../../services/buscalacre/buscalacre.service';
 import { Router } from '@angular/router';
 import { PdfService } from './../../../services/pdf/pdf.service';
 import { OpensnackbarService } from './../../services/opensnackbar/opensnackbar.service';
@@ -7,6 +8,7 @@ import { SalvaratendimentoService } from './../../services/salvaratendimento/sal
 import { Abertura } from './../../models/abertura/abertura';
 import { Component, OnInit } from '@angular/core';
 import { AvisocamposComponent } from '../../../avisocampos/avisocampos.component';
+const go = console.log;
 
 @Component({
   selector: 'app-entrega',
@@ -14,7 +16,7 @@ import { AvisocamposComponent } from '../../../avisocampos/avisocampos.component
   styleUrls: ['./entrega.component.scss']
 })
 export class EntregaComponent implements OnInit {
-disabled = false;
+  disabled = false;
 
   constructor(
     public abertura: Abertura, // objeto de abertura vinda da tela inicial
@@ -24,7 +26,8 @@ disabled = false;
     private avisocamposService: AvisocamposService,
     private opensnackbarService: OpensnackbarService,
     private pdfservice: PdfService,
-    private router: Router
+    private router: Router,
+    private buscarlacre: BuscalacreService
 
   ) { }
 
@@ -53,6 +56,16 @@ disabled = false;
       this.avisocamposService.mudarAviso(4);
       this.opensnackbarService.openSnackBarCampos(AvisocamposComponent, 4000);
     });
+  }
+
+  onChangeLacre() {
+    this.buscarlacre.arrayAtual.subscribe(arr => {
+      go(arr);
+    });
+  }
+
+  onFocusLacre() {
+    this.abertura.lacre = '';
   }
 
   refresh(): void {

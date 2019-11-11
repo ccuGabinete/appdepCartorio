@@ -6,6 +6,13 @@
       </mat-panel-title>
     </mat-expansion-panel-header>
 
+    <div class="unicorn-dark-theme">
+      <mat-form-field>
+        <input matInput type="text" placeholder="Lacre" name="lacre" id="lacre" [(ngModel)]='this.abertura.lacre'
+          maxlength='8' (change)='onChangeLacre(this.abertura.lacre)' (focus)='onFocusLacre()'>
+      </mat-form-field>
+    </div>
+
     <div class="alinhamentoItens">
       <button mat-button color="primary" (click)=onImprimir()>Imprimir recibo de entrega</button>
     </div>

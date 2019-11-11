@@ -31,7 +31,7 @@ export class SalvarlacreService {
   // devolve o array de Lacre para a planilha do google
   converteParaPlanilhaExcel(lacrearray: Array<Lacre>) {
     lacrearray.forEach(dado => {
-      dado.lacre = dado.numero + '(07;' + dado.data + ';aaaa;00;0000)';
+      dado.lacre = dado.numero + '(07;' + dado.data + ';aaaa;' + dado.grupo + ';' + dado.quantidade + ';' + dado.recebedor + ')';
     });
 
     const posicoes = [];
@@ -65,6 +65,9 @@ export class SalvarlacreService {
           l.numero = s.numero;
           l.pos = s.pos;
           l.processo = s.processo;
+          l.grupo = s.grupo;
+          l.quantidade = s.quantidade;
+          l.recebedor = s.recebedor;
           l.trm = s.trm;
           arrayenvio.push(l);
         }

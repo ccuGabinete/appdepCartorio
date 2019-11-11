@@ -18,7 +18,7 @@ export class SalvardoacaoService {
   public ouvirInstituicao = new BehaviorSubject(this.instituicaoAtual);
   public correnteInstituicao = this.ouvirInstituicao.asObservable();
 
-  constructor(private http: HttpClient, private gd: GerardataService) { 
+  constructor(private http: HttpClient, private gd: GerardataService) {
     this.instituicaoAtual = new Instituicao();
   }
 
@@ -28,7 +28,7 @@ export class SalvardoacaoService {
 
 
   salvarInstituicao(instituicao: Instituicao): Observable<HttpResponse<Instituicao>> {
-    if(typeof instituicao.matricula === 'undefined'){
+    if (typeof instituicao.matricula === 'undefined') {
       instituicao.matricula = 'o';
     }
     return this.http.post<Instituicao>(url + 'gcd/instituicao/salvar', instituicao, { observe: 'response' })

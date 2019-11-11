@@ -91,13 +91,11 @@ export class DadosComponent implements OnInit, OnDestroy {
 
     this.logado.currentMessage.subscribe(user => {
       this.usuario = user.nome;
-      console.log(user);
       (user.link) ? this.link = user.link.replace('open', 'uc') : this.link = '';
       this.cadastro.agenterespcadastro = user.nome;
       if (user.setor === 'admin' || user.setor === 'gabinete') {
         this.disabled = true;
       } else {
-        console.log(user.setor);
         this.disabled = false;
       }
     });
@@ -151,6 +149,7 @@ export class DadosComponent implements OnInit, OnDestroy {
         this.exibicao = 4;
         this.listenautorizado = false;
         this.onAutorizadotipo = 3;
+        this.carregaLacres();
         break;
       }
       case 'Recurso': {

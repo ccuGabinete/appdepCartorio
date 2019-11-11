@@ -395,6 +395,9 @@ export class AberturaComponent implements OnInit, OnDestroy {
         lacre.pos = '0000';
         lacre.auto = '0';
         lacre.trm = '0';
+        lacre.grupo = '00';
+        lacre.quantidade = '0000';
+        lacre.recebedor = '0';
         response.push(lacre);
         lacre.processo = this.abertura.processo.toString();
       }
