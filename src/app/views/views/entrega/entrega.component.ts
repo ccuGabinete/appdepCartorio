@@ -11,6 +11,7 @@ import { Abertura } from './../../models/abertura/abertura';
 import { Component, OnInit } from '@angular/core';
 import { AvisocamposComponent } from '../../../avisocampos/avisocampos.component';
 import { Lacre } from '../../models/lacre/lacre';
+import { runInThisContext } from 'vm';
 const go = console.log;
 
 @Component({
@@ -21,6 +22,8 @@ const go = console.log;
 export class EntregaComponent implements OnInit {
   disabled = false;
   arrayOriginal: Lacre[];
+  arrayLacresApresentacao: Lacre[] = [];
+  unif: string;
 
   constructor(
     public abertura: Abertura, // objeto de abertura vinda da tela inicial
@@ -69,26 +72,31 @@ export class EntregaComponent implements OnInit {
     });
   }
 
-  onChangeLacre() {
-    this.abertura.lacre = this.formatacoes.colocaZeros(this.abertura.lacre);
-    this.buscarlacre.arrayAtual.subscribe(arr => {
-      go(arr);
-      const lacrebuscado = arr.filter(t => t.numero === this.abertura.lacre);
-      go(lacrebuscado);
-      if (lacrebuscado.length > 0) {
-        const strbuscada = lacrebuscado[0];
-        go(strbuscada);
-        go(this.arrayOriginal);
-      } else {
-        this.avisocamposService.mudarAviso(12);
-        this.opensnackbarService.openSnackBarCampos(AvisocamposComponent, 2000);
-      }
-
-    });
+  onChangeAuto() {
+    const arr = this.arrayOriginal.filter(x => x.auto === this.abertura.autodeapreensao);
+    go(arr);
+    if(arr.length > 0) {
+      const response = this.buscarlacre.converteParaArrayDeLacres(arr);
+      response.forEach(x => {
+       this.arrayLacresApresentacao.push(x);
+      })
+    } else {
+      this.avisocamposService.mudarAviso(12);
+      this.opensnackbarService.openSnackBarCampos(AvisocamposComponent, 2000);
+    }
   }
 
-  onFocusLacre() {
-    this.abertura.lacre = '';
+  onDelete(lacre: Lacre) {
+    const index = this.arrayLacresApresentacao.findIndex(x => x.numero === lacre.numero);
+    this.arrayLacresApresentacao.splice(index, 1);
+  }
+
+  onFocusAuto() {
+    this.abertura.autodeapreensao = '';
+  }
+
+  onFocusUnif() {
+    this.unif = null;
   }
 
   refresh(): void {

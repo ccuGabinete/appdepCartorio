@@ -6,12 +6,37 @@
       </mat-panel-title>
     </mat-expansion-panel-header>
 
-    <div class="unicorn-dark-theme">
-      <mat-form-field>
-        <input matInput type="text" placeholder="Lacre" name="lacre" id="lacre" [(ngModel)]='this.abertura.lacre'
-          maxlength='8' (change)='onChangeLacre(this.abertura.lacre)' (focus)='onFocusLacre()'>
-      </mat-form-field>
-    </div>
+
+    <mat-form-field>
+      <input matInput type="text" placeholder="Auto" name="auto2" id="auto2" [(ngModel)]='abertura.autodeapreensao'
+        maxlength='8' (change)='onChangeAuto(this.abertura.autodeapreensao)' (focus)='onFocusAuto()' mask='00.00.00'>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput type="text" placeholder="Valor da UNIF" name="unif" id="unif" [(ngModel)]='unif' (focus)=onFocusUnif() mask='0.0000'>
+    </mat-form-field>
+
+
+    <table class="table table-dark">
+      <thead>
+        <tr>
+          <th scope="col">lacre</th>
+          <th scope="col">grupo</th>
+          <th scope="col">peso</th>
+          <th scope="col">peso</th>
+          <th scope="col">ação</th>
+        </tr>
+      </thead>
+      <tbody *ngIf='arrayLacresApresentacao.length > 0'>
+        <tr *ngFor='let lacre of arrayLacresApresentacao'>
+          <td>{{lacre.numero}}</td>
+          <td>{{lacre.grupo}}</td>
+          <td><input type="number" class="form-control" id="peso" style="height: 1em;"></td>
+          <td [(ngModel)]=lacre.valor>{{lacre.valor}}</td>
+          <td><span id='deletar' (click)='onDelete(lacre)'>Remover</span></td>
+        </tr>
+      </tbody>
+    </table>
 
     <div class="alinhamentoButton">
       <button mat-button color="primary" (click)=onImprimir()>Imprimir recibo de entrega</button>
