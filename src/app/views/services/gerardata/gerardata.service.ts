@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
 import * as moment from 'moment-timezone';
+moment.defineLocale('America/Sao_Paulo', {
+  parentLocale: 'pt-BR'
+});
 
 @Injectable({
   providedIn: 'root'
@@ -9,9 +12,7 @@ export class GerardataService {
   constructor() { }
 
   gerarData(bd?: boolean) {
-    moment.defineLocale('America/Sao_Paulo', {
-      parentLocale: 'pt-BR'
-    });
+
     const data = Date.now();
     const dateMoment = moment(data);
     if (bd) {
@@ -23,18 +24,18 @@ export class GerardataService {
   }
 
   gerarMomentData(date) {
-    moment.defineLocale('America/Sao_Paulo', {
-      parentLocale: 'pt-BR'
-    });
     const dateMoment = moment(date).format('DD/MM/YYYY');
     return dateMoment;
   }
 
   gerarDataHora(date) {
-    moment.defineLocale('America/Sao_Paulo', {
-      parentLocale: 'pt-BR'
-    });
     const dateMoment = moment(date).format('DD/MM/YYYY hh:mm:ss');
     return dateMoment;
+  }
+
+  calcularDiferenca(data: Date) {
+    const a = moment(data);
+    const b = moment(Date.now());
+    return b.diff(a, 'days');
   }
 }

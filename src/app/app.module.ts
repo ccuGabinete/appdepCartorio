@@ -1,3 +1,4 @@
+import { Grupo } from './models/grupo/grupo';
 import { Instituicao } from './views/models/instituicao/instituicao';
 import { ProcessoService } from './views/services/processo/processo.service';
 import { OpensnackbarService } from './views/services/opensnackbar/opensnackbar.service';
@@ -132,6 +133,7 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
     GerardataService,
     GeracodigoService,
     SalvarlacreService,
+    Grupo,
     Auto,
     BuscarautoService,
     Lacre,

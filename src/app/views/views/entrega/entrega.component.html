@@ -2,7 +2,7 @@
   <mat-expansion-panel class="fastamentoAcordion">
     <mat-expansion-panel-header>
       <mat-panel-title>
-        Registrar entrega de bens
+        Registrar entrega de mercadorias e bens
       </mat-panel-title>
     </mat-expansion-panel-header>
 
@@ -12,8 +12,22 @@
         maxlength='8' (change)='onChangeAuto(this.abertura.autodeapreensao)' (focus)='onFocusAuto()' mask='00.00.00'>
     </mat-form-field>
 
+    <ul *ngIf='listaautos.length > 0' matTooltip="clique para excluir">
+      <div *ngFor='let l of listaautos'>
+        <li (click)='onDeletarAuto(l)' style="color: #CAE1FF">{{l}}</li>
+      </div>
+    </ul>
+
     <mat-form-field>
-      <input matInput type="text" placeholder="Valor da UNIF" name="unif" id="unif" [(ngModel)]='unif' (focus)=onFocusUnif() mask='0.0000'>
+      <input matInput [matDatepicker]="picker3" placeholder="Data da ciência ou despacho"
+        [(ngModel)]='abertura.dataciencia' (blur)=onChangeData()>
+      <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
+      <mat-datepicker #picker3></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput type="text" placeholder="Valor da referência fiscal" name="unif" id="unif" [(ngModel)]='ufir'
+        (focus)=onFocusUnif() mask='0,0000' [disabled]=disabledUFIR (change)=onChangeValorRef()>
     </mat-form-field>
 
 
@@ -23,7 +37,7 @@
           <th scope="col">lacre</th>
           <th scope="col">grupo</th>
           <th scope="col">peso</th>
-          <th scope="col">peso</th>
+          <th scope="col">valor</th>
           <th scope="col">ação</th>
         </tr>
       </thead>
@@ -31,12 +45,21 @@
         <tr *ngFor='let lacre of arrayLacresApresentacao'>
           <td>{{lacre.numero}}</td>
           <td>{{lacre.grupo}}</td>
-          <td><input type="number" class="form-control" id="peso" style="height: 1em;"></td>
-          <td [(ngModel)]=lacre.valor>{{lacre.valor}}</td>
+          <td><input type="number" *ngIf='lacre.id === 1' class="form-control" id="peso" style="height: 1em;"
+              [(ngModel)]=lacre.peso (change)=onChangePeso(lacre)></td>
+          <td>{{lacre.valor}}</td>
           <td><span id='deletar' (click)='onDelete(lacre)'>Remover</span></td>
         </tr>
       </tbody>
     </table>
+
+    <div class="alinhamentoButton">
+      <button mat-button color="primary" (click)=onValorTotal()>Gerar total</button>
+    </div>
+
+    <mat-form-field>
+      <input matInput type="text" placeholder="Valor a pagar" name="valor" id="valor" [disabled]=true [(ngModel)]=valorapagar>
+    </mat-form-field>
 
     <div class="alinhamentoButton">
       <button mat-button color="primary" (click)=onImprimir()>Imprimir recibo de entrega</button>

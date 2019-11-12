@@ -1,3 +1,5 @@
+import { Grupo } from './../../../models/grupo/grupo';
+import { GerardataService } from './../../services/gerardata/gerardata.service';
 import { SalvarlacreService } from './../../services/salvarlacre/salvarlacre.service';
 import { FormatacoesService } from './../../services/formatacoes/formatacoes.service';
 import { BuscalacreService } from './../../services/buscalacre/buscalacre.service';
@@ -23,7 +25,10 @@ export class EntregaComponent implements OnInit {
   disabled = false;
   arrayOriginal: Lacre[];
   arrayLacresApresentacao: Lacre[] = [];
-  unif: string;
+  ufir: string;
+  listaautos = [];
+  disabledUFIR = true;
+  valorapagar = '0';
 
   constructor(
     public abertura: Abertura, // objeto de abertura vinda da tela inicial
@@ -36,11 +41,14 @@ export class EntregaComponent implements OnInit {
     private router: Router,
     private buscarlacre: BuscalacreService,
     private formatacoes: FormatacoesService,
-    private salvarlacre: SalvarlacreService
+    private salvarlacre: SalvarlacreService,
+    private gerardata: GerardataService,
+    private grupo: Grupo
 
   ) { }
 
   ngOnInit() {
+    this.grupo = new Grupo();
     this.abertura = new Abertura();
     this.aberturaatual = new Abertura();
     this.aberturaservice.correnteAbertura.subscribe(abertura => {
@@ -74,15 +82,45 @@ export class EntregaComponent implements OnInit {
 
   onChangeAuto() {
     const arr = this.arrayOriginal.filter(x => x.auto === this.abertura.autodeapreensao);
-    go(arr);
-    if(arr.length > 0) {
-      const response = this.buscarlacre.converteParaArrayDeLacres(arr);
-      response.forEach(x => {
-       this.arrayLacresApresentacao.push(x);
-      })
-    } else {
+    const response = this.buscarlacre.converteParaArrayDeLacres(arr);
+
+    if (arr.length === 0) {
       this.avisocamposService.mudarAviso(12);
       this.opensnackbarService.openSnackBarCampos(AvisocamposComponent, 2000);
+      this.abertura.autodeapreensao = '';
+    } else {
+      this.listaautos.push(this.abertura.autodeapreensao);
+      response.forEach(x => {
+        x.id = this.grupo.getId(x.grupo);
+        this.arrayLacresApresentacao.push(x);
+      });
+    }
+  }
+
+  onChangeValorRef() {
+    const dias = this.gerardata.calcularDiferenca(this.abertura.dataciencia);
+    this.arrayLacresApresentacao.forEach(x => {
+      if (x.id === 2) {
+        x.valor = (((25.08 * dias * parseFloat(this.ufir)) / 10000) / 4).toFixed(2);
+      }
+
+      if (x.id === 3) {
+        x.valor = (((25.08 * dias * parseFloat(this.ufir)) / 10000) / 1).toFixed(2);
+      }
+
+      if (x.id === 1) {
+        x.valor = '0';
+      }
+    });
+  }
+
+  onFocusData() {
+    this.abertura.dataciencia = null;
+  }
+
+  onChangeData(lacre: Lacre) {
+    if (typeof this.abertura.dataciencia !== 'undefined' && this.abertura.dataciencia !== null) {
+      this.disabledUFIR = false;
     }
   }
 
@@ -96,7 +134,27 @@ export class EntregaComponent implements OnInit {
   }
 
   onFocusUnif() {
-    this.unif = null;
+    this.ufir = null;
+  }
+
+  onChangePeso(lacre: Lacre) {
+    const dias = this.gerardata.calcularDiferenca(this.abertura.dataciencia);
+    lacre.valor = (((lacre.peso * 25.08 * dias * parseFloat(this.ufir)) / 10000) / 100).toFixed(2);
+  }
+
+  onDeletarAuto(value: string) {
+    const index = this.listaautos.indexOf(value);
+    this.listaautos.splice(index, 1);
+    this.arrayLacresApresentacao = this.arrayLacresApresentacao.filter(x => x.auto !== value);
+  }
+
+  onValorTotal() {
+    go(this.arrayLacresApresentacao);
+    this.valorapagar = this.arrayLacresApresentacao.reduce((a, b) => {
+      // tslint:disable-next-line: radix
+      return a + parseFloat(b.valor);
+    }, 0).toFixed(2);
+    go(this.valorapagar);
   }
 
   refresh(): void {

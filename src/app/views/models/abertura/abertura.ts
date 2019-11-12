@@ -10,6 +10,8 @@ export class Abertura {
   dataabertura: string;
   dataapreensao: Date;
   dataexpedicao: Date;
+  dataciencia: Date;
+  dataentrega: Date;
   email: string;
   endereco: string;
   equipamento: string;
