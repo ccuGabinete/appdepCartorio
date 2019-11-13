@@ -22,7 +22,7 @@ export class PdfService {
   imagedeferimento = body.deferimento;
   imageindeferimento = body.indeferimento;
   imageexigencia = body.exigencia;
-  imageexigenciacartoraria = body.exigenciacartoraria;
+  imageexigenciacartoraria = body.exigenciaCartorio;
   public buscarPdfaAviso = new BehaviorSubject(this.pdfaviso);
   pdfavisocorrente = this.buscarPdfaAviso.asObservable();
 
@@ -890,7 +890,7 @@ export class PdfService {
       case 'Cartorária': {
         imagem = this.imageexigenciacartoraria;
         largura = 180;
-        altura = 197.056;
+        altura = 146.607;
         eixoyprocesso = 12;
         eixoydata = 21;
 
@@ -900,7 +900,7 @@ export class PdfService {
       }
 
       default: {
-        imagem = ''
+        imagem = '';
         break;
       }
     }
@@ -958,5 +958,5 @@ formataExigencias(exigencias: Array<string>, doc: jsPDF, eixoY: number) {
       auxY += 10;
     })
   }
-  
+
 }
