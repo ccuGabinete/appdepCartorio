@@ -22,7 +22,7 @@ const go = console.log;
   styleUrls: ['./entrega.component.scss']
 })
 export class EntregaComponent implements OnInit {
-  disabled = false;
+  disabled = true;
   arrayOriginal: Lacre[];
   arrayLacresApresentacao: Lacre[] = [];
   ufir: string;
@@ -63,17 +63,21 @@ export class EntregaComponent implements OnInit {
     });
 
     this.buscarlacre.arrayAtualOriginal.subscribe(arr => {
-      go(arr);
       this.arrayOriginal = arr;
+      this.arrayOriginal.forEach((a, b) => {
+        a.linha = b + 1;
+      });
     });
   }
 
   onImprimir() {
+
+
+
     this.disabled = true;
-    this.pdfservice.downloadPDFEntrega(this.abertura);
+    // this.pdfservice.downloadPDFEntrega(this.abertura);
     this.salvaratendimento.salvarAtendimento(this.aberturaatual).subscribe(() => {
-      this.disabled = false;
-      this.refresh();
+      this.onSubmitUpdateLacre();
     }, error => {
       this.avisocamposService.mudarAviso(4);
       this.opensnackbarService.openSnackBarCampos(AvisocamposComponent, 4000);
@@ -90,8 +94,17 @@ export class EntregaComponent implements OnInit {
       this.abertura.autodeapreensao = '';
     } else {
       this.listaautos.push(this.abertura.autodeapreensao);
+      this.disabled = false;
       response.forEach(x => {
         x.id = this.grupo.getId(x.grupo);
+
+        //#region documentação
+        /* Vou fazer o push em dois array que a princípio serão identicos,
+        mas, a medida que o arrayLacresapresentação for 'perdendo' elementos
+        mantenho o contéudo original desse arquivo em arrayAtual. Dessa forma
+        posso comparar o que foi modificado e atualizar o status apenas dos que
+        foram entregues */
+        //#endregion
         this.arrayLacresApresentacao.push(x);
       });
     }
@@ -102,14 +115,17 @@ export class EntregaComponent implements OnInit {
     this.arrayLacresApresentacao.forEach(x => {
       if (x.id === 2) {
         x.valor = (((25.08 * dias * parseFloat(this.ufir)) / 10000) / 4).toFixed(2);
+        x.status = '08';
       }
 
       if (x.id === 3) {
         x.valor = (((25.08 * dias * parseFloat(this.ufir)) / 10000) / 1).toFixed(2);
+        x.status = '08';
       }
 
       if (x.id === 1) {
         x.valor = '0';
+        x.status = '08';
       }
     });
   }
@@ -149,13 +165,58 @@ export class EntregaComponent implements OnInit {
   }
 
   onValorTotal() {
-    go(this.arrayLacresApresentacao);
     this.valorapagar = this.arrayLacresApresentacao.reduce((a, b) => {
       // tslint:disable-next-line: radix
       return a + parseFloat(b.valor);
     }, 0).toFixed(2);
-    go(this.valorapagar);
   }
+
+  onSubmitUpdateLacre() {
+    // tslint:disable-next-line: prefer-const
+    const arr = [];
+
+    this.arrayLacresApresentacao.forEach((x, pos, array) => {
+      let resp = '';
+      // tslint:disable-next-line: prefer-const
+      let index = this.arrayOriginal.findIndex(z => z.auto === x.auto);
+      // tslint:disable-next-line: prefer-const
+      let passada = x.numero + '(' + x.status + ';' + x.data;
+      // tslint:disable-next-line: prefer-const
+      let futura = x.numero + '(08' + ';' + this.gerardata.gerarData(true);
+      // tslint:disable-next-line: prefer-const
+      resp = this.arrayOriginal[index].lacre.replace(passada, futura);
+      this.arrayOriginal[index].lacre = resp;
+      go(this.arrayOriginal[index].lacre);
+      go(this.arrayOriginal[index].linha);
+      go(index);
+      arr.push(index);
+    });
+
+    go(arr);
+    let count = 0;
+    const interval = setInterval(() => {
+
+      this.salvarlacre.atualizaLacre(this.arrayOriginal[arr[count]]).subscribe(data => {
+        go(this.arrayOriginal[arr[count - 1]]);
+        go(arr[count - 1]);
+      }, error => {
+        this.avisocamposService.mudarAviso(4);
+        this.opensnackbarService.openSnackBarCampos(AvisocamposComponent, 500);
+      });
+
+      count++;
+
+      if (count === arr.length) {
+        clearInterval(interval);
+        this.refresh();
+      }
+
+    }, 500);
+
+
+
+  }
+
 
   refresh(): void {
     this.router.navigateByUrl('/entrega', { skipLocationChange: true }).then(() => {

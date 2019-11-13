@@ -545,7 +545,6 @@ export class AberturaComponent implements OnInit, OnDestroy {
 
       } else {
         this.salvarlacre.salvarLacre(obj).subscribe(data => {
-          console.log(data);
         });
       }
     }, () => {

@@ -60,7 +60,6 @@ export class ConsultaComponent implements OnInit {
       this.disabled = false;
       this.refresh();
     }, error => {
-      console.log(this.abertura);
       this.serviceCampos.mudarAviso(4);
       this.opensnack.openSnackBarCampos(AvisocamposComponent, 2500);
     });

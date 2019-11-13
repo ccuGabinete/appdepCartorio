@@ -56,7 +56,7 @@ export class BuscalacreService {
 
         const lacre = new Lacre();
         lacre.auto = linha.auto;
-        lacre.data = this.gd.gerarData(true);
+        lacre.data = lc.substring(12, 20);
         // lacre.linha será usado para atualizar o status posteriormente
         lacre.linha = ln + 1;
         lacre.pos = linha.pos;
@@ -84,7 +84,6 @@ export class BuscalacreService {
         } else {
           lacre.recebedor = '0';
         }
-
         arr.push(lacre);
       });
     });

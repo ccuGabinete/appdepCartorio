@@ -28,10 +28,18 @@ export class SalvarlacreService {
       .pipe(catchError(this.handleError));
   }
 
+  atualizaLacre(lacre: Lacre): Observable<HttpResponse<Lacre>> {
+    return this.http.post<Lacre>(url + 'gcd/atualizaLacre', lacre, { observe: 'response' })
+      .pipe(catchError(this.handleError));
+  }
+
+
+
   // devolve o array de Lacre para a planilha do google
   converteParaPlanilhaExcel(lacrearray: Array<Lacre>): Lacre[] {
     lacrearray.forEach(dado => {
-      dado.lacre = dado.numero + '(07;' + dado.data + ';aaaa;' + dado.grupo + ';' + dado.quantidade + ';' + dado.recebedor + ')';
+      // tslint:disable-next-line: max-line-length
+      dado.lacre = dado.numero + '(' + dado.status + ';' + dado.data + ';aaaa;' + dado.grupo + ';' + dado.quantidade + ';' + dado.recebedor + ')';
     });
 
     const posicoes = [];
@@ -58,6 +66,7 @@ export class SalvarlacreService {
           str += s.lacre;
           // tslint:disable-next-line: prefer-const
           let l = new Lacre();
+          l.status = s.status;
           l.auto = s.auto;
           l.data = s.data;
           l.lacre = str;
@@ -79,8 +88,12 @@ export class SalvarlacreService {
 
   }
 
+  criaStringLacre(dado: Lacre): string {
+    // tslint:disable-next-line: max-line-length
+    return dado.lacre = dado.numero + ';' + dado.status + ';' + dado.data + ';aaaa;' + dado.grupo + ';' + dado.quantidade + ';' + dado.recebedor + ')';
+  }
 
-  private handleError(error: HttpErrorResponse) {
+   private handleError(error: HttpErrorResponse) {
     if (error.error instanceof ErrorEvent) {
       // A client-side or network error occurred. Handle it accordingly.
       console.error('An error occurred:', error.error.message);
