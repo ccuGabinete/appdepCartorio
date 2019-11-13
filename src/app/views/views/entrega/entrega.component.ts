@@ -186,19 +186,13 @@ export class EntregaComponent implements OnInit {
       // tslint:disable-next-line: prefer-const
       resp = this.arrayOriginal[index].lacre.replace(passada, futura);
       this.arrayOriginal[index].lacre = resp;
-      go(this.arrayOriginal[index].lacre);
-      go(this.arrayOriginal[index].linha);
-      go(index);
       arr.push(index);
     });
 
-    go(arr);
     let count = 0;
     const interval = setInterval(() => {
 
       this.salvarlacre.atualizaLacre(this.arrayOriginal[arr[count]]).subscribe(data => {
-        go(this.arrayOriginal[arr[count - 1]]);
-        go(arr[count - 1]);
       }, error => {
         this.avisocamposService.mudarAviso(4);
         this.opensnackbarService.openSnackBarCampos(AvisocamposComponent, 500);
